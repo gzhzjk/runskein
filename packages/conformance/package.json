@@ -1,0 +1,42 @@
+{
+  "name": "@runskein/conformance",
+  "private": true,
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./live-support": {
+      "types": "./src/liveSupport.ts",
+      "default": "./src/liveSupport.ts"
+    }
+  },
+  "scripts": {
+    "probe": "tsx src/probe.ts",
+    "test:live": "tsx src/live.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "gate": "vitest run test/core-gate.test.ts",
+    "test:coverage": "vitest run --coverage",
+    "st:conc": "tsx src/st-conc.ts",
+    "st:cwd": "tsx src/st-cwd-shell.ts",
+    "st:dig": "tsx src/st-dig.ts",
+    "st:quota": "tsx src/st-quota.ts",
+    "st:orph05": "tsx src/st-orph-05.ts"
+  },
+  "dependencies": {
+    "@runskein/core": "workspace:*",
+    "runskein": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^2.1.8",
+    "@runskein/adapter-pi": "workspace:*"
+  }
+}

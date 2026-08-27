@@ -1,0 +1,60 @@
+{
+  "name": "@runskein/core",
+  "version": "0.1.0-alpha.23",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gzhzjk/runskein.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/gzhzjk/runskein#readme",
+  "bugs": "https://github.com/gzhzjk/runskein/issues",
+  "description": "The runskein engine adapter core: Hub, Session, and the transcript store. Consumers normally install the runskein meta-package, which bundles the built-in adapters.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./internal": {
+      "types": "./src/internal.ts",
+      "default": "./src/internal.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc && node ../../scripts/build-assets.mjs",
+    "generate:vocabulary": "node scripts/generate-vocabulary.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@agentclientprotocol/sdk": "1.3.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8",
+    "@vitest/coverage-v8": "^2.1.8"
+  },
+  "files": [
+    "dist",
+    "NOTICE"
+  ],
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./internal": {
+        "types": "./dist/internal.d.ts",
+        "default": "./dist/internal.js"
+      }
+    }
+  }
+}

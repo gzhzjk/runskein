@@ -1,0 +1,28 @@
+{
+  "name": "@runskein/adapter-codex",
+  "version": "0.1.0-alpha.23",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gzhzjk/runskein.git",
+    "directory": "adapters/codex"
+  },
+  "homepage": "https://github.com/gzhzjk/runskein#readme",
+  "bugs": "https://github.com/gzhzjk/runskein/issues",
+  "description": "runskein adapter for codex, via the ACP org wrapper (shim-free).",
+  "type": "module",
+  "main": "index.mjs",
+  "types": "index.d.ts",
+  "runskein": {
+    "adapter": true,
+    "specVersion": 1
+  },
+  "devDependencies": {
+    "@runskein/core": "workspace:*"
+  },
+  "files": [
+    "index.mjs",
+    "index.d.ts",
+    "NOTICE"
+  ]
+}

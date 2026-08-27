@@ -1,0 +1,37 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+*.log
+.transcripts/
+.runskein/
+test-results/
+.worktree/
+
+# Coverage output from the CI coverage step.
+coverage/
+
+# The release pipeline writes a registry token here and removes it again; a
+# stray one must never be committable.
+.npmrc
+
+# `export-public.mjs` writes this into the directory it builds, and
+# `publish-public.mjs` reads it there. It is a handoff between two commands, not
+# content: the provenance link that belongs in public history is the
+# `Exported-From` trailer on the commit. Ignored so that the `git add -A` in the
+# release repository cannot sweep 1000 lines of hashes into every release diff.
+#
+# Note what an entry here costs: trunk skips an ignored path whether or not git
+# tracks it, so anything listed below leaves the trufflehog scan as well. This
+# file is written in step 7, after that scan, and holds only hashes and a commit
+# id. Never add a path here in order to keep a file out of a build or a
+# release — that also removes it from the credential scan.
+.export-manifest.json
+
+
+# Local environment secrets; keep out of every commit.
+.env
+.realm-plugin/
+
+# A local working checklist, untracked on purpose.
+/docs/pushlish-steps.md

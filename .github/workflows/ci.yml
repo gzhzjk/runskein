@@ -1,0 +1,49 @@
+# CI: install, lint, gates, typecheck, build, test.
+#
+# It is feedback for contributors, not the release gate. The gate lives in the
+# development repository that this one is exported from; where the two disagree,
+# that one decides. See CONTRIBUTING.md.
+#
+# No live engines and no authentication: the registration gate and the store
+# gate both run against a hermetic mock agent. `pnpm probe` and
+# `pnpm conformance <engine>` need a real engine and are run by hand.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    # Generous on purpose: the CLI suites drive real child processes, and a
+    # timeout that fires spuriously teaches contributors to ignore a red run.
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        # version comes from packageManager in package.json
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: trunk-io/trunk-action@04ba50e7658c81db7356da96657e6e77f220bfa3 # v1
+        with:
+          # Every file is new to a repository whose history starts at the first
+          # export, so trunk's default diff against the upstream branch has
+          # nothing to compare and checks everything anyway. Saying so is
+          # clearer than relying on it.
+          check-mode: all
+      - run: pnpm quality
+      - run: pnpm typecheck
+      - run: pnpm build
+      - run: pnpm test
+      # Coverage statistics (v8, printed to the log; not gated). The CLI's
+      # process-spawning e2e suites are excluded by design — their checks drive
+      # real CLI child processes, which line instrumentation cannot see.
+      - run: pnpm test:coverage

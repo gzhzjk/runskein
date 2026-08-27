@@ -1,0 +1,185 @@
+{
+  "sessionId": "st-dig-tools",
+  "events": [
+    {
+      "seq": 1,
+      "ts": 1700000001000,
+      "sessionId": "st-dig-tools",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Run the build and the tests"
+        }
+      }
+    },
+    {
+      "seq": 2,
+      "ts": 1700000002000,
+      "sessionId": "st-dig-tools",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "tool_call",
+        "toolCallId": "t1",
+        "title": "Execute build",
+        "kind": "execute",
+        "status": "pending"
+      }
+    },
+    {
+      "seq": 3,
+      "ts": 1700000003000,
+      "sessionId": "st-dig-tools",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "tool_call_update",
+        "toolCallId": "t1",
+        "status": "completed",
+        "content": [
+          {
+            "type": "content",
+            "content": {
+              "type": "text",
+              "text": "  build   ok\n\n  0 errors  "
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 4,
+      "ts": 1700000004000,
+      "sessionId": "st-dig-tools",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "tool_call",
+        "toolCallId": "t2",
+        "title": "Execute tests",
+        "kind": "execute",
+        "status": "pending"
+      }
+    },
+    {
+      "seq": 5,
+      "ts": 1700000005000,
+      "sessionId": "st-dig-tools",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "tool_call_update",
+        "toolCallId": "t2",
+        "status": "in_progress"
+      }
+    },
+    {
+      "seq": 6,
+      "ts": 1700000006000,
+      "sessionId": "st-dig-tools",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "tool_call_update",
+        "toolCallId": "t2",
+        "status": "failed",
+        "rawOutput": "3 tests failed"
+      }
+    },
+    {
+      "seq": 7,
+      "ts": 1700000007000,
+      "sessionId": "st-dig-tools",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "tool_call",
+        "toolCallId": "t3",
+        "status": "pending"
+      }
+    },
+    {
+      "seq": 8,
+      "ts": 1700000008000,
+      "sessionId": "st-dig-tools",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "tool_call_update",
+        "toolCallId": "t3",
+        "status": "completed",
+        "content": [
+          {
+            "type": "content",
+            "content": {
+              "type": "text",
+              "text": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 9,
+      "ts": 1700000009000,
+      "sessionId": "st-dig-tools",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "tool_call",
+        "toolCallId": "t4",
+        "title": "Read a huge log",
+        "kind": "read",
+        "status": "pending"
+      }
+    },
+    {
+      "seq": 10,
+      "ts": 1700000010000,
+      "sessionId": "st-dig-tools",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "tool_call_update",
+        "toolCallId": "t4",
+        "status": "completed",
+        "content": [
+          {
+            "type": "content",
+            "content": {
+              "type": "text",
+              "text": "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 11,
+      "ts": 1700000011000,
+      "sessionId": "st-dig-tools",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "tool_call_update",
+        "toolCallId": "t5",
+        "status": "completed",
+        "content": [
+          {
+            "type": "content",
+            "content": {
+              "type": "image",
+              "data": "AAAA",
+              "mimeType": "image/png"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 12,
+      "ts": 1700000012000,
+      "sessionId": "st-dig-tools",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Build passed, tests failed."
+        }
+      }
+    }
+  ]
+}

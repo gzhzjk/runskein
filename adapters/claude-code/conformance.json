@@ -1,0 +1,100 @@
+{
+  "id": "claude-code",
+  "ok": true,
+  "protocolVersion": 1,
+  "agentInfo": {
+    "name": "@zed-industries/claude-code-acp",
+    "title": "Claude Code",
+    "version": "0.16.2"
+  },
+  "authMethods": [
+    {
+      "description": "Run `claude /login` in the terminal",
+      "name": "Log in with Claude Code",
+      "id": "claude-login"
+    }
+  ],
+  "capabilities": {
+    "loadSession": true,
+    "session": {
+      "fork": true,
+      "list": true,
+      "resume": true
+    },
+    "prompt": {
+      "image": true,
+      "embeddedContext": true
+    },
+    "mcp": {
+      "http": true,
+      "sse": true
+    },
+    "providers": false
+  },
+  "modes": {
+    "current": "default",
+    "available": [
+      {
+        "id": "default",
+        "name": "Default"
+      },
+      {
+        "id": "acceptEdits",
+        "name": "Accept Edits"
+      },
+      {
+        "id": "plan",
+        "name": "Plan Mode"
+      },
+      {
+        "id": "dontAsk",
+        "name": "Don't Ask"
+      },
+      {
+        "id": "bypassPermissions",
+        "name": "Bypass Permissions"
+      }
+    ]
+  },
+  "models": {
+    "current": "default",
+    "available": [
+      {
+        "id": "default",
+        "name": "Default (recommended)"
+      },
+      {
+        "id": "sonnet",
+        "name": "Sonnet"
+      },
+      {
+        "id": "haiku",
+        "name": "Haiku"
+      }
+    ]
+  },
+  "configOptions": [],
+  "prompt": {
+    "stopReason": "end_turn",
+    "updateKinds": {
+      "available_commands_update": 1,
+      "agent_message_chunk": 2
+    },
+    "sawUsage": false,
+    "permissionRequests": 0,
+    "replyText": "OK",
+    "durationMs": 2305
+  },
+  "usage": {
+    "ok": false,
+    "source": "none",
+    "fields": [],
+    "semantics": "cumulative"
+  },
+  "commandExecution": {
+    "ok": false,
+    "usedClientTerminal": false,
+    "detail": "marker not returned (stopReason end_turn)"
+  },
+  "close": "not-supported"
+}

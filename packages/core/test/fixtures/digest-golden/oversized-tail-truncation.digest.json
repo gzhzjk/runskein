@@ -1,0 +1,5 @@
+{
+  "sessionId": "st-dig-trunc",
+  "throughSeq": 82,
+  "text": "[...earlier context truncated...]\nf the migration work here. \nUser: Ack 33. \nAssistant: Step 34: doing a portion of the migration work here. \nUser: Ack 34. \nAssistant: Step 35: doing a portion of the migration work here. \nUser: Ack 35. \nAssistant: Step 36: doing a portion of the migration work here. \nUser: Ack 36. \nAssistant: Step 37: doing a portion of the migration work here. \nUser: Ack 37. \nAssistant: Step 38: doing a portion of the migration work here. \nUser: Ack 38. \nAssistant: Step 39: doing a portion of the migration work here. \nUser: Ack 39. \nAssistant: TAIL-MARKER: migration complete."
+}

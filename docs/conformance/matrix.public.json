@@ -1,0 +1,235 @@
+[
+  {
+    "id": "opencode",
+    "agentInfo": {
+      "version": "1.18.21"
+    },
+    "capabilities": {
+      "loadSession": true,
+      "session": {
+        "close": true,
+        "fork": true,
+        "list": true,
+        "resume": true
+      },
+      "prompt": {
+        "embeddedContext": true,
+        "image": true
+      },
+      "mcp": {
+        "http": true,
+        "sse": true
+      },
+      "providers": false
+    },
+    "prompt": {
+      "stopReason": "end_turn",
+      "updateKinds": {
+        "available_commands_update": 1,
+        "agent_message_chunk": 1,
+        "usage_update": 1
+      },
+      "sawUsage": true,
+      "permissionRequests": 0,
+      "replyText": "OK",
+      "durationMs": 7196
+    },
+    "usage": {
+      "ok": true,
+      "source": "prompt_response_meta",
+      "fields": [
+        "input",
+        "output",
+        "total",
+        "cacheRead"
+      ],
+      "semantics": "per-turn"
+    }
+  },
+  {
+    "id": "kimi",
+    "agentInfo": {
+      "version": "0.38.0"
+    },
+    "capabilities": {
+      "loadSession": true,
+      "session": {
+        "list": true,
+        "resume": true,
+        "close": true,
+        "delete": true,
+        "fork": true,
+        "additionalDirectories": true
+      },
+      "prompt": {
+        "image": true,
+        "audio": false,
+        "embeddedContext": true
+      },
+      "mcp": {
+        "http": true,
+        "sse": true
+      },
+      "providers": false
+    },
+    "prompt": {
+      "stopReason": "end_turn",
+      "updateKinds": {
+        "available_commands_update": 1,
+        "session_info_update": 1,
+        "agent_thought_chunk": 20,
+        "agent_message_chunk": 1
+      },
+      "sawUsage": false,
+      "permissionRequests": 0,
+      "replyText": "OK",
+      "durationMs": 5354
+    },
+    "usage": {
+      "ok": false,
+      "source": "none",
+      "fields": [],
+      "semantics": "cumulative"
+    }
+  },
+  {
+    "id": "claude-code",
+    "agentInfo": {
+      "title": "Claude Code",
+      "version": "0.16.2"
+    },
+    "capabilities": {
+      "loadSession": true,
+      "session": {
+        "fork": true,
+        "list": true,
+        "resume": true
+      },
+      "prompt": {
+        "image": true,
+        "embeddedContext": true
+      },
+      "mcp": {
+        "http": true,
+        "sse": true
+      },
+      "providers": false
+    },
+    "prompt": {
+      "stopReason": "end_turn",
+      "updateKinds": {
+        "available_commands_update": 1,
+        "agent_message_chunk": 2
+      },
+      "sawUsage": false,
+      "permissionRequests": 0,
+      "replyText": "OK",
+      "durationMs": 2305
+    },
+    "usage": {
+      "ok": false,
+      "source": "none",
+      "fields": [],
+      "semantics": "cumulative"
+    }
+  },
+  {
+    "id": "codex",
+    "agentInfo": {
+      "title": "Codex",
+      "version": "1.6.2"
+    },
+    "capabilities": {
+      "loadSession": true,
+      "session": {
+        "resume": true,
+        "list": true,
+        "close": true,
+        "delete": true,
+        "additionalDirectories": true
+      },
+      "prompt": {
+        "embeddedContext": true,
+        "image": true
+      },
+      "mcp": {
+        "acp": false,
+        "http": true,
+        "sse": false
+      },
+      "providers": true
+    },
+    "prompt": {
+      "stopReason": "end_turn",
+      "updateKinds": {
+        "available_commands_update": 1,
+        "session_info_update": 3,
+        "agent_message_chunk": 1,
+        "usage_update": 1
+      },
+      "sawUsage": true,
+      "permissionRequests": 0,
+      "replyText": "OK",
+      "durationMs": 4283
+    },
+    "usage": {
+      "ok": true,
+      "source": "prompt_response_meta",
+      "fields": [
+        "input",
+        "output",
+        "total",
+        "cacheRead",
+        "thought"
+      ],
+      "semantics": "per-turn"
+    }
+  },
+  {
+    "id": "pi",
+    "agentInfo": {
+      "version": "0.84.2 (shim 1)"
+    },
+    "capabilities": {
+      "loadSession": true,
+      "session": {
+        "resume": true,
+        "close": true,
+        "fork": true,
+        "list": false,
+        "delete": false
+      },
+      "prompt": {
+        "image": false,
+        "audio": false,
+        "embeddedContext": true
+      },
+      "mcp": {
+        "http": false,
+        "sse": false
+      },
+      "providers": false
+    },
+    "prompt": {
+      "stopReason": "end_turn",
+      "updateKinds": {
+        "agent_message_chunk": 1,
+        "usage_update": 1
+      },
+      "sawUsage": true,
+      "permissionRequests": 0,
+      "replyText": "OK",
+      "durationMs": 6346
+    },
+    "usage": {
+      "ok": false,
+      "source": "none",
+      "fields": [
+        "input",
+        "output",
+        "total"
+      ],
+      "semantics": "cumulative"
+    }
+  }
+]

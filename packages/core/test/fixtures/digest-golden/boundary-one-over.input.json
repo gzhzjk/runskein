@@ -1,0 +1,21 @@
+{
+  "sessionId": "st-dig-over",
+  "opts": {
+    "maxChars": 100
+  },
+  "events": [
+    {
+      "seq": 1,
+      "ts": 1700000001000,
+      "sessionId": "st-dig-over",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        }
+      }
+    }
+  ]
+}

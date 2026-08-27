@@ -1,0 +1,64 @@
+{
+  "name": "runskein",
+  "version": "0.1.0-alpha.23",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gzhzjk/runskein.git",
+    "directory": "packages/runskein"
+  },
+  "homepage": "https://github.com/gzhzjk/runskein#readme",
+  "bugs": "https://github.com/gzhzjk/runskein/issues",
+  "description": "Unified engine adapter over the Agent Client Protocol — one API for coding-agent engines, with the built-in adapters bundled.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./fold": {
+      "types": "./src/fold.ts",
+      "default": "./src/fold.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc && node ../../scripts/build-assets.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@runskein/core": "workspace:*",
+    "@runskein/fold": "workspace:*",
+    "@runskein/adapter-opencode": "workspace:*",
+    "@runskein/adapter-kimi": "workspace:*",
+    "@runskein/adapter-claude-code": "workspace:*",
+    "@runskein/adapter-codex": "workspace:*",
+    "@runskein/adapter-pi": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8",
+    "@vitest/coverage-v8": "^2.1.8"
+  },
+  "files": [
+    "dist",
+    "NOTICE"
+  ],
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./fold": {
+        "types": "./dist/fold.d.ts",
+        "default": "./dist/fold.js"
+      }
+    }
+  }
+}

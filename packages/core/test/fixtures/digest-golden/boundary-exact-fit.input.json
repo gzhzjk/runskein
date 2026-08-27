@@ -1,0 +1,21 @@
+{
+  "sessionId": "st-dig-exact",
+  "opts": {
+    "maxChars": 100
+  },
+  "events": [
+    {
+      "seq": 1,
+      "ts": 1700000001000,
+      "sessionId": "st-dig-exact",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        }
+      }
+    }
+  ]
+}

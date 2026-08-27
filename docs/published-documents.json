@@ -1,0 +1,44 @@
+{
+  "documents": [
+    {
+      "source": "README.md",
+      "translation": "README.zh-CN.md"
+    },
+    {
+      "source": "docs/engine-support.md",
+      "translation": "docs/engine-support.zh-CN.md"
+    },
+    {
+      "source": "docs/engine-adapter-api.md",
+      "translation": "docs/engine-adapter-api.zh-CN.md"
+    },
+    {
+      "source": "docs/adapter-guide.md",
+      "translation": "docs/adapter-guide.zh-CN.md"
+    },
+    {
+      "source": "docs/versioning.md",
+      "translation": "docs/versioning.zh-CN.md"
+    },
+    {
+      "source": "docs/application-guide.md",
+      "translation": "docs/application-guide.zh-CN.md"
+    },
+    {
+      "source": "docs/architecture.md",
+      "translation": "docs/architecture.zh-CN.md"
+    },
+    {
+      "source": "docs/capability-matrix.md",
+      "translation": "docs/capability-matrix.zh-CN.md"
+    },
+    {
+      "source": "docs/runskein-vs-acp.md",
+      "translation": "docs/runskein-vs-acp.zh-CN.md"
+    },
+    {
+      "source": "docs/transcript-fold.md",
+      "translation": "docs/transcript-fold.zh-CN.md"
+    }
+  ]
+}

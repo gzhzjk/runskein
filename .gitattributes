@@ -1,0 +1,7 @@
+# Generated artifacts. Both are committed on purpose — the shim because it must
+# start where no node_modules can be resolved, the vocabulary because its
+# generator runs from the ACP SDK and CI only checks the result. Neither is
+# hand-written, and neither should be read as review input: `pnpm quality`
+# already fails if either drifts from its source.
+adapters/pi/shim.mjs            linguist-generated=true
+packages/core/src/vocabulary.ts  linguist-generated=true

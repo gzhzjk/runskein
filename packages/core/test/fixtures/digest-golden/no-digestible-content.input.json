@@ -1,0 +1,69 @@
+{
+  "sessionId": "st-dig-inert",
+  "events": [
+    {
+      "seq": 1,
+      "ts": 1700000001000,
+      "sessionId": "st-dig-inert",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_thought_chunk",
+        "content": {
+          "type": "text",
+          "text": "thinking"
+        }
+      }
+    },
+    {
+      "seq": 2,
+      "ts": 1700000002000,
+      "sessionId": "st-dig-inert",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "plan",
+        "entries": [
+          {
+            "content": "step one",
+            "priority": "high",
+            "status": "pending"
+          }
+        ]
+      }
+    },
+    {
+      "seq": 3,
+      "ts": 1700000003000,
+      "sessionId": "st-dig-inert",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "image",
+          "data": "AAAA",
+          "mimeType": "image/png"
+        }
+      }
+    },
+    {
+      "seq": 4,
+      "ts": 1700000004000,
+      "sessionId": "st-dig-inert",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "tool_call_update",
+        "toolCallId": "t1",
+        "status": "pending"
+      }
+    },
+    {
+      "seq": 5,
+      "ts": 1700000005000,
+      "sessionId": "st-dig-inert",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "available_commands_update",
+        "availableCommands": []
+      }
+    }
+  ]
+}

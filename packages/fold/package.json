@@ -1,0 +1,50 @@
+{
+  "name": "@runskein/fold",
+  "version": "0.1.0-alpha.23",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gzhzjk/runskein.git",
+    "directory": "packages/fold"
+  },
+  "homepage": "https://github.com/gzhzjk/runskein#readme",
+  "bugs": "https://github.com/gzhzjk/runskein/issues",
+  "description": "Transcript folding: TranscriptEvent stream -> presentation events (docs/transcript-fold.md)",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc && node ../../scripts/build-assets.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8",
+    "@vitest/coverage-v8": "^2.1.8"
+  },
+  "files": [
+    "dist",
+    "NOTICE"
+  ],
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "dependencies": {
+    "@runskein/core": "workspace:*"
+  }
+}

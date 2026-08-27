@@ -1,0 +1,42 @@
+{
+  "name": "@runskein/adapter-pi",
+  "version": "0.1.0-alpha.23",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gzhzjk/runskein.git",
+    "directory": "adapters/pi"
+  },
+  "homepage": "https://github.com/gzhzjk/runskein#readme",
+  "bugs": "https://github.com/gzhzjk/runskein/issues",
+  "description": "runskein adapter for the pi coding agent. pi speaks no ACP, so this one ships a shim that translates.",
+  "type": "module",
+  "main": "index.mjs",
+  "types": "index.d.ts",
+  "runskein": {
+    "adapter": true,
+    "specVersion": 1
+  },
+  "devDependencies": {
+    "@agentclientprotocol/sdk": "^1.3.0",
+    "@runskein/core": "workspace:*"
+  },
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.mjs"
+    },
+    "./permission-gate": "./permission-gate.ts"
+  },
+  "files": [
+    "index.mjs",
+    "index.d.ts",
+    "shim.mjs",
+    "permission-gate.ts",
+    "NOTICE"
+  ],
+  "scripts": {
+    "build": "node ../../scripts/bundle-shim.mjs",
+    "build:check": "node ../../scripts/bundle-shim.mjs --check"
+  }
+}

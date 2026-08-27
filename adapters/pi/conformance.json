@@ -1,0 +1,93 @@
+{
+  "id": "pi",
+  "ok": true,
+  "protocolVersion": 1,
+  "agentInfo": {
+    "name": "pi (runskein shim)",
+    "version": "0.84.2 (shim 1)"
+  },
+  "authMethods": [],
+  "capabilities": {
+    "loadSession": true,
+    "session": {
+      "resume": true,
+      "close": true,
+      "fork": true,
+      "list": false,
+      "delete": false
+    },
+    "prompt": {
+      "image": false,
+      "audio": false,
+      "embeddedContext": true
+    },
+    "mcp": {
+      "http": false,
+      "sse": false
+    },
+    "providers": false
+  },
+  "modes": null,
+  "models": null,
+  "configOptions": [
+    {
+      "id": "model",
+      "name": "Model",
+      "category": "model",
+      "type": "select",
+      "options": [
+        {
+          "value": "minimax/MiniMax-M2.7",
+          "name": "minimax/MiniMax-M2.7"
+        },
+        {
+          "value": "minimax/MiniMax-M2.7-highspeed",
+          "name": "minimax/MiniMax-M2.7-highspeed"
+        },
+        {
+          "value": "minimax/MiniMax-M3",
+          "name": "minimax/MiniMax-M3"
+        },
+        {
+          "value": "DeepSeek-V4-Flash-0731/DeepSeek-V4-Flash",
+          "name": "DeepSeek-V4-Flash-0731/DeepSeek-V4-Flash"
+        },
+        {
+          "value": "opencode go/deepseek-v4-flash",
+          "name": "opencode go/DeepSeek V4 Flash"
+        },
+        {
+          "value": "opencode go/ox-alpha-free",
+          "name": "opencode go/ox-alpha-free"
+        }
+      ]
+    }
+  ],
+  "prompt": {
+    "stopReason": "end_turn",
+    "updateKinds": {
+      "agent_message_chunk": 1,
+      "usage_update": 1
+    },
+    "sawUsage": true,
+    "permissionRequests": 0,
+    "replyText": "OK",
+    "durationMs": 6346
+  },
+  "usage": {
+    "ok": false,
+    "source": "none",
+    "fields": [
+      "input",
+      "output",
+      "total"
+    ],
+    "semantics": "cumulative"
+  },
+  "commandExecution": {
+    "ok": true,
+    "usedClientTerminal": false,
+    "detail": "read the marker back (stopReason end_turn)"
+  },
+  "close": "closed"
+}

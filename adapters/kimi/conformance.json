@@ -1,0 +1,174 @@
+{
+  "id": "kimi",
+  "ok": true,
+  "protocolVersion": 1,
+  "agentInfo": {
+    "name": "Kimi Code CLI",
+    "version": "0.38.0"
+  },
+  "authMethods": [
+    {
+      "id": "login",
+      "type": "terminal",
+      "name": "Login with Kimi account",
+      "description": "Open the device-code login flow in a terminal.",
+      "args": [
+        "--login"
+      ],
+      "env": {},
+      "_meta": {
+        "terminal-auth": {
+          "type": "terminal",
+          "label": "Login with Kimi account",
+          "command": "kimi",
+          "args": [
+            "login"
+          ],
+          "env": {}
+        }
+      }
+    }
+  ],
+  "capabilities": {
+    "loadSession": true,
+    "session": {
+      "list": true,
+      "resume": true,
+      "close": true,
+      "delete": true,
+      "fork": true,
+      "additionalDirectories": true
+    },
+    "prompt": {
+      "image": true,
+      "audio": false,
+      "embeddedContext": true
+    },
+    "mcp": {
+      "http": true,
+      "sse": true
+    },
+    "providers": false
+  },
+  "modes": {
+    "current": "default",
+    "available": [
+      {
+        "id": "default",
+        "name": "Default"
+      },
+      {
+        "id": "plan",
+        "name": "Plan"
+      },
+      {
+        "id": "auto",
+        "name": "Auto"
+      },
+      {
+        "id": "yolo",
+        "name": "YOLO"
+      }
+    ]
+  },
+  "models": null,
+  "configOptions": [
+    {
+      "id": "model",
+      "name": "Model",
+      "category": "model",
+      "type": "select",
+      "options": [
+        {
+          "value": "kimi-code/kimi-for-coding",
+          "name": "K2.7 Coding"
+        },
+        {
+          "value": "kimi-code/kimi-for-coding-highspeed",
+          "name": "K2.7 Coding Highspeed"
+        },
+        {
+          "value": "kimi-code/k3",
+          "name": "K3"
+        },
+        {
+          "value": "kimi-code/k3-256k",
+          "name": "K3-256k"
+        }
+      ]
+    },
+    {
+      "id": "thinking",
+      "name": "Thinking",
+      "category": "thought_level",
+      "type": "select",
+      "options": [
+        {
+          "value": "low",
+          "name": "Thinking Low"
+        },
+        {
+          "value": "high",
+          "name": "Thinking High"
+        },
+        {
+          "value": "max",
+          "name": "Thinking Max"
+        }
+      ]
+    },
+    {
+      "id": "mode",
+      "name": "Mode",
+      "category": "mode",
+      "type": "select",
+      "options": [
+        {
+          "value": "default",
+          "name": "Default",
+          "description": "Manual approvals; tools execute normally."
+        },
+        {
+          "value": "plan",
+          "name": "Plan",
+          "description": "Read-only planning; no tool execution."
+        },
+        {
+          "value": "auto",
+          "name": "Auto",
+          "description": "Auto-approve safe operations."
+        },
+        {
+          "value": "yolo",
+          "name": "YOLO",
+          "description": "Auto-approve everything."
+        }
+      ]
+    }
+  ],
+  "prompt": {
+    "stopReason": "end_turn",
+    "updateKinds": {
+      "available_commands_update": 1,
+      "session_info_update": 1,
+      "agent_thought_chunk": 20,
+      "agent_message_chunk": 1
+    },
+    "sawUsage": false,
+    "permissionRequests": 0,
+    "replyText": "OK",
+    "durationMs": 5354
+  },
+  "usage": {
+    "ok": false,
+    "source": "none",
+    "fields": [],
+    "semantics": "cumulative"
+  },
+  "commandExecution": {
+    "ok": true,
+    "usedClientTerminal": true,
+    "detail": "read the marker back (stopReason end_turn)"
+  },
+  "close": "closed"
+}

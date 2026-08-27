@@ -1,0 +1,5 @@
+{
+  "sessionId": "st-dig-mixed",
+  "throughSeq": 10,
+  "text": "User: Refactor the parser and keep the tests green.\nAssistant: Sure — I will start with the tokenizer.\nTool: Read src/parser.ts (read)\nTool result (t1): completed — export function parse() {}\nAssistant: The tokenizer is small.\nUser: Good, proceed.\nAssistant: Done."
+}

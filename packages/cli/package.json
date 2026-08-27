@@ -1,0 +1,35 @@
+{
+  "name": "@runskein/cli",
+  "private": true,
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "description": "Interactive engine test CLI for runskein (dev/verification tool, docs/cli.md)",
+  "type": "module",
+  "bin": {
+    "runskein": "./src/main.ts"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx src/main.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx test/smoke.ts",
+    "test:live": "tsx test/live.ts"
+  },
+  "dependencies": {
+    "@runskein/adapter-claude-code": "workspace:*",
+    "@runskein/adapter-codex": "workspace:*",
+    "@runskein/adapter-kimi": "workspace:*",
+    "@runskein/adapter-opencode": "workspace:*",
+    "@runskein/adapter-pi": "workspace:*",
+    "@runskein/core": "workspace:*",
+    "@runskein/fold": "workspace:*"
+  },
+  "devDependencies": {
+    "@runskein/conformance": "workspace:*",
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

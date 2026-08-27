@@ -1,0 +1,21 @@
+{
+  "sessionId": "st-dig-tiny",
+  "opts": {
+    "maxChars": 10
+  },
+  "events": [
+    {
+      "seq": 1,
+      "ts": 1700000001000,
+      "sessionId": "st-dig-tiny",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "some content that cannot fit"
+        }
+      }
+    }
+  ]
+}

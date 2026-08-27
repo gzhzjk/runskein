@@ -1,0 +1,142 @@
+{
+  "sessionId": "st-dig-mixed",
+  "events": [
+    {
+      "seq": 1,
+      "ts": 1700000001000,
+      "sessionId": "st-dig-mixed",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Refactor the parser"
+        }
+      }
+    },
+    {
+      "seq": 2,
+      "ts": 1700000002000,
+      "sessionId": "st-dig-mixed",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": " and keep the tests green."
+        }
+      }
+    },
+    {
+      "seq": 3,
+      "ts": 1700000003000,
+      "sessionId": "st-dig-mixed",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_thought_chunk",
+        "content": {
+          "type": "text",
+          "text": "the user wants a refactor"
+        }
+      }
+    },
+    {
+      "seq": 4,
+      "ts": 1700000004000,
+      "sessionId": "st-dig-mixed",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Sure — I will start"
+        }
+      }
+    },
+    {
+      "seq": 5,
+      "ts": 1700000005000,
+      "sessionId": "st-dig-mixed",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": " with the tokenizer."
+        }
+      }
+    },
+    {
+      "seq": 6,
+      "ts": 1700000006000,
+      "sessionId": "st-dig-mixed",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "tool_call",
+        "toolCallId": "t1",
+        "title": "Read src/parser.ts",
+        "kind": "read",
+        "status": "pending"
+      }
+    },
+    {
+      "seq": 7,
+      "ts": 1700000007000,
+      "sessionId": "st-dig-mixed",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "tool_call_update",
+        "toolCallId": "t1",
+        "status": "completed",
+        "content": [
+          {
+            "type": "content",
+            "content": {
+              "type": "text",
+              "text": "export function parse() {}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 8,
+      "ts": 1700000008000,
+      "sessionId": "st-dig-mixed",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "The tokenizer is small."
+        }
+      }
+    },
+    {
+      "seq": 9,
+      "ts": 1700000009000,
+      "sessionId": "st-dig-mixed",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Good, proceed."
+        }
+      }
+    },
+    {
+      "seq": 10,
+      "ts": 1700000010000,
+      "sessionId": "st-dig-mixed",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Done."
+        }
+      }
+    }
+  ]
+}

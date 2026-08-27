@@ -1,0 +1,814 @@
+{
+  "sessionId": "st-dig-utf8",
+  "opts": {
+    "maxChars": 357
+  },
+  "events": [
+    {
+      "seq": 1,
+      "ts": 1700000001000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "开始：迁移存储层。"
+        }
+      }
+    },
+    {
+      "seq": 2,
+      "ts": 1700000002000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第0步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 3,
+      "ts": 1700000003000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到0 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 4,
+      "ts": 1700000004000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第1步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 5,
+      "ts": 1700000005000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到1 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 6,
+      "ts": 1700000006000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第2步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 7,
+      "ts": 1700000007000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到2 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 8,
+      "ts": 1700000008000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第3步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 9,
+      "ts": 1700000009000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到3 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 10,
+      "ts": 1700000010000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第4步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 11,
+      "ts": 1700000011000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到4 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 12,
+      "ts": 1700000012000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第5步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 13,
+      "ts": 1700000013000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到5 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 14,
+      "ts": 1700000014000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第6步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 15,
+      "ts": 1700000015000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到6 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 16,
+      "ts": 1700000016000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第7步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 17,
+      "ts": 1700000017000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到7 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 18,
+      "ts": 1700000018000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第8步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 19,
+      "ts": 1700000019000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到8 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 20,
+      "ts": 1700000020000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第9步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 21,
+      "ts": 1700000021000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到9 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 22,
+      "ts": 1700000022000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第10步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 23,
+      "ts": 1700000023000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到10 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 24,
+      "ts": 1700000024000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第11步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 25,
+      "ts": 1700000025000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到11 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 26,
+      "ts": 1700000026000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第12步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 27,
+      "ts": 1700000027000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到12 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 28,
+      "ts": 1700000028000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第13步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 29,
+      "ts": 1700000029000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到13 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 30,
+      "ts": 1700000030000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第14步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 31,
+      "ts": 1700000031000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到14 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 32,
+      "ts": 1700000032000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第15步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 33,
+      "ts": 1700000033000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到15 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 34,
+      "ts": 1700000034000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第16步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 35,
+      "ts": 1700000035000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到16 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 36,
+      "ts": 1700000036000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第17步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 37,
+      "ts": 1700000037000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到17 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 38,
+      "ts": 1700000038000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第18步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 39,
+      "ts": 1700000039000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到18 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 40,
+      "ts": 1700000040000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第19步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 41,
+      "ts": 1700000041000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到19 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 42,
+      "ts": 1700000042000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第20步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 43,
+      "ts": 1700000043000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到20 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 44,
+      "ts": 1700000044000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第21步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 45,
+      "ts": 1700000045000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到21 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 46,
+      "ts": 1700000046000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第22步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 47,
+      "ts": 1700000047000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到22 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 48,
+      "ts": 1700000048000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第23步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 49,
+      "ts": 1700000049000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到23 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 50,
+      "ts": 1700000050000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第24步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 51,
+      "ts": 1700000051000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到24 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 52,
+      "ts": 1700000052000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第25步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 53,
+      "ts": 1700000053000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到25 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 54,
+      "ts": 1700000054000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第26步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 55,
+      "ts": 1700000055000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到26 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 56,
+      "ts": 1700000056000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第27步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 57,
+      "ts": 1700000057000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到27 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 58,
+      "ts": 1700000058000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第28步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 59,
+      "ts": 1700000059000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到28 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 60,
+      "ts": 1700000060000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "第29步：处理数据迁移 🚀🇯🇵 é ，继续。"
+        }
+      }
+    },
+    {
+      "seq": 61,
+      "ts": 1700000061000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "收到29 👍🏽。"
+        }
+      }
+    },
+    {
+      "seq": 62,
+      "ts": 1700000062000,
+      "sessionId": "st-dig-utf8",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "完成 ✅ 尾部标记。"
+        }
+      }
+    }
+  ]
+}

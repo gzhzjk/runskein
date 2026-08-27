@@ -1,0 +1,24 @@
+{
+  "name": "runskein-workspace",
+  "private": true,
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "description": "Unified engine adapter over the Agent Client Protocol — one API to manage coding-agent engines (spawn/quit/resume) and one transcript format, engine-pluggable.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r --workspace-concurrency=1 test",
+    "test:coverage": "pnpm -r --if-present test:coverage",
+    "typecheck": "pnpm -r typecheck",
+    "quality": "node scripts/quality.mjs && node scripts/verify-license-files.mjs && node scripts/verify-published-documents.mjs && node scripts/project-conformance-matrix.mjs && node scripts/generate-capability-tables.mjs --check && pnpm --filter @runskein/core generate:vocabulary -- --check && pnpm --filter @runskein/adapter-pi build:check",
+    "docs:translations:check": "node scripts/verify-published-documents.mjs",
+    "conformance": "node scripts/conformance.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}

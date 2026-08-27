@@ -1,0 +1,5231 @@
+{
+  "sessionId": "st-dig-default-trunc",
+  "events": [
+    {
+      "seq": 1,
+      "ts": 1700000001000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "HEAD-MARKER: default-budget run."
+        }
+      }
+    },
+    {
+      "seq": 2,
+      "ts": 1700000002000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 0: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 3,
+      "ts": 1700000003000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 0: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 4,
+      "ts": 1700000004000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 1: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 5,
+      "ts": 1700000005000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 1: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 6,
+      "ts": 1700000006000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 2: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 7,
+      "ts": 1700000007000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 2: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 8,
+      "ts": 1700000008000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 3: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 9,
+      "ts": 1700000009000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 3: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 10,
+      "ts": 1700000010000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 4: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 11,
+      "ts": 1700000011000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 4: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 12,
+      "ts": 1700000012000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 5: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 13,
+      "ts": 1700000013000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 5: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 14,
+      "ts": 1700000014000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 6: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 15,
+      "ts": 1700000015000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 6: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 16,
+      "ts": 1700000016000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 7: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 17,
+      "ts": 1700000017000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 7: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 18,
+      "ts": 1700000018000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 8: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 19,
+      "ts": 1700000019000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 8: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 20,
+      "ts": 1700000020000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 9: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 21,
+      "ts": 1700000021000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 9: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 22,
+      "ts": 1700000022000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 10: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 23,
+      "ts": 1700000023000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 10: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 24,
+      "ts": 1700000024000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 11: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 25,
+      "ts": 1700000025000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 11: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 26,
+      "ts": 1700000026000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 12: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 27,
+      "ts": 1700000027000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 12: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 28,
+      "ts": 1700000028000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 13: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 29,
+      "ts": 1700000029000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 13: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 30,
+      "ts": 1700000030000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 14: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 31,
+      "ts": 1700000031000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 14: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 32,
+      "ts": 1700000032000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 15: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 33,
+      "ts": 1700000033000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 15: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 34,
+      "ts": 1700000034000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 16: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 35,
+      "ts": 1700000035000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 16: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 36,
+      "ts": 1700000036000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 17: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 37,
+      "ts": 1700000037000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 17: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 38,
+      "ts": 1700000038000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 18: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 39,
+      "ts": 1700000039000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 18: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 40,
+      "ts": 1700000040000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 19: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 41,
+      "ts": 1700000041000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 19: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 42,
+      "ts": 1700000042000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 20: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 43,
+      "ts": 1700000043000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 20: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 44,
+      "ts": 1700000044000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 21: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 45,
+      "ts": 1700000045000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 21: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 46,
+      "ts": 1700000046000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 22: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 47,
+      "ts": 1700000047000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 22: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 48,
+      "ts": 1700000048000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 23: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 49,
+      "ts": 1700000049000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 23: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 50,
+      "ts": 1700000050000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 24: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 51,
+      "ts": 1700000051000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 24: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 52,
+      "ts": 1700000052000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 25: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 53,
+      "ts": 1700000053000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 25: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 54,
+      "ts": 1700000054000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 26: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 55,
+      "ts": 1700000055000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 26: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 56,
+      "ts": 1700000056000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 27: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 57,
+      "ts": 1700000057000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 27: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 58,
+      "ts": 1700000058000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 28: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 59,
+      "ts": 1700000059000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 28: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 60,
+      "ts": 1700000060000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 29: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 61,
+      "ts": 1700000061000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 29: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 62,
+      "ts": 1700000062000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 30: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 63,
+      "ts": 1700000063000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 30: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 64,
+      "ts": 1700000064000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 31: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 65,
+      "ts": 1700000065000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 31: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 66,
+      "ts": 1700000066000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 32: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 67,
+      "ts": 1700000067000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 32: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 68,
+      "ts": 1700000068000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 33: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 69,
+      "ts": 1700000069000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 33: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 70,
+      "ts": 1700000070000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 34: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 71,
+      "ts": 1700000071000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 34: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 72,
+      "ts": 1700000072000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 35: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 73,
+      "ts": 1700000073000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 35: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 74,
+      "ts": 1700000074000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 36: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 75,
+      "ts": 1700000075000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 36: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 76,
+      "ts": 1700000076000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 37: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 77,
+      "ts": 1700000077000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 37: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 78,
+      "ts": 1700000078000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 38: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 79,
+      "ts": 1700000079000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 38: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 80,
+      "ts": 1700000080000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 39: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 81,
+      "ts": 1700000081000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 39: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 82,
+      "ts": 1700000082000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 40: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 83,
+      "ts": 1700000083000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 40: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 84,
+      "ts": 1700000084000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 41: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 85,
+      "ts": 1700000085000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 41: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 86,
+      "ts": 1700000086000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 42: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 87,
+      "ts": 1700000087000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 42: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 88,
+      "ts": 1700000088000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 43: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 89,
+      "ts": 1700000089000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 43: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 90,
+      "ts": 1700000090000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 44: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 91,
+      "ts": 1700000091000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 44: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 92,
+      "ts": 1700000092000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 45: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 93,
+      "ts": 1700000093000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 45: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 94,
+      "ts": 1700000094000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 46: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 95,
+      "ts": 1700000095000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 46: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 96,
+      "ts": 1700000096000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 47: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 97,
+      "ts": 1700000097000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 47: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 98,
+      "ts": 1700000098000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 48: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 99,
+      "ts": 1700000099000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 48: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 100,
+      "ts": 1700000100000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 49: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 101,
+      "ts": 1700000101000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 49: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 102,
+      "ts": 1700000102000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 50: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 103,
+      "ts": 1700000103000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 50: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 104,
+      "ts": 1700000104000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 51: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 105,
+      "ts": 1700000105000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 51: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 106,
+      "ts": 1700000106000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 52: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 107,
+      "ts": 1700000107000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 52: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 108,
+      "ts": 1700000108000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 53: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 109,
+      "ts": 1700000109000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 53: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 110,
+      "ts": 1700000110000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 54: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 111,
+      "ts": 1700000111000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 54: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 112,
+      "ts": 1700000112000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 55: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 113,
+      "ts": 1700000113000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 55: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 114,
+      "ts": 1700000114000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 56: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 115,
+      "ts": 1700000115000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 56: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 116,
+      "ts": 1700000116000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 57: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 117,
+      "ts": 1700000117000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 57: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 118,
+      "ts": 1700000118000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 58: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 119,
+      "ts": 1700000119000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 58: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 120,
+      "ts": 1700000120000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 59: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 121,
+      "ts": 1700000121000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 59: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 122,
+      "ts": 1700000122000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 60: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 123,
+      "ts": 1700000123000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 60: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 124,
+      "ts": 1700000124000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 61: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 125,
+      "ts": 1700000125000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 61: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 126,
+      "ts": 1700000126000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 62: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 127,
+      "ts": 1700000127000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 62: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 128,
+      "ts": 1700000128000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 63: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 129,
+      "ts": 1700000129000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 63: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 130,
+      "ts": 1700000130000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 64: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 131,
+      "ts": 1700000131000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 64: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 132,
+      "ts": 1700000132000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 65: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 133,
+      "ts": 1700000133000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 65: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 134,
+      "ts": 1700000134000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 66: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 135,
+      "ts": 1700000135000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 66: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 136,
+      "ts": 1700000136000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 67: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 137,
+      "ts": 1700000137000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 67: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 138,
+      "ts": 1700000138000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 68: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 139,
+      "ts": 1700000139000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 68: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 140,
+      "ts": 1700000140000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 69: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 141,
+      "ts": 1700000141000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 69: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 142,
+      "ts": 1700000142000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 70: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 143,
+      "ts": 1700000143000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 70: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 144,
+      "ts": 1700000144000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 71: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 145,
+      "ts": 1700000145000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 71: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 146,
+      "ts": 1700000146000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 72: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 147,
+      "ts": 1700000147000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 72: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 148,
+      "ts": 1700000148000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 73: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 149,
+      "ts": 1700000149000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 73: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 150,
+      "ts": 1700000150000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 74: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 151,
+      "ts": 1700000151000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 74: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 152,
+      "ts": 1700000152000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 75: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 153,
+      "ts": 1700000153000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 75: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 154,
+      "ts": 1700000154000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 76: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 155,
+      "ts": 1700000155000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 76: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 156,
+      "ts": 1700000156000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 77: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 157,
+      "ts": 1700000157000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 77: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 158,
+      "ts": 1700000158000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 78: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 159,
+      "ts": 1700000159000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 78: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 160,
+      "ts": 1700000160000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 79: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 161,
+      "ts": 1700000161000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 79: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 162,
+      "ts": 1700000162000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 80: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 163,
+      "ts": 1700000163000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 80: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 164,
+      "ts": 1700000164000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 81: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 165,
+      "ts": 1700000165000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 81: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 166,
+      "ts": 1700000166000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 82: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 167,
+      "ts": 1700000167000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 82: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 168,
+      "ts": 1700000168000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 83: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 169,
+      "ts": 1700000169000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 83: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 170,
+      "ts": 1700000170000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 84: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 171,
+      "ts": 1700000171000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 84: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 172,
+      "ts": 1700000172000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 85: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 173,
+      "ts": 1700000173000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 85: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 174,
+      "ts": 1700000174000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 86: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 175,
+      "ts": 1700000175000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 86: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 176,
+      "ts": 1700000176000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 87: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 177,
+      "ts": 1700000177000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 87: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 178,
+      "ts": 1700000178000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 88: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 179,
+      "ts": 1700000179000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 88: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 180,
+      "ts": 1700000180000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 89: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 181,
+      "ts": 1700000181000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 89: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 182,
+      "ts": 1700000182000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 90: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 183,
+      "ts": 1700000183000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 90: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 184,
+      "ts": 1700000184000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 91: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 185,
+      "ts": 1700000185000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 91: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 186,
+      "ts": 1700000186000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 92: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 187,
+      "ts": 1700000187000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 92: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 188,
+      "ts": 1700000188000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 93: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 189,
+      "ts": 1700000189000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 93: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 190,
+      "ts": 1700000190000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 94: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 191,
+      "ts": 1700000191000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 94: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 192,
+      "ts": 1700000192000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 95: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 193,
+      "ts": 1700000193000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 95: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 194,
+      "ts": 1700000194000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 96: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 195,
+      "ts": 1700000195000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 96: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 196,
+      "ts": 1700000196000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 97: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 197,
+      "ts": 1700000197000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 97: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 198,
+      "ts": 1700000198000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 98: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 199,
+      "ts": 1700000199000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 98: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 200,
+      "ts": 1700000200000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 99: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 201,
+      "ts": 1700000201000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 99: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 202,
+      "ts": 1700000202000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 100: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 203,
+      "ts": 1700000203000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 100: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 204,
+      "ts": 1700000204000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 101: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 205,
+      "ts": 1700000205000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 101: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 206,
+      "ts": 1700000206000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 102: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 207,
+      "ts": 1700000207000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 102: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 208,
+      "ts": 1700000208000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 103: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 209,
+      "ts": 1700000209000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 103: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 210,
+      "ts": 1700000210000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 104: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 211,
+      "ts": 1700000211000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 104: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 212,
+      "ts": 1700000212000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 105: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 213,
+      "ts": 1700000213000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 105: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 214,
+      "ts": 1700000214000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 106: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 215,
+      "ts": 1700000215000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 106: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 216,
+      "ts": 1700000216000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 107: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 217,
+      "ts": 1700000217000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 107: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 218,
+      "ts": 1700000218000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 108: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 219,
+      "ts": 1700000219000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 108: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 220,
+      "ts": 1700000220000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 109: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 221,
+      "ts": 1700000221000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 109: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 222,
+      "ts": 1700000222000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 110: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 223,
+      "ts": 1700000223000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 110: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 224,
+      "ts": 1700000224000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 111: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 225,
+      "ts": 1700000225000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 111: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 226,
+      "ts": 1700000226000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 112: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 227,
+      "ts": 1700000227000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 112: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 228,
+      "ts": 1700000228000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 113: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 229,
+      "ts": 1700000229000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 113: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 230,
+      "ts": 1700000230000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 114: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 231,
+      "ts": 1700000231000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 114: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 232,
+      "ts": 1700000232000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 115: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 233,
+      "ts": 1700000233000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 115: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 234,
+      "ts": 1700000234000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 116: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 235,
+      "ts": 1700000235000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 116: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 236,
+      "ts": 1700000236000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 117: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 237,
+      "ts": 1700000237000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 117: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 238,
+      "ts": 1700000238000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 118: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 239,
+      "ts": 1700000239000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 118: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 240,
+      "ts": 1700000240000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 119: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 241,
+      "ts": 1700000241000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 119: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 242,
+      "ts": 1700000242000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 120: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 243,
+      "ts": 1700000243000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 120: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 244,
+      "ts": 1700000244000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 121: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 245,
+      "ts": 1700000245000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 121: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 246,
+      "ts": 1700000246000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 122: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 247,
+      "ts": 1700000247000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 122: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 248,
+      "ts": 1700000248000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 123: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 249,
+      "ts": 1700000249000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 123: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 250,
+      "ts": 1700000250000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 124: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 251,
+      "ts": 1700000251000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 124: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 252,
+      "ts": 1700000252000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 125: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 253,
+      "ts": 1700000253000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 125: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 254,
+      "ts": 1700000254000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 126: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 255,
+      "ts": 1700000255000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 126: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 256,
+      "ts": 1700000256000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 127: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 257,
+      "ts": 1700000257000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 127: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 258,
+      "ts": 1700000258000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 128: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 259,
+      "ts": 1700000259000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 128: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 260,
+      "ts": 1700000260000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 129: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 261,
+      "ts": 1700000261000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 129: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 262,
+      "ts": 1700000262000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 130: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 263,
+      "ts": 1700000263000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 130: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 264,
+      "ts": 1700000264000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 131: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 265,
+      "ts": 1700000265000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 131: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 266,
+      "ts": 1700000266000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 132: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 267,
+      "ts": 1700000267000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 132: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 268,
+      "ts": 1700000268000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 133: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 269,
+      "ts": 1700000269000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 133: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 270,
+      "ts": 1700000270000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 134: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 271,
+      "ts": 1700000271000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 134: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 272,
+      "ts": 1700000272000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 135: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 273,
+      "ts": 1700000273000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 135: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 274,
+      "ts": 1700000274000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 136: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 275,
+      "ts": 1700000275000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 136: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 276,
+      "ts": 1700000276000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 137: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 277,
+      "ts": 1700000277000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 137: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 278,
+      "ts": 1700000278000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 138: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 279,
+      "ts": 1700000279000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 138: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 280,
+      "ts": 1700000280000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 139: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 281,
+      "ts": 1700000281000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 139: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 282,
+      "ts": 1700000282000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 140: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 283,
+      "ts": 1700000283000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 140: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 284,
+      "ts": 1700000284000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 141: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 285,
+      "ts": 1700000285000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 141: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 286,
+      "ts": 1700000286000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 142: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 287,
+      "ts": 1700000287000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 142: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 288,
+      "ts": 1700000288000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 143: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 289,
+      "ts": 1700000289000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 143: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 290,
+      "ts": 1700000290000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 144: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 291,
+      "ts": 1700000291000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 144: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 292,
+      "ts": 1700000292000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 145: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 293,
+      "ts": 1700000293000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 145: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 294,
+      "ts": 1700000294000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 146: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 295,
+      "ts": 1700000295000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 146: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 296,
+      "ts": 1700000296000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 147: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 297,
+      "ts": 1700000297000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 147: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 298,
+      "ts": 1700000298000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 148: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 299,
+      "ts": 1700000299000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 148: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 300,
+      "ts": 1700000300000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 149: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 301,
+      "ts": 1700000301000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 149: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 302,
+      "ts": 1700000302000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 150: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 303,
+      "ts": 1700000303000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 150: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 304,
+      "ts": 1700000304000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 151: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 305,
+      "ts": 1700000305000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 151: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 306,
+      "ts": 1700000306000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 152: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 307,
+      "ts": 1700000307000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 152: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 308,
+      "ts": 1700000308000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 153: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 309,
+      "ts": 1700000309000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 153: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 310,
+      "ts": 1700000310000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 154: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 311,
+      "ts": 1700000311000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 154: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 312,
+      "ts": 1700000312000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 155: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 313,
+      "ts": 1700000313000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 155: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 314,
+      "ts": 1700000314000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 156: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 315,
+      "ts": 1700000315000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 156: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 316,
+      "ts": 1700000316000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 157: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 317,
+      "ts": 1700000317000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 157: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 318,
+      "ts": 1700000318000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 158: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 319,
+      "ts": 1700000319000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 158: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 320,
+      "ts": 1700000320000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 159: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 321,
+      "ts": 1700000321000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 159: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 322,
+      "ts": 1700000322000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 160: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 323,
+      "ts": 1700000323000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 160: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 324,
+      "ts": 1700000324000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 161: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 325,
+      "ts": 1700000325000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 161: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 326,
+      "ts": 1700000326000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 162: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 327,
+      "ts": 1700000327000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 162: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 328,
+      "ts": 1700000328000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 163: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 329,
+      "ts": 1700000329000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 163: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 330,
+      "ts": 1700000330000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 164: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 331,
+      "ts": 1700000331000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 164: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 332,
+      "ts": 1700000332000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 165: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 333,
+      "ts": 1700000333000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 165: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 334,
+      "ts": 1700000334000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 166: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 335,
+      "ts": 1700000335000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 166: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 336,
+      "ts": 1700000336000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 167: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 337,
+      "ts": 1700000337000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 167: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 338,
+      "ts": 1700000338000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 168: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 339,
+      "ts": 1700000339000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 168: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 340,
+      "ts": 1700000340000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 169: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 341,
+      "ts": 1700000341000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 169: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 342,
+      "ts": 1700000342000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 170: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 343,
+      "ts": 1700000343000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 170: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 344,
+      "ts": 1700000344000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 171: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 345,
+      "ts": 1700000345000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 171: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 346,
+      "ts": 1700000346000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 172: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 347,
+      "ts": 1700000347000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 172: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 348,
+      "ts": 1700000348000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 173: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 349,
+      "ts": 1700000349000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 173: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 350,
+      "ts": 1700000350000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 174: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 351,
+      "ts": 1700000351000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 174: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 352,
+      "ts": 1700000352000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 175: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 353,
+      "ts": 1700000353000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 175: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 354,
+      "ts": 1700000354000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 176: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 355,
+      "ts": 1700000355000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 176: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 356,
+      "ts": 1700000356000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 177: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 357,
+      "ts": 1700000357000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 177: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 358,
+      "ts": 1700000358000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 178: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 359,
+      "ts": 1700000359000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 178: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 360,
+      "ts": 1700000360000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 179: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 361,
+      "ts": 1700000361000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 179: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 362,
+      "ts": 1700000362000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 180: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 363,
+      "ts": 1700000363000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 180: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 364,
+      "ts": 1700000364000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 181: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 365,
+      "ts": 1700000365000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 181: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 366,
+      "ts": 1700000366000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 182: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 367,
+      "ts": 1700000367000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 182: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 368,
+      "ts": 1700000368000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 183: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 369,
+      "ts": 1700000369000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 183: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 370,
+      "ts": 1700000370000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 184: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 371,
+      "ts": 1700000371000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 184: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 372,
+      "ts": 1700000372000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 185: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 373,
+      "ts": 1700000373000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 185: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 374,
+      "ts": 1700000374000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 186: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 375,
+      "ts": 1700000375000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 186: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 376,
+      "ts": 1700000376000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 187: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 377,
+      "ts": 1700000377000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 187: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 378,
+      "ts": 1700000378000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 188: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 379,
+      "ts": 1700000379000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 188: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 380,
+      "ts": 1700000380000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 189: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 381,
+      "ts": 1700000381000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 189: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 382,
+      "ts": 1700000382000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 190: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 383,
+      "ts": 1700000383000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 190: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 384,
+      "ts": 1700000384000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 191: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 385,
+      "ts": 1700000385000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 191: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 386,
+      "ts": 1700000386000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 192: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 387,
+      "ts": 1700000387000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 192: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 388,
+      "ts": 1700000388000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 193: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 389,
+      "ts": 1700000389000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 193: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 390,
+      "ts": 1700000390000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 194: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 391,
+      "ts": 1700000391000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 194: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 392,
+      "ts": 1700000392000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 195: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 393,
+      "ts": 1700000393000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 195: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 394,
+      "ts": 1700000394000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 196: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 395,
+      "ts": 1700000395000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 196: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 396,
+      "ts": 1700000396000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 197: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 397,
+      "ts": 1700000397000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 197: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 398,
+      "ts": 1700000398000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 198: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 399,
+      "ts": 1700000399000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 198: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 400,
+      "ts": 1700000400000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Turn 199: a paragraph of assistant output that is long enough to add up across the run. "
+        }
+      }
+    },
+    {
+      "seq": 401,
+      "ts": 1700000401000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "user_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "Reply 199: understood, continue with the next portion of the task. "
+        }
+      }
+    },
+    {
+      "seq": 402,
+      "ts": 1700000402000,
+      "sessionId": "st-dig-default-trunc",
+      "engineId": "mock",
+      "update": {
+        "sessionUpdate": "agent_message_chunk",
+        "content": {
+          "type": "text",
+          "text": "TAIL-MARKER: default-budget run complete."
+        }
+      }
+    }
+  ]
+}

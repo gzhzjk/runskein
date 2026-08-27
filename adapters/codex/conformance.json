@@ -1,0 +1,352 @@
+{
+  "id": "codex",
+  "ok": true,
+  "protocolVersion": 1,
+  "agentInfo": {
+    "name": "@agentclientprotocol/codex-acp",
+    "title": "Codex",
+    "version": "1.6.2"
+  },
+  "authMethods": [
+    {
+      "id": "api-key",
+      "name": "API Key",
+      "description": "Use an API key to authenticate",
+      "_meta": {
+        "api-key": {
+          "provider": "openai"
+        }
+      }
+    },
+    {
+      "id": "chat-gpt",
+      "name": "ChatGPT",
+      "description": "Use ChatGPT to authenticate"
+    }
+  ],
+  "capabilities": {
+    "loadSession": true,
+    "session": {
+      "resume": true,
+      "list": true,
+      "close": true,
+      "delete": true,
+      "additionalDirectories": true
+    },
+    "prompt": {
+      "embeddedContext": true,
+      "image": true
+    },
+    "mcp": {
+      "acp": false,
+      "http": true,
+      "sse": false
+    },
+    "providers": true
+  },
+  "modes": {
+    "current": "agent",
+    "available": [
+      {
+        "id": "read-only",
+        "name": "Read-only"
+      },
+      {
+        "id": "agent",
+        "name": "Agent"
+      },
+      {
+        "id": "agent-full-access",
+        "name": "Agent (full access)"
+      }
+    ]
+  },
+  "models": {
+    "current": "gpt-5.6-terra[medium]",
+    "available": [
+      {
+        "id": "gpt-5.6-sol[low]",
+        "name": "GPT-5.6-Sol (low)"
+      },
+      {
+        "id": "gpt-5.6-sol[medium]",
+        "name": "GPT-5.6-Sol (medium)"
+      },
+      {
+        "id": "gpt-5.6-sol[high]",
+        "name": "GPT-5.6-Sol (high)"
+      },
+      {
+        "id": "gpt-5.6-sol[xhigh]",
+        "name": "GPT-5.6-Sol (xhigh)"
+      },
+      {
+        "id": "gpt-5.6-sol[max]",
+        "name": "GPT-5.6-Sol (max)"
+      },
+      {
+        "id": "gpt-5.6-sol[ultra]",
+        "name": "GPT-5.6-Sol (ultra)"
+      },
+      {
+        "id": "gpt-5.6-terra[low]",
+        "name": "GPT-5.6-Terra (low)"
+      },
+      {
+        "id": "gpt-5.6-terra[medium]",
+        "name": "GPT-5.6-Terra (medium)"
+      },
+      {
+        "id": "gpt-5.6-terra[high]",
+        "name": "GPT-5.6-Terra (high)"
+      },
+      {
+        "id": "gpt-5.6-terra[xhigh]",
+        "name": "GPT-5.6-Terra (xhigh)"
+      },
+      {
+        "id": "gpt-5.6-terra[max]",
+        "name": "GPT-5.6-Terra (max)"
+      },
+      {
+        "id": "gpt-5.6-terra[ultra]",
+        "name": "GPT-5.6-Terra (ultra)"
+      },
+      {
+        "id": "gpt-5.6-luna[low]",
+        "name": "GPT-5.6-Luna (low)"
+      },
+      {
+        "id": "gpt-5.6-luna[medium]",
+        "name": "GPT-5.6-Luna (medium)"
+      },
+      {
+        "id": "gpt-5.6-luna[high]",
+        "name": "GPT-5.6-Luna (high)"
+      },
+      {
+        "id": "gpt-5.6-luna[xhigh]",
+        "name": "GPT-5.6-Luna (xhigh)"
+      },
+      {
+        "id": "gpt-5.6-luna[max]",
+        "name": "GPT-5.6-Luna (max)"
+      },
+      {
+        "id": "gpt-5.5[low]",
+        "name": "GPT-5.5 (low)"
+      },
+      {
+        "id": "gpt-5.5[medium]",
+        "name": "GPT-5.5 (medium)"
+      },
+      {
+        "id": "gpt-5.5[high]",
+        "name": "GPT-5.5 (high)"
+      },
+      {
+        "id": "gpt-5.5[xhigh]",
+        "name": "GPT-5.5 (xhigh)"
+      },
+      {
+        "id": "gpt-5.4[low]",
+        "name": "GPT-5.4 (low)"
+      },
+      {
+        "id": "gpt-5.4[medium]",
+        "name": "GPT-5.4 (medium)"
+      },
+      {
+        "id": "gpt-5.4[high]",
+        "name": "GPT-5.4 (high)"
+      },
+      {
+        "id": "gpt-5.4[xhigh]",
+        "name": "GPT-5.4 (xhigh)"
+      },
+      {
+        "id": "gpt-5.4-mini[low]",
+        "name": "GPT-5.4-Mini (low)"
+      },
+      {
+        "id": "gpt-5.4-mini[medium]",
+        "name": "GPT-5.4-Mini (medium)"
+      },
+      {
+        "id": "gpt-5.4-mini[high]",
+        "name": "GPT-5.4-Mini (high)"
+      },
+      {
+        "id": "gpt-5.4-mini[xhigh]",
+        "name": "GPT-5.4-Mini (xhigh)"
+      }
+    ]
+  },
+  "configOptions": [
+    {
+      "id": "mode",
+      "name": "Mode",
+      "category": "mode",
+      "type": "select",
+      "options": [
+        {
+          "value": "read-only",
+          "name": "Read-only",
+          "description": "Requires approval to edit files and run commands."
+        },
+        {
+          "value": "agent",
+          "name": "Agent",
+          "description": "Read and edit files, and run commands."
+        },
+        {
+          "value": "agent-full-access",
+          "name": "Agent (full access)",
+          "description": "Codex can edit files outside this workspace and run commands with network access. Exercise caution when using."
+        }
+      ]
+    },
+    {
+      "id": "collaboration_mode",
+      "name": "Collaboration mode",
+      "category": "collaboration_mode",
+      "type": "select",
+      "options": [
+        {
+          "value": "default",
+          "name": "Default"
+        },
+        {
+          "value": "plan",
+          "name": "Plan",
+          "description": "Plan before making changes"
+        }
+      ]
+    },
+    {
+      "id": "model",
+      "name": "Model",
+      "category": "model",
+      "type": "select",
+      "options": [
+        {
+          "value": "gpt-5.6-sol",
+          "name": "GPT-5.6-Sol",
+          "description": "Latest frontier agentic coding model."
+        },
+        {
+          "value": "gpt-5.6-terra",
+          "name": "GPT-5.6-Terra",
+          "description": "Balanced agentic coding model for everyday work."
+        },
+        {
+          "value": "gpt-5.6-luna",
+          "name": "GPT-5.6-Luna",
+          "description": "Fast and affordable agentic coding model."
+        },
+        {
+          "value": "gpt-5.5",
+          "name": "GPT-5.5",
+          "description": "Frontier model for complex coding, research, and real-world work."
+        },
+        {
+          "value": "gpt-5.4",
+          "name": "GPT-5.4",
+          "description": "Strong model for everyday coding."
+        },
+        {
+          "value": "gpt-5.4-mini",
+          "name": "GPT-5.4-Mini",
+          "description": "Small, fast, and cost-efficient model for simpler coding tasks."
+        }
+      ]
+    },
+    {
+      "id": "reasoning_effort",
+      "name": "Reasoning effort",
+      "category": "thought_level",
+      "type": "select",
+      "options": [
+        {
+          "value": "low",
+          "name": "Low",
+          "description": "Fast responses with lighter reasoning"
+        },
+        {
+          "value": "medium",
+          "name": "Medium",
+          "description": "Balances speed and reasoning depth for everyday tasks"
+        },
+        {
+          "value": "high",
+          "name": "High",
+          "description": "Greater reasoning depth for complex problems"
+        },
+        {
+          "value": "xhigh",
+          "name": "Xhigh",
+          "description": "Extra high reasoning depth for complex problems"
+        },
+        {
+          "value": "max",
+          "name": "Max",
+          "description": "Maximum reasoning depth for the hardest problems"
+        },
+        {
+          "value": "ultra",
+          "name": "Ultra",
+          "description": "Maximum reasoning with automatic task delegation"
+        }
+      ]
+    },
+    {
+      "id": "fast-mode",
+      "name": "Fast mode",
+      "category": "model_config",
+      "type": "select",
+      "options": [
+        {
+          "value": "off",
+          "name": "Off",
+          "description": "Default speed, normal usage"
+        },
+        {
+          "value": "on",
+          "name": "On",
+          "description": "1.5x speed, increased usage"
+        }
+      ]
+    }
+  ],
+  "prompt": {
+    "stopReason": "end_turn",
+    "updateKinds": {
+      "available_commands_update": 1,
+      "session_info_update": 3,
+      "agent_message_chunk": 1,
+      "usage_update": 1
+    },
+    "sawUsage": true,
+    "permissionRequests": 0,
+    "replyText": "OK",
+    "durationMs": 4283
+  },
+  "usage": {
+    "ok": true,
+    "source": "prompt_response_meta",
+    "fields": [
+      "input",
+      "output",
+      "total",
+      "cacheRead",
+      "thought"
+    ],
+    "semantics": "per-turn"
+  },
+  "commandExecution": {
+    "ok": true,
+    "usedClientTerminal": false,
+    "detail": "read the marker back (stopReason end_turn)"
+  },
+  "close": "closed"
+}

@@ -1,0 +1,108 @@
+[
+  {
+    "name": "mixed-roles",
+    "why": "same-role runs fold without a new \"Role:\" prefix; alternating roles start a new line; a tool entry resets the role so the next same-role chunk re-prefixes. This is the core rendering contract §2.7 must not change for the default text digest.",
+    "events": 10,
+    "textLength": 264,
+    "throughSeq": 10,
+    "truncated": false
+  },
+  {
+    "name": "tool-calls",
+    "why": "exercises every tool branch: title/kind fallbacks, whitespace collapse, rawOutput fallback, empty output, the 400-char per-result cap, non-terminal updates ignored, and non-text content contributing nothing.",
+    "events": 12,
+    "textLength": 755,
+    "throughSeq": 12,
+    "truncated": false
+  },
+  {
+    "name": "no-digestible-content",
+    "why": "events that produce no digest text (thought chunks, plan, non-text message content, a pending tool update) must still advance throughSeq while leaving text empty — catches a regression that either emits stray text or loses the seq watermark.",
+    "events": 5,
+    "textLength": 0,
+    "throughSeq": 5,
+    "truncated": false
+  },
+  {
+    "name": "empty",
+    "why": "zero events: empty text, throughSeq 0, no truncation marker. The degenerate input a bounding rewrite is most likely to break.",
+    "events": 0,
+    "textLength": 0,
+    "throughSeq": 0,
+    "truncated": false
+  },
+  {
+    "name": "oversized-tail-truncation",
+    "why": "exceeds an explicit small maxChars so the current tail-biased policy is frozen: oldest content dropped, truncation marker prepended, TAIL-MARKER surviving and HEAD-MARKER gone. This is the exact behaviour §2.7 adds head/head-tail options beside — the default must not drift.",
+    "events": 82,
+    "opts": {
+      "maxChars": 600
+    },
+    "textLength": 600,
+    "throughSeq": 82,
+    "truncated": true
+  },
+  {
+    "name": "oversized-default-budget",
+    "why": "crosses the 32 000-char DEFAULT bound with no opts — the configuration the resume chain actually uses, so a change to the default budget or policy is caught even if explicit-maxChars behaviour is preserved.",
+    "events": 402,
+    "textLength": 32000,
+    "throughSeq": 402,
+    "truncated": true
+  },
+  {
+    "name": "utf8-multibyte-truncation",
+    "why": "CJK, astral-plane emoji (surrogate pairs), a flag sequence, a skin-tone modifier and a combining accent, forced past the budget so the slice lands inside multi-byte text. §2.7 moves bounding from JS chars to UTF-8 bytes; this fixture makes any change to where the cut falls visible instead of silent.",
+    "events": 62,
+    "opts": {
+      "maxChars": 400
+    },
+    "textLength": 400,
+    "throughSeq": 62,
+    "truncated": true
+  },
+  {
+    "name": "utf8-split-surrogate",
+    "why": "the same corpus at a budget whose cut falls inside a surrogate pair: the current char-based slice emits a lone low surrogate (half of a flag emoji). Captured as it is today, NOT as an expectation — AC-7.2 requires truncation to back up to a valid UTF-8 boundary, so this golden is the before-picture of a defect §2.7 is expected to fix, and a diff here needs a human ruling, not an auto-refresh.",
+    "events": 62,
+    "opts": {
+      "maxChars": 357
+    },
+    "textLength": 357,
+    "throughSeq": 62,
+    "truncated": true
+  },
+  {
+    "name": "boundary-exact-fit",
+    "why": "text length lands exactly on maxChars: the current bound is inclusive, so no truncation and no marker. An off-by-one in a rewritten bounder shows up here and nowhere else.",
+    "events": 1,
+    "opts": {
+      "maxChars": 100
+    },
+    "textLength": 100,
+    "throughSeq": 1,
+    "truncated": false
+  },
+  {
+    "name": "boundary-one-over",
+    "why": "one char past maxChars — the smallest input that must truncate. Pins the exact trigger point together with boundary-exact-fit.",
+    "events": 1,
+    "opts": {
+      "maxChars": 100
+    },
+    "textLength": 100,
+    "throughSeq": 1,
+    "truncated": true
+  },
+  {
+    "name": "boundary-budget-below-marker",
+    "why": "maxChars smaller than the truncation marker itself: the degenerate case where no content can survive. Frozen so a rewrite cannot start emitting a marker that overflows its own budget.",
+    "events": 1,
+    "opts": {
+      "maxChars": 10
+    },
+    "textLength": 34,
+    "throughSeq": 1,
+    "truncated": true
+  }
+]
