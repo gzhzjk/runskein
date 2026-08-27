@@ -7,6 +7,13 @@
 # No live engines and no authentication: the registration gate and the store
 # gate both run against a hermetic mock agent. `pnpm probe` and
 # `pnpm conformance <engine>` need a real engine and are run by hand.
+# Every `uses:` is pinned to a full commit SHA, and its comment names the
+# **exact** release that SHA is — `# v4.4.0`, never `# v4`. pinact rewrites a
+# floating major tag into the exact one and fails the run until someone does,
+# and it cannot be caught before pushing: it resolves the SHA through the GitHub
+# API, trunk does not forward a token into the linter sandbox, so a local
+# `trunk check` reports no issues on a comment that CI rejects. Measured, not
+# assumed — a deliberately wrong `# v3` also passed locally.
 name: ci
 
 on:
@@ -24,15 +31,15 @@ jobs:
     # timeout that fires spuriously teaches contributors to ignore a red run.
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
         # version comes from packageManager in package.json
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - uses: trunk-io/trunk-action@04ba50e7658c81db7356da96657e6e77f220bfa3 # v1
+      - uses: trunk-io/trunk-action@04ba50e7658c81db7356da96657e6e77f220bfa3 # v1.3.1
         with:
           # Every file is new to a repository whose history starts at the first
           # export, so trunk's default diff against the upstream branch has
