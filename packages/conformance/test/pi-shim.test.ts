@@ -45,6 +45,13 @@ const scratch = (prefix: string): string => mkdtempSync(join(tmpdir(), `runskein
 function fakePi(env: Record<string, string> = {}): EngineAdapter {
   return {
     ...piAdapter,
+    // Replaced along with `launch`, and for the same reason. The shipped
+    // `detect()` runs `pi --version` on PATH, so spreading the adapter without
+    // it left this file's opening claim — no pi binary — false: every case here
+    // passed on a machine that happened to have pi installed and failed on one
+    // that did not, reporting `not-installed` where the gate expects `stopped`.
+    // It fooled every machine this was developed on and none of the public CI's.
+    detect: async () => ({ installed: true, version: 'fake-pi' }),
     launch: {
       command: process.execPath,
       args: [FAKE_PI],
