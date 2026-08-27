@@ -64,10 +64,9 @@ Node.js 22 or newer, ESM only.
   against real engines. It is a snapshot of the machine that probed; for your
   own machine, `hub.engines()` and `hub.describe()` are the runtime facts.
 
-No version has been promoted to npmjs yet, so no release page exists here yet —
-the first release will be the first one. A tag can appear slightly before its
-release page: the repository is tagged before promotion, and the page is
-attached once the packages are actually on npmjs.
+A tag can appear slightly before its release page: the repository is tagged
+before promotion, and the page is attached once the packages are actually on
+npmjs.
 
 ## How a release reaches this repository
 

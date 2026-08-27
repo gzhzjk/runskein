@@ -4,10 +4,12 @@ Date: 2026-08-26 · Status: **accepted** · Cases: the three migration cases in
 `packages/core/test/orphanSweep.test.ts` · Rests on: decision 015 (the
 ownership registry)
 
-> Written after decision 038, which decided the rename in full. This record
-> covers one of its consequences — the state file that had to move — because
-> that is the part the shipped code cites, and a citation has to lead somewhere
-> the reader can go. Nothing here revises 038.
+> The product rename was decided in full in a record that is not published here.
+> This one covers a single consequence of it — the state file that had to move —
+> because that is the part the shipped code cites, and a citation has to lead
+> somewhere the reader can go. Citing the other record by number would have been
+> the same mistake in the other direction, so it is described rather than named.
+> Nothing here revises what it decided.
 
 ## Context
 

@@ -1,6 +1,6 @@
 ---
 source: README.md
-source-sha256: b93a7bc84ed43d06d1e92e0464c10bdbec994283485eedf59e8ce6f7e95f3b1d
+source-sha256: 99545dfe9023da6fb68b3a5c24ac457aad433ba76b96a26db5bf00e576208a6d
 ---
 
 # runskein
@@ -60,15 +60,6 @@ runskein 来做：
 
 ### 安装
 
-**npmjs 上现在还什么都没有。** 首个版本尚未晋升，所以目前请从源码构建：
-
-```bash
-git clone https://github.com/gzhzjk/runskein.git
-cd runskein && pnpm install --frozen-lockfile && pnpm build
-```
-
-首个版本发布之后，安装方式是：
-
 ```bash
 npm install runskein@alpha        # 或者：pnpm add runskein@alpha
 ```
@@ -76,9 +67,10 @@ npm install runskein@alpha        # 或者：pnpm add runskein@alpha
 `runskein` 就是你要装的那个包，五个 Engine 的 Adapter 都打包在里面，多数应用只
 需要这一行。
 
-**那时 `@alpha` 也不能省。** 裸写包名时 npm 解析的是 `latest` 这个 tag，而预发布
-版本不会带上它；`latest` 目前指向的是一个占名用的空壳包，所以省掉 `@alpha` 不会
-报错，只会装到一个没有代码的包。要单独装某个包也一样，写 `@runskein/core@alpha`。
+**`@alpha` 不能省。** 裸写包名时 npm 解析的是 `latest` 这个 tag，而预发布版本不会
+带上它；`latest` 指向的是一个已标记废弃、占名用的空壳包，所以省掉 `@alpha` 不会
+报错，只会带着一条警告装到一个没有代码的包。要单独装某个包也一样，写
+`@runskein/core@alpha`。
 
 需要 Node.js 22 或更高版本，只支持 ESM。装这个包不会装任何 Engine。runskein 只
 会去找你 `PATH` 上已有的 Engine。

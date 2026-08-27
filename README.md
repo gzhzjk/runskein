@@ -61,16 +61,6 @@ the ACP SDK and you do not think about the wire. See
 
 ### Install
 
-**Nothing is on npmjs yet.** The first release has not been promoted, so build
-from a clone for now:
-
-```bash
-git clone https://github.com/gzhzjk/runskein.git
-cd runskein && pnpm install --frozen-lockfile && pnpm build
-```
-
-Once the first release lands, the install is:
-
 ```bash
 npm install runskein@alpha        # or: pnpm add runskein@alpha
 ```
@@ -78,11 +68,11 @@ npm install runskein@alpha        # or: pnpm add runskein@alpha
 `runskein` is the package you want: it bundles all five engine adapters, so this
 is the only line most applications need.
 
-**`@alpha` will not be optional.** A bare package name resolves the `latest`
-tag, and no prerelease will carry it — `latest` currently points at a
-name-reservation placeholder with no code in it, so dropping `@alpha` installs
-an empty package rather than failing. The same goes for `@runskein/core@alpha`
-and the rest, if you reach for one directly.
+**`@alpha` is not optional.** A bare package name resolves the `latest` tag, and
+no prerelease carries it — `latest` points at a deprecated name-reservation
+placeholder with no code in it, so dropping `@alpha` installs an empty package
+with a warning rather than failing outright. The same goes for
+`@runskein/core@alpha` and the rest, if you reach for one directly.
 
 Node.js 22 or newer, ESM only. Installing this installs no engine — runskein
 finds engines already on your `PATH`.

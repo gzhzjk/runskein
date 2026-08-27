@@ -1,6 +1,6 @@
 ---
 source: docs/versioning.md
-source-sha256: ed6dace2978275469d1a10d2ec0255cabdcd87286c041226389299005ceb8360
+source-sha256: 9e6d1f8bfccdd337b677c24c3c99162db62aa19ced195c92bfa3bc6ea1bd7c98
 ---
 
 # 版本与发布
@@ -59,7 +59,6 @@ Node.js 22 或更高，仅 ESM。
   engine 的探测重新生成。它是探测那台机器的快照；你自己机器上的事实是
   `hub.engines()` 与 `hub.describe()`。
 
-目前还没有任何版本晋升到 npmjs，所以这里也还没有发布页——首次发布就是第一个。
 tag 可能比它的发布页早一点出现：仓库是在晋升之前打 tag 的，而发布页要等包真的上了
 npmjs 才挂上去。
 
