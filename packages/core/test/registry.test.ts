@@ -162,9 +162,7 @@ describe('Registry — workspace discovery', () => {
     writeAdapterDir(cwd, 'runskein-adapter-foo', { id: 'foo' });
     const r = new Registry({ cwd, discovery: true });
     expect([...(await r.adapters()).keys()]).toEqual([]);
-    expect((await r.invalidCandidates())[0]?.error).toMatch(
-      /duplicate adapter id 'foo' in the same layer/,
-    );
+    expect((await r.invalidCandidates())[0]?.error).toMatch(/duplicate adapter id 'foo' in the same layer/);
   });
 
   it('skips unsupported specVersion with a warning, not an invalid entry', async () => {

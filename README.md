@@ -12,7 +12,7 @@ does not decide which agent gets which task, cap what they spend, or keep them
 out of each other's files — that is your program's job, or the job of a layer
 you build on top.
 
-> **Status: preview.** The current release is `0.1.0-alpha.23`. The API is good
+> **Status: preview.** The current release is `0.1.0-alpha.24`. The API is good
 > enough to build against and evaluate, but it is not yet a promise to stay
 > compatible. What an engine can do also depends on the version installed on the
 > machine — check the [measured matrix](docs/conformance/matrix.public.json) before you
