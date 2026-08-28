@@ -54,6 +54,44 @@ function plantProcess(tag: string): ChildProcess {
 }
 
 /**
+ * Wait until `ps` can see a planted process as the thing that was planted.
+ *
+ * `spawn` returns a pid before the child has finished replacing itself with the
+ * program, and until it has, `ps` reports the command line it was forked from —
+ * which does not carry the tag. Anything that asks about identity in that window
+ * gets `mismatch` for a process that is exactly what it says it is.
+ *
+ * How wide the window is, measured: on an idle machine it closes before a single
+ * read, 40 of 40 immediate reads matching on Linux and on macOS. **That it is
+ * what a CI runner hit is not established** — the failure there reported a
+ * count and no evidence, which is why the assertion below now reports the
+ * branch it took. This closes a race that is real whether or not it was that
+ * one.
+ *
+ * Waiting here does not weaken any case: no test in this file is about how soon
+ * a process becomes observable, and every one of them is about what happens
+ * once it is.
+ *
+ * @param child - the planted process.
+ * @param tag - the marker its command line carries.
+ * @throws `Error` naming what `ps` last reported, when the window never closes.
+ */
+async function awaitInspectable(child: ChildProcess, tag: string): Promise<void> {
+  const pid = child.pid!;
+  const deadline = Date.now() + 10_000;
+  let last: string | undefined = '<never read>';
+  while (Date.now() < deadline) {
+    const info = await readProcessInfo(pid);
+    if (info?.command.includes(tag) === true) return;
+    last = info === undefined ? '<ps returned nothing>' : info.command;
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  throw new Error(
+    `planted process ${String(pid)} never became inspectable as ${tag}; ps last reported ${JSON.stringify(last)}`,
+  );
+}
+
+/**
  * Every live descendant of a pid this file planted.
  *
  * Deliberately a tree walk from a known pid rather than a search for a tag in
@@ -228,6 +266,8 @@ describe('sweep kill conditions', () => {
     const registry = fileOwnershipRegistry(registryPath());
     const orphan = plantProcess('runskein-orphan-victim');
     const sibling = plantProcess('runskein-orphan-sibling');
+    await awaitInspectable(orphan, 'runskein-orphan-victim');
+    await awaitInspectable(sibling, 'runskein-orphan-sibling');
     // A pid that is certainly not running stands in for the dead host.
     const deadOwner = 999_999;
     expect(isPidAlive(deadOwner)).toBe(false);
@@ -275,6 +315,7 @@ describe('sweep kill conditions', () => {
   it('prunes an entry whose process is already gone, without killing anything', async () => {
     const registry = fileOwnershipRegistry(registryPath());
     const dead = plantProcess('runskein-orphan-gone');
+    await awaitInspectable(dead, 'runskein-orphan-gone');
     const pid = dead.pid!;
     process.kill(-pid, 'SIGKILL');
     expect(await until(() => !isPidAlive(pid))).toBe(true);
@@ -302,6 +343,7 @@ describe('sweep kill conditions', () => {
     // running now — which is exactly what pid reuse looks like.
     const registry = fileOwnershipRegistry(registryPath());
     const stranger = plantProcess('runskein-orphan-stranger');
+    await awaitInspectable(stranger, 'runskein-orphan-stranger');
     await registry.add({
       enginePid: stranger.pid!,
       engineId: 'mock',
@@ -601,18 +643,36 @@ describe('a reap that fails is not reported as success', () => {
   it('keeps the entry so a later sweep tries again', async () => {
     const registry = fileOwnershipRegistry(registryPath());
     const survivor = plantProcess('runskein-orphan-survivor');
+    await awaitInspectable(survivor, 'runskein-orphan-survivor');
+    const plantedAt = Date.now();
     await registry.add({
       enginePid: survivor.pid!,
       engineId: 'mock',
       ownerPid: 999_999,
       argv0: 'runskein-orphan-survivor',
-      startedAt: Date.now(),
+      startedAt: plantedAt,
     });
 
     // A stop chain that reports honestly that the process is still there.
     const result = await sweepOrphans(registry, async () => false);
 
-    expect(result).toMatchObject({ scanned: 1, reaped: 0, prunedStaleEntries: 0 });
+    // `prunedStaleEntries: 1` has two causes and the count names neither: the
+    // pid was not alive, or `identityMatches` said the live pid is not this
+    // entry. This failed once on a CI runner and the number was all it said.
+    expect(
+      result,
+      result.prunedStaleEntries === 0
+        ? ''
+        : `the sweep pruned the entry. isPidAlive(${String(survivor.pid)}) = ${String(
+            isPidAlive(survivor.pid!),
+          )}\n${await whyIdentityFailed(survivor.pid!, {
+            enginePid: survivor.pid!,
+            engineId: 'mock',
+            ownerPid: 999_999,
+            argv0: 'runskein-orphan-survivor',
+            startedAt: plantedAt,
+          })}`,
+    ).toMatchObject({ scanned: 1, reaped: 0, prunedStaleEntries: 0 });
     // Still on file: forgetting it would mean nobody ever cleans it up.
     expect((await registry.list()).map((e) => e.enginePid)).toEqual([survivor.pid]);
   });
@@ -626,6 +686,7 @@ describe('pid recycling', () => {
     // the recorded signature perfectly. Only the start time separates them.
     const registry = fileOwnershipRegistry(registryPath());
     const impostor = plantProcess('runskein-orphan-recycled');
+    await awaitInspectable(impostor, 'runskein-orphan-recycled');
     await registry.add({
       enginePid: impostor.pid!,
       engineId: 'mock',
@@ -648,6 +709,7 @@ describe('pid recycling', () => {
   it('an entry with no usable timestamp is never a kill candidate', async () => {
     const registry = fileOwnershipRegistry(registryPath());
     const victim = plantProcess('runskein-orphan-notime');
+    await awaitInspectable(victim, 'runskein-orphan-notime');
     await registry.add({
       enginePid: victim.pid!,
       engineId: 'mock',
@@ -700,6 +762,7 @@ async function whyIdentityFailed(pid: number, entry: OwnershipEntry): Promise<st
 describe('identityMatches', () => {
   it('matches a live process it really describes', async () => {
     const child = plantProcess('runskein-identity-live');
+    await awaitInspectable(child, 'runskein-identity-live');
     const entry: OwnershipEntry = {
       enginePid: child.pid!,
       engineId: 'mock',
@@ -721,6 +784,7 @@ describe('identityMatches', () => {
     // are driven here against the real function: whatever the verdict is for, the
     // report has to agree.
     const child = plantProcess('runskein-identity-report');
+    await awaitInspectable(child, 'runskein-identity-report');
     const base: OwnershipEntry = {
       enginePid: child.pid!,
       engineId: 'mock',
