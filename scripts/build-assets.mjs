@@ -13,6 +13,13 @@
  * maintained list, so the next asset added is covered without anyone
  * remembering to add it here.
  *
+ * What it does not ask is whether the path survives leaving this tree: a
+ * reference that resolves here is exactly the one that ships and then resolves
+ * into a consumer's build directory. `verify-runtime-paths.mjs` asks that, and
+ * the two are separate on purpose — this one catches an asset that was not
+ * copied, which is a different mistake from a path that should not have been
+ * resolved at run time at all.
+ *
  * Usage: `node ../../scripts/build-assets.mjs` from a package directory.
  */
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync } from 'node:fs';

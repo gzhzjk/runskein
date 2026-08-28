@@ -48,8 +48,9 @@ import {
   isLiveCaseOptedIn,
   isLiveEnvironmentUnavailable as providerUnavailable,
   liveCaseOptInLabel,
+  liveConfigFor,
   LIVE_E2E_EXTEND_GROUP,
-  LIVE_MODEL_PINS,
+  LivePinRejectedError,
   listEngineSessionIds,
   ownedLiveEnginePids,
   requiredModelFamilyPresent,
@@ -61,10 +62,10 @@ import { runAgentMessageCase } from './message-format-case.js';
 /** The usage declaration an engine's adapter carries, if any. */
 type UsageMapping = (typeof builtinAdapters)[number]['usage'];
 
-// Every case forces a concrete model per engine from the shared pin table
-// (live runs are model-specific). Every engine takes its pin the same way —
-// config:{model} at session creation in sessionFor, written through the
-// engine's own model surface.
+// Every case forces a concrete model per engine from the adapter package's
+// live.config.json (live runs are model-specific). Every engine takes its pin
+// the same way — config:{model} at session creation in sessionFor, written
+// through the engine's own model surface.
 
 // ── Artifacts ─────────────────────────────────────────────────────────
 
@@ -107,25 +108,6 @@ function emit(c: CaseResult): void {
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 const tmp = (p: string) => mkdtempSync(join(tmpdir(), p));
-
-// OpenCode's default permission policy is model/config dependent. Inject an
-// adapter-scoped config layer instead of editing the user's config, so the
-// live case always exercises ACP request_permission and still answers it
-// through runskein's PermissionPolicy.
-const OPENCODE_ASK_CONFIG = JSON.stringify({
-  permission: {
-    read: 'ask',
-    edit: 'ask',
-    glob: 'ask',
-    grep: 'ask',
-    list: 'ask',
-    bash: 'ask',
-    external_directory: 'ask',
-    task: 'ask',
-    question: 'ask',
-    webfetch: 'ask',
-  },
-});
 
 /**
  * Find a descriptor config option by id, or by category as a fallback.
@@ -193,17 +175,22 @@ async function openEngine(engine: string): Promise<EngineCtx> {
   const ownership = fileOwnershipRegistry();
   const baseAdapter = builtinAdapters.find((adapter) => adapter.id === engine);
   if (baseAdapter === undefined) throw new Error(`unknown live engine '${engine}'`);
+  // Live-only launch env from the adapter's live.config.json. opencode uses it
+  // to inject an all-"ask" permission layer: its default policy is
+  // model/config dependent, and the live cases must always exercise ACP
+  // request_permission rather than whatever the user's own config says.
+  const liveEnv = liveConfigFor(engine).env;
   const hub = createLiveHub({
     store,
     orphanSweep: { ownership },
-    ...(engine === 'opencode'
+    ...(liveEnv !== undefined
       ? {
           adapters: [
             {
               ...baseAdapter,
               launch: {
                 ...baseAdapter.launch,
-                env: { ...baseAdapter.launch.env, OPENCODE_CONFIG_CONTENT: OPENCODE_ASK_CONFIG },
+                env: { ...baseAdapter.launch.env, ...liveEnv },
               },
             },
           ],
@@ -261,12 +248,16 @@ async function withOneTimeoutRetry<T>(ctx: EngineCtx, operation: string, fn: () 
 }
 
 /**
- * Create a session with the engine's forced model applied; session/new is
- * retried once on timeout (see withOneTimeoutRetry).
+ * Create a session with the engine's pinned live config applied; session/new
+ * is retried once on timeout (see withOneTimeoutRetry). A ConfigError against
+ * the pin is rethrown as LivePinRejectedError so the shared waiver rule can
+ * tell "the engine declined its own pin on this machine" apart from a case's
+ * own config being rejected — only the former may skip.
  * @param ctx - the engine context.
  * @param cwd - the session workspace.
  * @param opts - optional resume id, policy, timeout, and initial config.
- * @returns the session, with the engine's pinned model applied at creation.
+ * @returns the session, with the pinned config applied at creation.
+ * @throws LivePinRejectedError when the engine refuses the pinned config.
  */
 async function sessionFor(
   ctx: EngineCtx,
@@ -278,23 +269,29 @@ async function sessionFor(
     config?: Record<string, string | boolean>;
   } = {},
 ): Promise<ReturnType<typeof ctx.hub.session>> {
-  const pin = LIVE_MODEL_PINS[ctx.engine];
-  return withOneTimeoutRetry(ctx, 'session/new', () =>
-    ctx.hub.session({
-      engine: ctx.engine,
-      cwd,
-      ...(opts.resume !== undefined ? { resume: opts.resume } : {}),
-      ...(opts.permissionPolicy !== undefined ? { permissionPolicy: opts.permissionPolicy } : {}),
-      ...(opts.sessionIdleTimeoutMs !== undefined
-        ? { sessionIdleTimeoutMs: opts.sessionIdleTimeoutMs }
-        : {}),
-      ...(opts.config !== undefined
-        ? { config: opts.config }
-        : pin !== undefined
-          ? { config: { model: pin.model } }
+  const liveConfig = liveConfigFor(ctx.engine);
+  const pinned = opts.config ?? liveConfig.config;
+  try {
+    return await withOneTimeoutRetry(ctx, 'session/new', () =>
+      ctx.hub.session({
+        engine: ctx.engine,
+        cwd,
+        ...(opts.resume !== undefined ? { resume: opts.resume } : {}),
+        ...(opts.permissionPolicy !== undefined ? { permissionPolicy: opts.permissionPolicy } : {}),
+        ...(opts.sessionIdleTimeoutMs !== undefined
+          ? { sessionIdleTimeoutMs: opts.sessionIdleTimeoutMs }
           : {}),
-    }),
-  );
+        ...(pinned !== undefined ? { config: pinned } : {}),
+      }),
+    );
+  } catch (error) {
+    // Only a rejection of the pin itself waives; a caller's own config being
+    // rejected (opts.config set) is the case's defect to fail on.
+    if (opts.config === undefined && error instanceof ConfigError) {
+      throw new LivePinRejectedError(ctx.engine, liveConfig, error);
+    }
+    throw error;
+  }
 }
 
 // ── Cases ──────────────────────────────────────────────────────────────────
@@ -678,7 +675,8 @@ async function stLifetimeRecovery(ctx: EngineCtx): Promise<void> {
   // format changes.
   const codewordPrefix = 'LIFE-';
   const codeword = `${codewordPrefix}${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-  const pin = LIVE_MODEL_PINS[ctx.engine];
+  const pinned = liveConfigFor(ctx.engine).config;
+  const pinnedModel = pinned?.['model'];
   let session: Session | undefined;
 
   /**
@@ -711,7 +709,7 @@ async function stLifetimeRecovery(ctx: EngineCtx): Promise<void> {
         engine: ctx.engine,
         cwd: tmp('runskein-live-life-'),
         sessionIdleTimeoutMs: 2_000,
-        ...(pin !== undefined ? { config: { model: pin.model } } : {}),
+        ...(pinned !== undefined ? { config: pinned } : {}),
       }),
     );
     let reply = '';
@@ -737,7 +735,7 @@ async function stLifetimeRecovery(ctx: EngineCtx): Promise<void> {
       'lifetime plant',
     );
     log.push(
-      `STEP 1/5 planted ${codeword}, model ${pin === undefined ? 'left to the engine' : `pinned to ${pin.model}`}`,
+      `STEP 1/5 planted ${codeword}, model ${pinnedModel === undefined ? 'left to the engine' : `pinned to ${pinnedModel}`}`,
     );
 
     /**
@@ -803,7 +801,7 @@ async function stLifetimeRecovery(ctx: EngineCtx): Promise<void> {
           ],
       durationMs: Date.now() - t0,
     });
-    if (pin === undefined) {
+    if (pinned === undefined) {
       // Nothing was pinned, so there is no desired config for recovery to
       // re-apply and nothing this oracle could observe.
       emit({
@@ -830,10 +828,16 @@ async function stLifetimeRecovery(ctx: EngineCtx): Promise<void> {
       });
     }
   } catch (e) {
-    const unavailable = providerUnavailable(e);
+    // This script creates its session directly (it needs the idle timeout), so
+    // a declined pin arrives as a bare ConfigError; wrap it for the waiver rule.
+    const error =
+      pinned !== undefined && e instanceof ConfigError
+        ? new LivePinRejectedError(ctx.engine, { config: pinned }, e)
+        : e;
+    const unavailable = providerUnavailable(error);
     emitBoth(
       unavailable ? 'skip' : 'fail',
-      [`${unavailable ? 'INFO' : 'FAIL'} ${(e as Error).message}`],
+      [`${unavailable ? 'INFO' : 'FAIL'} ${(error as Error).message}`],
       unavailable ? 'typed engine auth/start/network unavailability' : undefined,
     );
   } finally {
@@ -1320,13 +1324,14 @@ async function cf05ModelList(ctx: EngineCtx): Promise<void> {
     return;
   }
   try {
-    const forced = LIVE_MODEL_PINS[ctx.engine]!.model;
-    if (!values.includes(forced)) {
+    const pinnedConfig = liveConfigFor(ctx.engine).config?.['model'];
+    const forced = typeof pinnedConfig === 'string' ? pinnedConfig : undefined;
+    if (forced === undefined || !values.includes(forced)) {
       emit({
         caseId: 'CF-05',
         engine: ctx.engine,
         verdict: 'fail',
-        log: [`FAIL forced model ${forced} not in the live model list`],
+        log: [`FAIL forced model ${String(forced)} not in the live model list`],
         durationMs: Date.now() - t0,
       });
       return;
@@ -1582,11 +1587,20 @@ async function ad05ColdStart(ctx: EngineCtx): Promise<void> {
  * a run where the low setting also produced thought is not a defect. What is
  * recorded is whether the high setting produced any thought at all, which is
  * the signal that dies if the contract drifts.
+ *
+ * The session also carries the engine's pinned live config, like every live
+ * session; a rejection of a pin key waives (environment mismatch), while a
+ * rejection of the declared creation key itself fails — that is the defect
+ * this case exists to catch.
  * @param ctx - the live engine context.
  */
 async function cf10CreationConfig(ctx: EngineCtx): Promise<void> {
   const t0 = Date.now();
   const log: string[] = [];
+  const pinned = liveConfigFor(ctx.engine).config;
+  // The key this case measures; the catch needs it to tell a rejection of the
+  // case's own value apart from a rejection of a pin key.
+  let measuredKey: string | undefined;
   try {
     const option = ctx.descriptor.configOptions.find((o) => o.settable === 'creation');
     if (option === undefined) {
@@ -1607,11 +1621,14 @@ async function cf10CreationConfig(ctx: EngineCtx): Promise<void> {
     );
     const highest = levels[levels.length - 1];
     if (highest === undefined) throw new Error(`'${option.id}' declares no values`);
+    measuredKey = option.id;
+    // The pin rides along so the run stays machine-independent; the case's own
+    // key wins on a collision — that key is what the case measures.
     const s = await withOneTimeoutRetry(ctx, 'session/new', () =>
       ctx.hub.session({
         engine: ctx.engine,
         cwd: tmp('runskein-live-cf10-'),
-        config: { [option.id]: highest },
+        config: { ...pinned, [option.id]: highest },
       }),
     );
     let thought = 0;
@@ -1647,8 +1664,20 @@ async function cf10CreationConfig(ctx: EngineCtx): Promise<void> {
       ...(thought > 0 ? {} : { waiver: 'creation-time thinking produced no observable thought' }),
     });
   } catch (e) {
-    const unavailable = providerUnavailable(e);
-    log.push(`${unavailable ? 'INFO' : 'FAIL'} ${(e as Error).message}`);
+    // Only a rejection of a pin key waives. The measured key is excluded even
+    // when the pin also carries it: on a collision the case's own value is the
+    // one sent, so its rejection is the contract regression this case exists
+    // to catch.
+    const error =
+      pinned !== undefined &&
+      e instanceof ConfigError &&
+      e.key !== undefined &&
+      e.key !== measuredKey &&
+      Object.hasOwn(pinned, e.key)
+        ? new LivePinRejectedError(ctx.engine, { config: pinned }, e)
+        : e;
+    const unavailable = providerUnavailable(error);
+    log.push(`${unavailable ? 'INFO' : 'FAIL'} ${(error as Error).message}`);
     emit({
       caseId: 'CF-10',
       engine: ctx.engine,

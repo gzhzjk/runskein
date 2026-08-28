@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 250" width="960" height="250"
+     role="img" aria-labelledby="t d">
+  <title id="t">runskein — one API for five coding agents</title>
+  <desc id="d">A TypeScript program calls one runskein API. runskein manages session
+  lifecycle, typed errors, the transcript store and permission control, and drives
+  OpenCode, Kimi Code, Claude Code, Codex and pi as child processes.</desc>
+
+  <style>
+    :root {
+      --ink: #0f172a; --muted: #475569; --line: #cbd5e1;
+      --card: #ffffff; --card-2: #f8fafc;
+      --brand: #1d4ed8; --brand-ink: #ffffff; --brand-soft: #dbeafe;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #e2e8f0; --muted: #94a3b8; --line: #334155;
+        --card: #0f172a; --card-2: #1e293b;
+        --brand: #2563eb; --brand-ink: #ffffff; --brand-soft: #1e3a8a;
+      }
+    }
+    .t { font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .ink { fill: var(--ink); } .muted { fill: var(--muted); }
+    .card { fill: var(--card); stroke: var(--line); stroke-width: 1.5; }
+    .brand-fill { fill: var(--brand); }
+    .on-brand { fill: var(--brand-ink); }
+    .pill { fill: var(--brand-soft); }
+    .flow { stroke: var(--brand); stroke-width: 2; fill: none; }
+  </style>
+
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--brand)"/>
+    </marker>
+  </defs>
+
+  <!-- consumer -->
+  <rect class="card" x="12" y="78" rx="10" width="196" height="94"/>
+  <text class="t ink" x="110" y="112" font-size="15" font-weight="600" text-anchor="middle">Your TypeScript</text>
+  <text class="t ink" x="110" y="132" font-size="15" font-weight="600" text-anchor="middle">program</text>
+  <text class="t muted" x="110" y="153" font-size="12" text-anchor="middle">app · CLI · MCP server</text>
+
+  <path class="flow" d="M212 125 H286" marker-end="url(#a)"/>
+  <text class="t muted" x="249" y="115" font-size="12" text-anchor="middle">one API</text>
+
+  <!-- runskein -->
+  <rect class="brand-fill" x="292" y="40" rx="12" width="330" height="170"/>
+  <text class="t on-brand" x="457" y="80" font-size="26" font-weight="700" text-anchor="middle">runskein</text>
+  <text class="t on-brand" x="457" y="101" font-size="12" opacity="0.85" text-anchor="middle">runtime layer, not an orchestrator</text>
+
+  <rect class="pill" x="308" y="118" rx="7" width="141" height="34"/>
+  <text class="t ink" x="378" y="139" font-size="12" text-anchor="middle">Session lifecycle</text>
+  <rect class="pill" x="465" y="118" rx="7" width="141" height="34"/>
+  <text class="t ink" x="535" y="139" font-size="12" text-anchor="middle">Typed errors</text>
+  <rect class="pill" x="308" y="160" rx="7" width="141" height="34"/>
+  <text class="t ink" x="378" y="181" font-size="12" text-anchor="middle">Transcript store</text>
+  <rect class="pill" x="465" y="160" rx="7" width="141" height="34"/>
+  <text class="t ink" x="535" y="181" font-size="12" text-anchor="middle">Permission control</text>
+
+  <!-- fan-out -->
+  <path class="flow" d="M626 125 C664 125 664 41 700 41" marker-end="url(#a)"/>
+  <path class="flow" d="M626 125 C664 125 664 83 700 83" marker-end="url(#a)"/>
+  <path class="flow" d="M626 125 H700" marker-end="url(#a)"/>
+  <path class="flow" d="M626 125 C664 125 664 167 700 167" marker-end="url(#a)"/>
+  <path class="flow" d="M626 125 C664 125 664 209 700 209" marker-end="url(#a)"/>
+
+  <!-- engines -->
+  <g class="t">
+    <rect class="card" x="706" y="26" rx="8" width="242" height="30"/>
+    <text class="ink" x="722" y="46" font-size="14">OpenCode</text>
+    <rect class="card" x="706" y="68" rx="8" width="242" height="30"/>
+    <text class="ink" x="722" y="88" font-size="14">Kimi Code</text>
+    <rect class="card" x="706" y="110" rx="8" width="242" height="30"/>
+    <text class="ink" x="722" y="130" font-size="14">Claude Code</text>
+    <rect class="card" x="706" y="152" rx="8" width="242" height="30"/>
+    <text class="ink" x="722" y="172" font-size="14">Codex</text>
+    <rect class="card" x="706" y="194" rx="8" width="242" height="30"/>
+    <text class="ink" x="722" y="214" font-size="14">pi</text>
+    <text class="muted" x="827" y="240" font-size="11" text-anchor="middle">agent processes runskein starts and stops</text>
+  </g>
+</svg>

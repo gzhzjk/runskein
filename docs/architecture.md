@@ -6,13 +6,20 @@ measured to support, [the capability matrix](capability-matrix.md).
 
 ## The layers
 
+<p align="center">
+  <img src="assets/runskein-layers.svg" width="900"
+       alt="Your application calls the runskein public API (Hub, Session, typed errors, optional runskein/fold). Beneath it, engine-agnostic core holds sessions, permissions, resume, the transcript store and the process manager. Beneath that, an internal-only ACP client speaks JSON-RPC over stdio to opencode, kimi, claude-code and codex directly, and to pi through a shim translating ACP to pi's JSONL.">
+</p>
+
+The same shape in text, which is what a diff and a screen reader can follow:
+
 ```text
         your application
                │
                ▼
 ┌──────────────────────────────────┐
-│  runskein public API           │  Hub, Session, typed errors
-│  (runskein's own types)        │  runskein/fold (optional)
+│  runskein public API             │  Hub, Session, typed errors
+│  (runskein's own types)          │  runskein/fold (optional)
 ├──────────────────────────────────┤
 │  core                            │  sessions, permissions, resume,
 │  engine-agnostic                 │  transcript store, process manager

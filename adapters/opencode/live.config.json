@@ -1,0 +1,8 @@
+{
+  "config": {
+    "model": "opencode-go/muse-spark-1.2-contributor"
+  },
+  "env": {
+    "OPENCODE_CONFIG_CONTENT": "{\"permission\":{\"read\":\"ask\",\"edit\":\"ask\",\"glob\":\"ask\",\"grep\":\"ask\",\"list\":\"ask\",\"bash\":\"ask\",\"external_directory\":\"ask\",\"task\":\"ask\",\"question\":\"ask\",\"webfetch\":\"ask\"}}"
+  }
+}

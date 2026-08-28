@@ -4,7 +4,7 @@
   "protocolVersion": 1,
   "agentInfo": {
     "name": "OpenCode",
-    "version": "1.18.21"
+    "version": "1.18.25"
   },
   "authMethods": [
     {
@@ -153,14 +153,6 @@
           "name": "Minimax/MiniMax-M3"
         },
         {
-          "value": "deepseek/deepseek-chat",
-          "name": "DeepSeek/DeepSeek Chat"
-        },
-        {
-          "value": "deepseek/deepseek-reasoner",
-          "name": "DeepSeek/DeepSeek Reasoner"
-        },
-        {
           "value": "deepseek/deepseek-v4-flash-vision-exp",
           "name": "DeepSeek/DeepSeek V4 Flash Vision Exp"
         },
@@ -215,6 +207,10 @@
         {
           "value": "nvidia/deepseek-ai/deepseek-v4-pro",
           "name": "NVIDIA/DeepSeek V4 Pro"
+        },
+        {
+          "value": "nvidia/deepseek-ai/deepseek-v4-pro-0813",
+          "name": "NVIDIA/DeepSeek V4 Pro 0813"
         },
         {
           "value": "nvidia/deepseek-v4-pro",
@@ -613,16 +609,24 @@
           "name": "OpenCode Go/GLM-5.3"
         },
         {
+          "value": "opencode-go/glm-5.3-flash",
+          "name": "OpenCode Go/GLM-5.3-Flash (2x usage)"
+        },
+        {
           "value": "opencode-go/gpt-5.6-luna",
           "name": "OpenCode Go/GPT-5.6 Luna"
         },
         {
-          "value": "opencode-go/grok-4.5",
-          "name": "OpenCode Go/Grok 4.5"
+          "value": "opencode-go/grok-4.6",
+          "name": "OpenCode Go/Grok 4.6"
         },
         {
           "value": "opencode-go/hy3",
           "name": "OpenCode Go/Hy3 (8x usage)"
+        },
+        {
+          "value": "opencode-go/hy4-preview",
+          "name": "OpenCode Go/Hy4 preview"
         },
         {
           "value": "opencode-go/kimi-k2.6",
@@ -635,6 +639,10 @@
         {
           "value": "opencode-go/kimi-k3",
           "name": "OpenCode Go/Kimi K3"
+        },
+        {
+          "value": "opencode-go/longcat-2.0",
+          "name": "OpenCode Go/LongCat-2.0"
         },
         {
           "value": "opencode-go/mimo-v2.5",
@@ -657,10 +665,6 @@
           "name": "OpenCode Go/Muse Spark 1.2 Contributor"
         },
         {
-          "value": "opencode-go/ox-alpha-free",
-          "name": "OpenCode Go/Ox Alpha Free"
-        },
-        {
           "value": "opencode-go/qwen3.6-plus",
           "name": "OpenCode Go/Qwen 3.6 Plus"
         },
@@ -673,8 +677,20 @@
           "name": "OpenCode Go/Qwen3.7 Plus"
         },
         {
+          "value": "opencode-go/qwen3.8-flash",
+          "name": "OpenCode Go/Qwen3.8 Flash"
+        },
+        {
           "value": "opencode-go/qwen3.8-max",
           "name": "OpenCode Go/Qwen3.8 Max"
+        },
+        {
+          "value": "agnes/agnes-2.5-flash",
+          "name": "Agnes/Agnes 2.5 Flash"
+        },
+        {
+          "value": "agnes/agnes-2.5-pro-alpha",
+          "name": "Agnes/Agnes 2.5 Pro Alpha"
         },
         {
           "value": "agnes/agnes-2.0-flash",
@@ -841,6 +857,10 @@
           "name": "OpenCode Zen/Hy3 Free"
         },
         {
+          "value": "opencode/ling-3.0-flash-fin-free",
+          "name": "OpenCode Zen/Ling 3.0 Flash Fin Free"
+        },
+        {
           "value": "opencode/mimo-v2.5-free",
           "name": "OpenCode Zen/MiMo V2.5 Free"
         },
@@ -855,10 +875,6 @@
         {
           "value": "opencode/nemotron-3.5-lightning-free",
           "name": "OpenCode Zen/Nemotron 3.5 Lightning Free"
-        },
-        {
-          "value": "opencode/x-preview-f-free",
-          "name": "OpenCode Zen/Ox Alpha Free (Unlimited)"
         },
         {
           "value": "baiduqianfancodingplan/glm-5",
@@ -889,16 +905,24 @@
       "type": "select",
       "options": [
         {
+          "value": "minimal",
+          "name": "Minimal"
+        },
+        {
           "value": "low",
           "name": "Low"
+        },
+        {
+          "value": "medium",
+          "name": "Medium"
         },
         {
           "value": "high",
           "name": "High"
         },
         {
-          "value": "max",
-          "name": "Max"
+          "value": "xhigh",
+          "name": "Xhigh"
         }
       ]
     },
@@ -931,7 +955,7 @@
     "sawUsage": true,
     "permissionRequests": 0,
     "replyText": "OK",
-    "durationMs": 7196
+    "durationMs": 2697
   },
   "usage": {
     "ok": true,
@@ -940,7 +964,7 @@
       "input",
       "output",
       "total",
-      "cacheRead"
+      "thought"
     ],
     "semantics": "per-turn"
   },

@@ -31,9 +31,9 @@ import { jsonlStore, type TranscriptEvent } from '@runskein/core';
 // four bundled adapters, which core's Hub does not do on its own.
 import { builtinAdapters, createHub } from 'runskein';
 import {
-  LIVE_MODEL_PINS,
   collectNativeSessionIds,
   deleteEngineSessions,
+  liveConfigFor,
   withLiveTimeout,
 } from './liveSupport.js';
 
@@ -127,8 +127,9 @@ async function measure(engine: string): Promise<EngineMeasurement> {
   const row: EngineMeasurement = { engine, ok: false, probes: [], shellCwdIsolated: false };
   const store = jsonlStore(tmp(`runskein-stcwd-store-${engine}-`));
   const hub = createHub({ store });
-  const pin = LIVE_MODEL_PINS[engine];
-  if (pin !== undefined) row.model = pin.model;
+  const pinned = liveConfigFor(engine).config;
+  const pinnedModel = pinned?.['model'];
+  if (typeof pinnedModel === 'string') row.model = pinnedModel;
   try {
     const dirs = { A: workspace(engine, 'A'), B: workspace(engine, 'B') } as const;
     const sessions: Array<{ label: 'A' | 'B'; cwd: string; s: Awaited<ReturnType<typeof hub.session>> }> =
@@ -140,7 +141,7 @@ async function measure(engine: string): Promise<EngineMeasurement> {
         s: await hub.session({
           engine,
           cwd: dirs[label],
-          ...(pin !== undefined ? { config: { model: pin.model } } : {}),
+          ...(pinned !== undefined ? { config: pinned } : {}),
         }),
       });
     }

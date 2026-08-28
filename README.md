@@ -1,6 +1,15 @@
 # runskein
 
+<p align="center">
+  <b>English</b> | <a href="README.zh-CN.md">简体中文</a>
+</p>
+
 **One API for five coding agents.**
+
+<p align="center">
+  <img src="docs/assets/runskein-overview.svg" width="960"
+       alt="Your TypeScript program calls one runskein API; runskein handles session lifecycle, typed errors, the transcript store and permission control, and drives OpenCode, Kimi Code, Claude Code, Codex and pi as child processes.">
+</p>
 
 runskein lets one TypeScript program drive OpenCode, Kimi Code, Claude Code,
 Codex, and pi through the same calls. It starts and stops the agent processes,
@@ -12,14 +21,16 @@ does not decide which agent gets which task, cap what they spend, or keep them
 out of each other's files — that is your program's job, or the job of a layer
 you build on top.
 
-> **Status: beta.** The current release is `0.1.0-beta.1`. The v1 surface is
-> frozen — see [the engine adapter API](docs/engine-adapter-api.md) — and a
-> change to it takes a numbered decision note, so what you build against now is
-> what a stable release will carry. It is not yet a compatibility promise: the
-> version is `0.x` and the measured behaviour of each engine still moves under
-> it. What an engine can do also depends on the version installed on the
-> machine — check the [measured matrix](docs/conformance/matrix.public.json)
-> before you depend on a feature.
+> **Status: released.** The current release is `0.1.0` — the first version that
+> is not a prerelease, and so the first that a bare `npm install runskein`
+> resolves to with code in it. The v1
+> surface is frozen — see [the engine adapter API](docs/engine-adapter-api.md) —
+> and a change to it takes a numbered decision note. It is still not a
+> compatibility promise: the version is `0.x` and the measured behaviour of each
+> engine moves under it. What an engine can do also depends on the version
+> installed on the machine — check the
+> [measured matrix](docs/conformance/matrix.public.json) before you depend on a
+> feature.
 
 Without runskein:
 
@@ -65,20 +76,17 @@ the ACP SDK and you do not think about the wire. See
 ### Install
 
 ```bash
-npm install runskein@beta         # or: pnpm add runskein@beta
+npm install runskein          # or: pnpm add runskein
 ```
 
 `runskein` is the package you want: it bundles all five engine adapters, so this
 is the only line most applications need.
 
-**`@beta` is not optional**, and the two packages fail differently without it.
-A bare name resolves the `latest` tag, which no prerelease carries. For
-`runskein` itself `latest` is a deprecated two-file name reservation with no
-code in it, so dropping `@beta` installs an empty package with a warning rather
-than failing outright. For the scoped packages — `@runskein/core` and the rest,
-if you reach for one directly — `latest` is `0.1.0-alpha.24`, a superseded
-release whose bundling defect stops a bundled artifact from loading at all.
-Name the tag.
+**No tag is needed any more.** Every release before this one was a prerelease,
+and a prerelease carries no `latest` — so a bare name resolved either a
+deprecated name reservation with no code in it or a superseded alpha, depending
+on which package you asked for. `0.1.0` is published under `latest` on all nine
+packages, which is what makes the line above the whole story.
 
 Node.js 22 or newer, ESM only. Installing this installs no engine — runskein
 finds engines already on your `PATH`.

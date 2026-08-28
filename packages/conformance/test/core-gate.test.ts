@@ -9,6 +9,7 @@
  */
 import { resolve } from 'node:path';
 import { coreGateSuite } from '../src/suite.js';
+import { liveConfigFor } from '../src/liveSupport.js';
 import { builtinAdapters } from 'runskein';
 import type { EngineAdapter } from '@runskein/core';
 
@@ -52,8 +53,12 @@ for (const id of liveIds) {
       `RUNSKEIN_GATE_ENGINES: unknown engine '${id}' — known: ${builtinAdapters.map((a) => a.id).join(', ')}`,
     );
   }
+  // The pinned live config comes from the adapter package's live.config.json;
+  // an engine that rejects it skips rather than fails (CoreGateOptions.config).
+  const pinned = liveConfigFor(id).config;
   coreGateSuite(adapter, {
     timeoutMs: 300_000,
+    ...(pinned !== undefined ? { config: pinned } : {}),
     permission: {
       prompt: 'Create a file named gate-permission.txt containing the word OK, using your file tools.',
       rules: [

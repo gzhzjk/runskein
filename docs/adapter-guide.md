@@ -58,8 +58,17 @@ adapters/<engine-id>/
 ├── package.json      name runskein-adapter-<engine-id> when published, plus the marker
 ├── index.mjs         default export: the EngineAdapter
 ├── index.d.ts        typing for static imports by the meta-package
-└── conformance.json  written by the probe (§ below); commit it as evidence
+├── conformance.json  written by the probe (§ below); commit it as evidence
+└── live.config.json  bundled adapters only: the config live test suites force; repository-only
 ```
+
+`live.config.json` pins what the repository's live test suites force at
+session creation — a `config` record (the model pin, plus any other session
+config such as reasoning) and optional launch `env` overrides. Live runs are
+model-specific: an unpinned engine default is account-dependent, which would
+make results incomparable across machines. The file is test data, not part of
+the adapter contract: it is excluded from the published `files`, and
+third-party adapters do not need one.
 
 Every directory-backed candidate follows one identity rule: its `id` must equal
 the directory basename directly (`<engine-id>/`), or equal the basename after

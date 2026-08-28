@@ -17,18 +17,54 @@
 import { existsSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
-import { createHub, jsonlStore, type TranscriptEvent } from 'runskein';
+import { describe, expect, it, type TaskContext } from 'vitest';
+import { ConfigError, createHub, jsonlStore, type TranscriptEvent } from 'runskein';
+import { liveConfigFor, livePinRejectionReason } from '../src/liveSupport.js';
 
 const live = process.env['RUNSKEIN_LIVE_PI'] === '1';
 const workspace = (): string => mkdtempSync(join(tmpdir(), 'runskein-live-pi-ws-'));
 const store = (): ReturnType<typeof jsonlStore> =>
   jsonlStore(mkdtempSync(join(tmpdir(), 'runskein-live-pi-store-')));
 
+type LiveHub = ReturnType<typeof createHub>;
+
+/**
+ * Create a pi session with the pinned live config from the adapter package's
+ * live.config.json. A pi that rejects the pin skips the case instead of
+ * failing it: the pin names this machine's environment, not the code under
+ * test. The reason is logged first — ctx.skip() itself carries no note.
+ * @param hub - the live hub.
+ * @param ctx - the test context, used to skip on a rejected pin.
+ * @param params - session parameters; the engine and config are owned here.
+ * @returns the created session.
+ * @throws anything that is not a pin rejection.
+ */
+async function liveSession(
+  hub: LiveHub,
+  ctx: TaskContext,
+  params: Omit<Parameters<LiveHub['session']>[0], 'engine' | 'config'>,
+): Promise<Awaited<ReturnType<LiveHub['session']>>> {
+  const liveConfig = liveConfigFor('pi');
+  try {
+    return await hub.session({
+      ...params,
+      engine: 'pi',
+      ...(liveConfig.config !== undefined ? { config: liveConfig.config } : {}),
+    });
+  } catch (error) {
+    if (error instanceof ConfigError) {
+      await hub.quit();
+      console.log(`SKIP: ${livePinRejectionReason('pi', liveConfig)}: ${error.message}`);
+      ctx.skip();
+    }
+    throw error;
+  }
+}
+
 describe.skipIf(!live)('live pi', () => {
-  it('PI-LV-01: spawn → prompt → streamed reply → usage', async () => {
+  it('PI-LV-01: spawn → prompt → streamed reply → usage', async (ctx) => {
     const hub = createHub({ store: store() });
-    const s = await hub.session({ engine: 'pi', cwd: workspace() });
+    const s = await liveSession(hub, ctx, { cwd: workspace() });
     const chunks: string[] = [];
     s.on('update', (event) => {
       if (event.update.sessionUpdate === 'agent_message_chunk') {
@@ -47,12 +83,11 @@ describe.skipIf(!live)('live pi', () => {
     await hub.quit();
   }, 180_000);
 
-  it('PI-LV-05: an allowed tool call runs and the file appears', async () => {
+  it('PI-LV-05: an allowed tool call runs and the file appears', async (ctx) => {
     const hub = createHub({ store: store() });
     const cwd = workspace();
     const asked: string[] = [];
-    const s = await hub.session({
-      engine: 'pi',
+    const s = await liveSession(hub, ctx, {
       cwd,
       permissionPolicy: (request) => {
         asked.push(`${request.tool}/${request.kind}`);
@@ -76,12 +111,11 @@ describe.skipIf(!live)('live pi', () => {
     await hub.quit();
   }, 300_000);
 
-  it('PI-LV-05: a denied tool call never touches the filesystem', async () => {
+  it('PI-LV-05: a denied tool call never touches the filesystem', async (ctx) => {
     const hub = createHub({ store: store() });
     const cwd = workspace();
     let asked = 0;
-    const s = await hub.session({
-      engine: 'pi',
+    const s = await liveSession(hub, ctx, {
       cwd,
       permissionPolicy: () => {
         asked++;

@@ -1,0 +1,6 @@
+{
+  "$comment": "Files that published code is allowed to reach by path at run time, per package, relative to the package directory. Everything else a built file resolves against its own location is refused by scripts/verify-runtime-paths.mjs. Adding a line here is the moment to ask whether the value could be compiled in instead: two defects have shipped from resolving a path that was only true of this tree, and neither would have been an entry anyone questioned. (The third in the report, pi's shim importing a package by bare specifier, is a different mechanism and belongs to quality.mjs; the shim itself was always an intentional runtime asset, which is why it is declared here.) Every entry is checked to exist and to be inside the package's published `files`, so a declaration cannot quietly become a lie.",
+  "@runskein/core": ["dist/process/supervisor.mjs"],
+  "@runskein/testkit": ["dist/scripted-agent.mjs"],
+  "@runskein/adapter-pi": ["shim.mjs", "permission-gate.ts"]
+}

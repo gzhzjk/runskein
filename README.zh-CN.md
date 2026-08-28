@@ -1,11 +1,20 @@
 ---
 source: README.md
-source-sha256: 6f270e923ef0357d6a2d36c688a8cf1ea5a317f24ce56c4d6701fa4a4a6e8304
+source-sha256: 45f4cbe6e2e421ec309fb7572e1351bc29a27d113d8c879636f938aee8ec3c0d
 ---
 
 # runskein
 
+<p align="center">
+  <a href="README.md">English</a> | <b>简体中文</b>
+</p>
+
 **一套 API，驱动五个 coding agent。**
+
+<p align="center">
+  <img src="docs/assets/runskein-overview.svg" width="960"
+       alt="Your TypeScript program calls one runskein API; runskein handles session lifecycle, typed errors, the transcript store and permission control, and drives OpenCode, Kimi Code, Claude Code, Codex and pi as child processes.">
+</p>
 
 runskein 让一个 TypeScript 程序用同一套调用去驱动 OpenCode、Kimi Code、
 Claude Code、Codex 和 pi。它负责启动和停止这些 coding agent 的进程（process），
@@ -15,11 +24,12 @@ runskein 是一个**运行时层（runtime layer），不是编排器（orchestr
 负责把 coding agent 跑起来。它不决定哪个 agent 接哪个任务（task），不限制它们花多
 少钱，也不隔离它们的文件。这些是你的程序要做的，或者是你在它之上再搭一层要做的。
 
-> **状态：beta。** 当前发布版本是 `0.1.0-beta.1`。v1 的接口面已经冻结——见
-> [engine adapter API](docs/engine-adapter-api.md)——改动它需要一条编号决策记录，
-> 所以你现在依赖的东西就是正式版会带的东西。但它还不是兼容性承诺：版本号是 `0.x`，
-> 而各个 Engine 的实测行为仍在变。每个 Engine 能做什么，也取决于机器上装的是哪个
-> 版本。依赖某个特性之前，先看[实测矩阵](docs/conformance/matrix.public.json)。
+> **状态：已发布。** 当前发布版本是 `0.1.0`——第一个不是预发布的版本，因此也是第一个
+> 裸写 `npm install runskein` 能装到真实代码的版本。v1 的接口面已经冻结——见
+> [engine adapter API](docs/engine-adapter-api.md)——改动它需要一条编号决策记录。
+> 但它仍然不是兼容性承诺：版本号是 `0.x`，而各个 Engine 的实测行为仍在变。每个
+> Engine 能做什么，也取决于机器上装的是哪个版本。依赖某个特性之前，先看
+> [实测矩阵](docs/conformance/matrix.public.json)。
 
 不用 runskein：
 
@@ -63,18 +73,16 @@ runskein 来做：
 ### 安装
 
 ```bash
-npm install runskein@beta         # 或者：pnpm add runskein@beta
+npm install runskein          # 或者：pnpm add runskein
 ```
 
 `runskein` 就是你要装的那个包，五个 Engine 的 Adapter 都打包在里面，多数应用只
 需要这一行。
 
-**`@beta` 不能省**，而且两类包漏掉它之后坏的方式还不一样。裸写包名时 npm 解析的是
-`latest` 这个 tag，而预发布版本不会带上它。对 `runskein` 本身，`latest` 指向的是一个
-已标记废弃、占名用的两文件空壳包，所以省掉 `@beta` 不会报错，只会带着一条警告装到一个
-没有代码的包。对带 scope 的那几个——`@runskein/core` 以及你直接引用的其它包——`latest`
-指向 `0.1.0-alpha.24`，那是一个已被取代的版本，它的打包缺陷会让打包后的产物根本加载
-不起来。把 tag 写上。
+**不再需要写 tag。** 在这之前的每个版本都是预发布，而预发布不带 `latest`——所以裸写
+包名解析到的，要么是一个已标记废弃、没有代码的占名包，要么是一个已被取代的 alpha，
+取决于你要的是哪个包。`0.1.0` 在九个包上都发布在 `latest` 下，这正是上面那一行就是
+全部的原因。
 
 需要 Node.js 22 或更高版本，只支持 ESM。装这个包不会装任何 Engine。runskein 只
 会去找你 `PATH` 上已有的 Engine。

@@ -1,6 +1,6 @@
 ---
 source: docs/adapter-guide.md
-source-sha256: 1b06536bb0324cbbc8b0d48be096550dd3fd75dc0574b3f7ba7f6ac13e04694f
+source-sha256: 3862c7fd452065d351d345107474c1ecfe4d7fd821d05b8a87ee4d07fd66d734
 ---
 
 # 编写 Engine Adapter
@@ -53,8 +53,15 @@ adapters/<engine-id>/
 ├── package.json      发布时命名为 runskein-adapter-<engine-id>，并带上标记
 ├── index.mjs         default export: the EngineAdapter
 ├── index.d.ts        typing for static imports by the meta-package
-└── conformance.json  由下文的 probe 命令写出；提交它作为证据
+├── conformance.json  由下文的 probe 命令写出；提交它作为证据
+└── live.config.json  仅内置 adapter:live 测试套件强制使用的配置；仅存在于仓库
 ```
+
+`live.config.json` 固定了本仓库 live 测试套件在 session 创建时强制使用的配置——
+一个 `config` 记录（模型 pin，以及 reasoning 等其他 session config）和可选的启动
+`env` 覆盖。live 运行是模型相关的：不固定时引擎默认值取决于账号，跨机器的结果
+无法比较。该文件是测试数据，不属于 adapter 契约：不进入发布的 `files`，第三方
+adapter 不需要它。
 
 每个以目录为载体的候选都遵循同一条身份规则：`id` 要么直接等于目录 basename
 （`<engine-id>/`），要么等于从 basename 中剥去精确前缀 `runskein-adapter-`

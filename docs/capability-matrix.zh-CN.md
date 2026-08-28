@@ -1,6 +1,6 @@
 ---
 source: docs/capability-matrix.md
-source-sha256: d4dc2b9736cdf2fd05e28c1321d578b7df815e1573d09fc6122f201940709079
+source-sha256: 27b20865bd065020052d82012907cb04814e26df973ca060cfe85065bf28155c
 ---
 
 # 能力矩阵
@@ -97,10 +97,10 @@ resume** 的原因——包括将来某个完全没有持久化的 Engine。
 <!-- prettier-ignore -->
 | Engine      | Measured version | Native resume | Load | Fork | List | Delete | Image input | MCP HTTP | MCP SSE | Providers | Token usage |
 | ----------- | ---------------- | ------------- | ---- | ---- | ---- | ------ | ----------- | -------- | ------- | --------- | ----------- |
-| OpenCode    | 1.18.21          | ✓             | ✓    | ✓    | ✓    | —      | ✓           | ✓        | ✓       | ✗         | ✓           |
+| OpenCode    | 1.18.25          | ✓             | ✓    | ✓    | ✓    | —      | ✓           | ✓        | ✓       | ✗         | ✓           |
 | Kimi Code   | 0.38.0           | ✓             | ✓    | ✓    | ✓    | ✓      | ✓           | ✓        | ✓       | ✗         | ✗           |
 | Claude Code | 0.16.2           | ✓             | ✓    | ✓    | ✓    | —      | ✓           | ✓        | ✓       | ✗         | ✗           |
-| Codex       | 1.6.2            | ✓             | ✓    | —    | ✓    | ✓      | ✓           | ✓        | ✗       | ✓         | ✓           |
+| Codex       | 1.7.0            | ✓             | ✓    | —    | ✓    | ✓      | ✓           | ✓        | ✗       | ✓         | ✓           |
 | pi          | 0.84.2 (shim 1)  | ✓             | ✓    | ✓    | ✗    | ✗      | ✗           | ✗        | ✗       | ✗         | ✓           |
 
 <!-- /generated:builtin-support -->

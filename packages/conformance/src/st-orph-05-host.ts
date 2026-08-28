@@ -5,7 +5,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { Hub, fileOwnershipRegistry, memoryStore } from '@runskein/core/internal';
 import { builtinAdapters } from 'runskein';
-import { LIVE_MODEL_PINS } from './liveSupport.js';
+import { liveConfigFor } from './liveSupport.js';
 
 interface HostConfig {
   engineId: string;
@@ -16,7 +16,7 @@ interface HostConfig {
 
 const config = JSON.parse(readFileSync(process.argv[2]!, 'utf8')) as HostConfig;
 const adapter = builtinAdapters.find((a) => a.id === config.engineId)!;
-const pin = LIVE_MODEL_PINS[config.engineId];
+const pinned = liveConfigFor(config.engineId).config;
 
 const hub = new Hub({
   discovery: false,
@@ -28,7 +28,7 @@ const hub = new Hub({
 const session = await hub.session({
   engine: config.engineId,
   cwd: config.cwd,
-  ...(pin !== undefined ? { config: { model: pin.model } } : {}),
+  ...(pinned !== undefined ? { config: pinned } : {}),
 });
 // A turn, so the engine is fully warmed rather than merely spawned — the leak
 // this case exists for happens to engines that have really been working.

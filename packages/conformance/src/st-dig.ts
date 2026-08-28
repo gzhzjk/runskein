@@ -14,8 +14,8 @@ import { builtinAdapters, createHub, jsonlStore, type StructuredDigest } from 'r
 import {
   collectNativeSessionIds,
   deleteEngineSessions,
-  LIVE_MODEL_PINS,
   isLiveEnvironmentUnavailable,
+  liveConfigFor,
   withLiveTimeout,
 } from './liveSupport.js';
 
@@ -53,13 +53,15 @@ async function replyText(
 }
 
 try {
+  // Both sessions take the pinned config from the adapter's live.config.json,
+  // so the handoff does not depend on either machine's engine default.
+  const sourcePinned = liveConfigFor(sourceEngine).config;
+  const destinationPinned = liveConfigFor(destinationEngine).config;
   const reason = `DIG-REASON-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
   source = await hub.session({
     engine: sourceEngine,
     cwd: tmp(`runskein-st-dig-source-${sourceEngine}-`),
-    ...(LIVE_MODEL_PINS[sourceEngine] !== undefined
-      ? { config: { model: LIVE_MODEL_PINS[sourceEngine]!.model } }
-      : {}),
+    ...(sourcePinned !== undefined ? { config: sourcePinned } : {}),
   });
   await replyText(
     source,
@@ -73,9 +75,7 @@ try {
   destination = await hub.session({
     engine: destinationEngine,
     cwd: tmp(`runskein-st-dig-destination-${destinationEngine}-`),
-    ...(LIVE_MODEL_PINS[destinationEngine] !== undefined
-      ? { config: { model: LIVE_MODEL_PINS[destinationEngine]!.model } }
-      : {}),
+    ...(destinationPinned !== undefined ? { config: destinationPinned } : {}),
   });
   const answer = await replyText(
     destination,

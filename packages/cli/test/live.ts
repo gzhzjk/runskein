@@ -36,7 +36,8 @@ import {
   collectNativeSessionIds,
   deleteEngineSessions,
   isLiveEnvironmentErrorLine,
-  LIVE_MODEL_PINS,
+  liveConfigFor,
+  livePinRejectionReason,
 } from '@runskein/conformance/live-support';
 import { jsonlStore } from '@runskein/core';
 import claudeCode from '@runskein/adapter-claude-code';
@@ -141,19 +142,21 @@ function usable(rows: Map<string, EngineRow>, id: string): string | undefined {
 }
 
 /**
- * Live runs pin the model per engine from LIVE_MODEL_PINS, the table shared
- * with the conformance live runner, keeping turns cheap and comparable
- * across machines.
+ * Live runs force the config each engine's adapter pins in its
+ * live.config.json, keeping turns cheap and comparable across machines.
  *
- * One mechanism for every engine: `-c model=…`, which lands on
- * SessionOpts.config and is written with the engine's own model surface.
+ * One mechanism for every engine: `-c key=value`, which lands on
+ * SessionOpts.config and is written with the engine's own config surface.
  * claude-code previously needed an environment pin here because core had no
  * model path for it; that pin was measured to have no effect, and the engine
  * now takes `-c model=…` like the others.
  */
 const FORCED_CONFIG: Record<string, string[]> = {};
-for (const [engine, pin] of Object.entries(LIVE_MODEL_PINS)) {
-  FORCED_CONFIG[engine] = ['-c', `model=${pin.model}`];
+for (const engine of BUILTIN_IDS) {
+  const config = liveConfigFor(engine).config;
+  if (config !== undefined) {
+    FORCED_CONFIG[engine] = Object.entries(config).flatMap(([key, value]) => ['-c', `${key}=${value}`]);
+  }
 }
 
 function liveChat(engine: string, extra: string[] = []): ChatDriver {
@@ -195,9 +198,24 @@ class LiveSessionEnvironmentError extends Error {
   }
 }
 
-/** Classify a session-creation failure: environmental waiver or rethrow as-is. */
-function classifySessionFailure(chat: ChatDriver, e: unknown): unknown {
+/**
+ * Classify a session-creation failure: environmental waiver or rethrow as-is.
+ * A ConfigError line here is the engine declining the `-c` pin this suite
+ * forced — waived with the pin's remediation, but only at this creation point;
+ * a ConfigError surfacing anywhere else (e.g. mid-turn) is a real failure.
+ * @param engine - the engine id, used to name the declined pin on a waiver.
+ * @param chat - the chat process whose output carries the failure.
+ * @param e - the failure thrown while waiting for the session banner.
+ * @returns a LiveSessionEnvironmentError to throw on an environmental failure,
+ *   or `e` unchanged.
+ */
+function classifySessionFailure(engine: string, chat: ChatDriver, e: unknown): unknown {
   const line = firstErrorLine(chat);
+  if (line !== undefined && /^\[error\] ConfigError: /.test(line)) {
+    return new LiveSessionEnvironmentError(
+      `${livePinRejectionReason(engine, liveConfigFor(engine))} — ${line}`,
+    );
+  }
   return isLiveEnvironmentErrorLine(line) ? new LiveSessionEnvironmentError(line as string) : e;
 }
 
@@ -212,11 +230,16 @@ function classifySessionFailure(chat: ChatDriver, e: unknown): unknown {
  * auth, network, quota) throws `LiveSessionEnvironmentError` for the caller
  * to waive. Any other failure (a real hang, a genuine defect) propagates
  * unchanged.
+ * @param engine - the engine id, used to name the declined pin on a waiver.
  * @param chat - the chat process already spawned.
  * @param recreate - spawns a fresh chat process for the retry.
  * @returns the chat process the session banner was actually seen on.
  */
-async function waitForSessionRetrying<T extends ChatDriver>(chat: T, recreate: () => T): Promise<T> {
+async function waitForSessionRetrying<T extends ChatDriver>(
+  engine: string,
+  chat: T,
+  recreate: () => T,
+): Promise<T> {
   try {
     await chat.waitFor('[session] id=', 60_000);
     return chat;
@@ -224,7 +247,7 @@ async function waitForSessionRetrying<T extends ChatDriver>(chat: T, recreate: (
     const isSessionNewTimeout =
       chat.combined.includes("operation 'session/new' failed") &&
       chat.combined.includes('timeout after 30000ms');
-    if (!isSessionNewTimeout) throw classifySessionFailure(chat, e);
+    if (!isSessionNewTimeout) throw classifySessionFailure(engine, chat, e);
     chat.signal('SIGKILL');
     await chat.exit();
     const retry = recreate();
@@ -232,7 +255,7 @@ async function waitForSessionRetrying<T extends ChatDriver>(chat: T, recreate: (
       await retry.waitFor('[session] id=', 60_000);
       return retry;
     } catch (e2) {
-      throw classifySessionFailure(retry, e2);
+      throw classifySessionFailure(engine, retry, e2);
     }
   }
 }
@@ -280,7 +303,7 @@ async function lv03(g: Group, rows: Map<string, EngineRow>, id: string): Promise
   }
   let chat = liveChat(id);
   try {
-    chat = await waitForSessionRetrying(chat, () => liveChat(id));
+    chat = await waitForSessionRetrying(id, chat, () => liveChat(id));
     chat.write('Reply with the single word OK');
     const seen = await waitForEither(chat, '[turn] stopReason=', '[error]', TURN_TIMEOUT_MS);
     if (seen === '[error]') {

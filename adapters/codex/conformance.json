@@ -5,7 +5,7 @@
   "agentInfo": {
     "name": "@agentclientprotocol/codex-acp",
     "title": "Codex",
-    "version": "1.6.2"
+    "version": "1.7.0"
   },
   "authMethods": [
     {
@@ -31,7 +31,8 @@
       "list": true,
       "close": true,
       "delete": true,
-      "additionalDirectories": true
+      "additionalDirectories": true,
+      "subagents": true
     },
     "prompt": {
       "embeddedContext": true,
@@ -49,20 +50,20 @@
     "available": [
       {
         "id": "read-only",
-        "name": "Read-only"
+        "name": "Ask for approval"
       },
       {
         "id": "agent",
-        "name": "Agent"
+        "name": "Approve for me"
       },
       {
         "id": "agent-full-access",
-        "name": "Agent (full access)"
+        "name": "Full access"
       }
     ]
   },
   "models": {
-    "current": "gpt-5.6-terra[medium]",
+    "current": "gpt-5.6-sol[high]",
     "available": [
       {
         "id": "gpt-5.6-sol[low]",
@@ -191,18 +192,27 @@
       "options": [
         {
           "value": "read-only",
-          "name": "Read-only",
-          "description": "Requires approval to edit files and run commands."
+          "name": "Ask for approval",
+          "description": "Always ask to edit external files and use the internet",
+          "_meta": {
+            "kind": "standard"
+          }
         },
         {
           "value": "agent",
-          "name": "Agent",
-          "description": "Read and edit files, and run commands."
+          "name": "Approve for me",
+          "description": "Only ask for actions detected as potentially unsafe",
+          "_meta": {
+            "kind": "auto_review"
+          }
         },
         {
           "value": "agent-full-access",
-          "name": "Agent (full access)",
-          "description": "Codex can edit files outside this workspace and run commands with network access. Exercise caution when using."
+          "name": "Full access",
+          "description": "Unrestricted access to the internet and any file on your computer",
+          "_meta": {
+            "kind": "full_access"
+          }
         }
       ]
     },
@@ -329,7 +339,7 @@
     "sawUsage": true,
     "permissionRequests": 0,
     "replyText": "OK",
-    "durationMs": 4283
+    "durationMs": 5092
   },
   "usage": {
     "ok": true,

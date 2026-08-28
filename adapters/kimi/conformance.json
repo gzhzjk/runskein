@@ -151,13 +151,13 @@
     "updateKinds": {
       "available_commands_update": 1,
       "session_info_update": 1,
-      "agent_thought_chunk": 20,
+      "agent_thought_chunk": 15,
       "agent_message_chunk": 1
     },
     "sawUsage": false,
     "permissionRequests": 0,
     "replyText": "OK",
-    "durationMs": 5354
+    "durationMs": 6769
   },
   "usage": {
     "ok": false,

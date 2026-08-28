@@ -1,6 +1,6 @@
 ---
 source: docs/architecture.md
-source-sha256: 665f622baed7fb214285b51d70ecb1c7678322887b6d578ea7710afdd7ce8c8f
+source-sha256: 6bbb694128f53746b5fa1cbcc5811b1fa80d1e4e9c2a71839904a2db78645245
 ---
 
 # 架构
@@ -11,13 +11,20 @@ source-sha256: 665f622baed7fb214285b51d70ecb1c7678322887b6d578ea7710afdd7ce8c8f
 
 ## 分层
 
+<p align="center">
+  <img src="assets/runskein-layers.svg" width="900"
+       alt="Your application calls the runskein public API (Hub, Session, typed errors, optional runskein/fold). Beneath it, engine-agnostic core holds sessions, permissions, resume, the transcript store and the process manager. Beneath that, an internal-only ACP client speaks JSON-RPC over stdio to opencode, kimi, claude-code and codex directly, and to pi through a shim translating ACP to pi's JSONL.">
+</p>
+
+同一个形状的文字版——diff 和读屏软件能跟着走的是这一份：
+
 ```text
         your application
                │
                ▼
 ┌──────────────────────────────────┐
-│  runskein public API           │  Hub, Session, typed errors
-│  (runskein's own types)        │  runskein/fold (optional)
+│  runskein public API             │  Hub, Session, typed errors
+│  (runskein's own types)          │  runskein/fold (optional)
 ├──────────────────────────────────┤
 │  core                            │  sessions, permissions, resume,
 │  engine-agnostic                 │  transcript store, process manager

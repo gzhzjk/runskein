@@ -2,7 +2,7 @@
   {
     "id": "opencode",
     "agentInfo": {
-      "version": "1.18.21"
+      "version": "1.18.25"
     },
     "capabilities": {
       "loadSession": true,
@@ -32,7 +32,7 @@
       "sawUsage": true,
       "permissionRequests": 0,
       "replyText": "OK",
-      "durationMs": 7196
+      "durationMs": 2697
     },
     "usage": {
       "ok": true,
@@ -41,7 +41,7 @@
         "input",
         "output",
         "total",
-        "cacheRead"
+        "thought"
       ],
       "semantics": "per-turn"
     }
@@ -77,13 +77,13 @@
       "updateKinds": {
         "available_commands_update": 1,
         "session_info_update": 1,
-        "agent_thought_chunk": 20,
+        "agent_thought_chunk": 15,
         "agent_message_chunk": 1
       },
       "sawUsage": false,
       "permissionRequests": 0,
       "replyText": "OK",
-      "durationMs": 5354
+      "durationMs": 6769
     },
     "usage": {
       "ok": false,
@@ -124,7 +124,7 @@
       "sawUsage": false,
       "permissionRequests": 0,
       "replyText": "OK",
-      "durationMs": 2305
+      "durationMs": 2702
     },
     "usage": {
       "ok": false,
@@ -137,7 +137,7 @@
     "id": "codex",
     "agentInfo": {
       "title": "Codex",
-      "version": "1.6.2"
+      "version": "1.7.0"
     },
     "capabilities": {
       "loadSession": true,
@@ -146,7 +146,8 @@
         "list": true,
         "close": true,
         "delete": true,
-        "additionalDirectories": true
+        "additionalDirectories": true,
+        "subagents": true
       },
       "prompt": {
         "embeddedContext": true,
@@ -170,7 +171,7 @@
       "sawUsage": true,
       "permissionRequests": 0,
       "replyText": "OK",
-      "durationMs": 4283
+      "durationMs": 5092
     },
     "usage": {
       "ok": true,
@@ -219,7 +220,7 @@
       "sawUsage": true,
       "permissionRequests": 0,
       "replyText": "OK",
-      "durationMs": 6346
+      "durationMs": 4635
     },
     "usage": {
       "ok": false,

@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { EngineOperationError, UnauthenticatedError } from 'runskein';
+import { ConfigError, EngineOperationError, UnauthenticatedError } from 'runskein';
 import {
   isLiveEnvironmentErrorLine,
   isLiveEnvironmentUnavailable,
   isLiveCaseOptedIn,
   liveCaseOptInLabel,
   LIVE_E2E_EXTEND_GROUP,
-  LIVE_MODEL_PINS,
+  LivePinRejectedError,
   ownedLiveEnginePids,
   requiredModelFamilyPresent,
   withLiveTimeout,
@@ -22,18 +22,6 @@ describe('live runner verdict boundaries', () => {
     expect(isLiveCaseOptedIn('PV-02', new Set([LIVE_E2E_EXTEND_GROUP]))).toBe(false);
     expect(liveCaseOptInLabel('OP-MSG-01')).toBe(LIVE_E2E_EXTEND_GROUP);
     expect(liveCaseOptInLabel('PV-02')).toBe('PV-02');
-  });
-
-  it('pins one model per engine, all through the same mechanism', () => {
-    // claude-code used to pin via launch args and environment. Both were
-    // measured to have no effect on the model the engine actually ran, so
-    // every engine now takes its pin through config: { model }.
-    for (const engine of ['opencode', 'kimi', 'codex', 'claude-code']) {
-      expect(LIVE_MODEL_PINS[engine]?.model).toBeTruthy();
-    }
-    for (const pin of Object.values(LIVE_MODEL_PINS)) {
-      expect(Object.keys(pin)).toEqual(['model']);
-    }
   });
 
   it('never waives a missing required model family', () => {
@@ -79,6 +67,22 @@ describe('live runner verdict boundaries', () => {
         }),
       ),
     ).toBe(true);
+    // A declined live pin (wrapped at the pinned session-creation point) is an
+    // environment mismatch on this machine, not a code defect.
+    expect(
+      isLiveEnvironmentUnavailable(
+        new LivePinRejectedError(
+          'pi',
+          { config: { model: 'x' } },
+          new ConfigError({ engineId: 'pi', key: 'model', message: "invalid model 'x'" }),
+        ),
+      ),
+    ).toBe(true);
+    // A bare ConfigError is config a case built itself being rejected — a real
+    // defect, never waived.
+    expect(
+      isLiveEnvironmentUnavailable(new ConfigError({ engineId: 'pi', key: 'model', message: 'no' })),
+    ).toBe(false);
   });
 
   it('classifies CLI [error] lines with the same rule core', () => {
@@ -92,6 +96,8 @@ describe('live runner verdict boundaries', () => {
         "[error] EngineOperationError: engine 'kimi' operation 'session/close' failed: rate limit exceeded { operation: \"session/close\" }",
       ),
     ).toBe(false);
+    // A bare ConfigError line does not waive: the CLI live suite recognises a
+    // declined `-c` pin itself, at session creation (classifySessionFailure).
     expect(isLiveEnvironmentErrorLine('[error] ConfigError: unknown value { key: "model" }')).toBe(false);
     expect(isLiveEnvironmentErrorLine('[error] unexpected: TypeError: boom')).toBe(false);
     expect(isLiveEnvironmentErrorLine(undefined)).toBe(false);

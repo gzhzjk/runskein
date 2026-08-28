@@ -11,6 +11,9 @@ importers:
       esbuild:
         specifier: ^0.28.1
         version: 0.28.1
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
 
   adapters/claude-code:
     devDependencies:
@@ -91,6 +94,18 @@ importers:
         specifier: workspace:*
         version: link:../runskein
     devDependencies:
+      '@runskein/adapter-claude-code':
+        specifier: workspace:*
+        version: link:../../adapters/claude-code
+      '@runskein/adapter-codex':
+        specifier: workspace:*
+        version: link:../../adapters/codex
+      '@runskein/adapter-kimi':
+        specifier: workspace:*
+        version: link:../../adapters/kimi
+      '@runskein/adapter-opencode':
+        specifier: workspace:*
+        version: link:../../adapters/opencode
       '@runskein/adapter-pi':
         specifier: workspace:*
         version: link:../../adapters/pi

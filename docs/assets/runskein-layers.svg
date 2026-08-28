@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500"
+     role="img" aria-labelledby="t d">
+  <title id="t">runskein layers</title>
+  <desc id="d">Your application calls the runskein public API (Hub, Session, typed errors,
+  and the optional runskein/fold). Beneath it, engine-agnostic core holds sessions,
+  permissions, resume, the transcript store and the process manager. Beneath that, an
+  internal-only ACP client speaks JSON-RPC over stdio to opencode, kimi, claude-code and
+  codex directly, and to pi through a shim that translates ACP to pi's JSONL.</desc>
+
+  <style>
+    :root {
+      --ink: #0f172a; --muted: #475569; --line: #cbd5e1;
+      --card: #ffffff; --api: #dbeafe; --core: #dcfce7; --acp: #ede9fe; --engine: #f1f5f9;
+      --brand: #1d4ed8;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #e2e8f0; --muted: #94a3b8; --line: #334155;
+        --card: #0f172a; --api: #1e3a8a; --core: #14532d; --acp: #4c1d95; --engine: #1e293b;
+        --brand: #3b82f6;
+      }
+    }
+    .t { font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .ink { fill: var(--ink); } .muted { fill: var(--muted); }
+    .band { stroke: var(--line); stroke-width: 1.5; }
+    .sub { fill: var(--card); stroke: var(--line); stroke-width: 1; }
+    .flow { stroke: var(--brand); stroke-width: 2; fill: none; }
+    .dash { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--brand)"/>
+    </marker>
+  </defs>
+
+  <!-- your application -->
+  <rect class="band" x="300" y="10" rx="9" width="300" height="42" fill="var(--engine)"/>
+  <text class="t ink" x="450" y="37" font-size="15" font-weight="600" text-anchor="middle">your application</text>
+  <path class="flow" d="M450 54 V78" marker-end="url(#a)"/>
+
+  <!-- public API -->
+  <rect class="band" x="40" y="82" rx="9" width="820" height="88" fill="var(--api)"/>
+  <text class="t ink" x="60" y="108" font-size="15" font-weight="700">runskein public API</text>
+  <text class="t muted" x="228" y="108" font-size="12">runskein's own types — no ACP on any surface you can reach</text>
+  <rect class="sub" x="60" y="120" rx="6" width="176" height="34"/>
+  <text class="t ink" x="148" y="141" font-size="13" text-anchor="middle">Hub</text>
+  <rect class="sub" x="248" y="120" rx="6" width="176" height="34"/>
+  <text class="t ink" x="336" y="141" font-size="13" text-anchor="middle">Session</text>
+  <rect class="sub" x="436" y="120" rx="6" width="176" height="34"/>
+  <text class="t ink" x="524" y="141" font-size="13" text-anchor="middle">typed errors</text>
+  <rect class="sub" x="624" y="120" rx="6" width="216" height="34"/>
+  <text class="t ink" x="732" y="141" font-size="13" text-anchor="middle">runskein/fold (optional)</text>
+
+  <!-- core -->
+  <rect class="band" x="40" y="182" rx="9" width="820" height="88" fill="var(--core)"/>
+  <text class="t ink" x="60" y="208" font-size="15" font-weight="700">core</text>
+  <text class="t muted" x="108" y="208" font-size="12">engine-agnostic — an adapter is data core reads, never code core calls into</text>
+  <rect class="sub" x="60" y="220" rx="6" width="146" height="34"/>
+  <text class="t ink" x="133" y="241" font-size="12" text-anchor="middle">sessions</text>
+  <rect class="sub" x="218" y="220" rx="6" width="146" height="34"/>
+  <text class="t ink" x="291" y="241" font-size="12" text-anchor="middle">permissions</text>
+  <rect class="sub" x="376" y="220" rx="6" width="146" height="34"/>
+  <text class="t ink" x="449" y="241" font-size="12" text-anchor="middle">resume</text>
+  <rect class="sub" x="534" y="220" rx="6" width="146" height="34"/>
+  <text class="t ink" x="607" y="241" font-size="12" text-anchor="middle">transcript store</text>
+  <rect class="sub" x="692" y="220" rx="6" width="148" height="34"/>
+  <text class="t ink" x="766" y="241" font-size="12" text-anchor="middle">process manager</text>
+
+  <!-- ACP client -->
+  <rect class="band" x="40" y="282" rx="9" width="820" height="72" fill="var(--acp)"/>
+  <text class="t ink" x="60" y="308" font-size="15" font-weight="700">ACP client</text>
+  <text class="t muted" x="152" y="308" font-size="12">internal only — the protocol stops here, and nothing a consumer imports reaches it</text>
+  <rect class="sub" x="60" y="318" rx="6" width="230" height="26"/>
+  <text class="t ink" x="175" y="336" font-size="12" text-anchor="middle">JSON-RPC over stdio</text>
+
+  <!-- fan to engines -->
+  <path class="flow" d="M170 358 V392" marker-end="url(#a)"/>
+  <path class="flow" d="M330 358 V392" marker-end="url(#a)"/>
+  <path class="flow" d="M490 358 V392" marker-end="url(#a)"/>
+  <path class="flow" d="M650 358 V392" marker-end="url(#a)"/>
+  <path class="flow" d="M800 358 V392" marker-end="url(#a)"/>
+
+  <rect class="dash" x="60" y="396" rx="9" width="660" height="58" fill="none"/>
+  <g class="t">
+    <rect class="band" x="82" y="408" rx="7" width="150" height="34" fill="var(--engine)"/>
+    <text class="ink" x="157" y="429" font-size="13" text-anchor="middle">opencode</text>
+    <rect class="band" x="248" y="408" rx="7" width="150" height="34" fill="var(--engine)"/>
+    <text class="ink" x="323" y="429" font-size="13" text-anchor="middle">kimi</text>
+    <rect class="band" x="414" y="408" rx="7" width="150" height="34" fill="var(--engine)"/>
+    <text class="ink" x="489" y="429" font-size="13" text-anchor="middle">claude-code</text>
+    <rect class="band" x="580" y="408" rx="7" width="120" height="34" fill="var(--engine)"/>
+    <text class="ink" x="640" y="429" font-size="13" text-anchor="middle">codex</text>
+    <text class="muted" x="390" y="470" font-size="11" text-anchor="middle">speak ACP directly</text>
+  </g>
+
+  <g class="t">
+    <rect class="band" x="736" y="396" rx="9" width="128" height="58" fill="var(--engine)"/>
+    <text class="ink" x="800" y="417" font-size="12" text-anchor="middle">pi shim</text>
+    <text class="muted" x="800" y="435" font-size="11" text-anchor="middle">ACP → pi's JSONL</text>
+    <text class="muted" x="800" y="470" font-size="11" text-anchor="middle">pi speaks no ACP</text>
+  </g>
+</svg>

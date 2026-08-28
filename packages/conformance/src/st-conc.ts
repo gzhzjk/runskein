@@ -36,9 +36,9 @@ import { jsonlStore, type TranscriptEvent } from '@runskein/core';
 // four bundled adapters, which core's Hub does not do on its own.
 import { builtinAdapters, createHub, EngineOperationError } from 'runskein';
 import {
-  LIVE_MODEL_PINS,
   collectNativeSessionIds,
   deleteEngineSessions,
+  liveConfigFor,
   withLiveTimeout,
 } from './liveSupport.js';
 
@@ -209,8 +209,9 @@ async function measure(engine: string): Promise<EngineMeasurement> {
   };
   const store = jsonlStore(tmp(`runskein-stconc-${engine}-`));
   const hub = createHub({ store });
-  const pin = LIVE_MODEL_PINS[engine];
-  if (pin !== undefined) row.model = pin.model;
+  const pinned = liveConfigFor(engine).config;
+  const pinnedModel = pinned?.['model'];
+  if (typeof pinnedModel === 'string') row.model = pinnedModel;
   try {
     // Sessions are created sequentially on purpose: the case measures
     // concurrent PROMPTS on a shared process, and concurrent session/new is a
@@ -221,7 +222,7 @@ async function measure(engine: string): Promise<EngineMeasurement> {
         await hub.session({
           engine,
           cwd: tmp(`runskein-stconc-ws-${engine}-`),
-          ...(pin !== undefined ? { config: { model: pin.model } } : {}),
+          ...(pinned !== undefined ? { config: pinned } : {}),
         }),
       );
     }

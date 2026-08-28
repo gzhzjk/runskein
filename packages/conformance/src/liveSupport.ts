@@ -1,41 +1,189 @@
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { EngineOperationError, EngineStartError, NotInstalledError, UnauthenticatedError } from 'runskein';
 import type { EngineAdapter, TranscriptStore } from '@runskein/core';
 import { ProcessManager, readSessionMeta } from '@runskein/core/internal';
 
 /**
- * The model each live suite pins per engine — the single source of truth for
- * both the conformance live runner and the CLI live suite
- * (`@runskein/conformance/live-support`), so the two cannot drift.
+ * Per-engine live configuration, loaded from the adapter package's own
+ * `live.config.json`.
  *
  * Live runs are model-specific: an unpinned engine default is
- * account-dependent, which would make results incomparable across machines.
+ * account-dependent, which would make results incomparable across machines, so
+ * every live session creation forces the adapter's pinned config. Which model
+ * an engine should run is a property of that engine's adapter — that is why
+ * the pin lives in the adapter package rather than in a table here.
  *
- * Every engine takes its pin the same way — `config: { model }` at session
+ * Every engine takes its pin the same way — `config: { model, … }` at session
  * creation. claude-code used to be an exception with a launch-argument and
  * environment pin, both of which were measured to have no effect: its wrapper
  * rebuilds the environment for the process it spawns and ignores --model, so
  * pinned runs silently used the account default. It now goes through
  * session/set_model like everything else.
  */
-export interface LiveModelPin {
-  /** The exact model id both live suites force. */
-  readonly model: string;
+export interface LiveEngineConfig {
+  /** Forced session config, applied as `SessionOpts.config` at creation. */
+  readonly config?: Record<string, string | boolean>;
+  /** Extra launch environment for live runs of this engine. */
+  readonly env?: Record<string, string>;
 }
 
-/** Per-engine live model pins, keyed by engine id. */
-export const LIVE_MODEL_PINS: Readonly<Record<string, LiveModelPin>> = {
-  opencode: { model: 'deepseek/deepseek-v4-flash' },
-  kimi: { model: 'kimi-code/kimi-for-coding' },
-  codex: { model: 'gpt-5.6-luna' },
-  'claude-code': { model: 'sonnet' },
-  // pi advertises five model ids, but advertising is not reachability: the
-  // minimax ones end the turn with an error on this account. Pinned to the id
-  // pi itself reports as current, which is the one demonstrably served.
-  pi: { model: 'DeepSeek-V4-Flash-0731/DeepSeek-V4-Flash' },
-};
+/**
+ * Return the environment variable that overrides an engine's pinned model.
+ * @param engineId - the engine id (dashes become underscores).
+ * @returns the variable name, e.g. `RUNSKEIN_LIVE_MODEL_CLAUDE_CODE`.
+ */
+export function liveModelEnvVar(engineId: string): string {
+  return `RUNSKEIN_LIVE_MODEL_${engineId.toUpperCase().replaceAll('-', '_')}`;
+}
+
+/**
+ * Resolve the live config file path inside an engine's adapter package.
+ *
+ * Adapter `exports` do not expose `./package.json`, so the package entry is
+ * resolved and the file sits beside it. The resolution goes through
+ * `createRequire` rather than `import.meta.resolve` because the vitest/vite
+ * transform shims the latter and the shim does not resolve bare specifiers
+ * against node_modules.
+ * @param engineId - the engine id.
+ * @returns the absolute path of the adapter's `live.config.json`.
+ * @throws `Error` when no adapter package resolves for the engine id.
+ */
+export function liveConfigPath(engineId: string): string {
+  let entry: string;
+  try {
+    entry = createRequire(import.meta.url).resolve(`@runskein/adapter-${engineId}`);
+  } catch {
+    throw new Error(`live config: no adapter package resolves for engine '${engineId}'`);
+  }
+  return join(dirname(entry), 'live.config.json');
+}
+
+/**
+ * Load an engine's live configuration from its adapter package.
+ *
+ * The `RUNSKEIN_LIVE_MODEL_<ID>` environment variable (see liveModelEnvVar),
+ * when set, replaces the file's model pin. It is read at call time so a test
+ * process can set it per case.
+ * @param engineId - the engine id.
+ * @returns the validated configuration.
+ * @throws `Error` naming the file when it is missing, unparsable, or carries
+ *   values of the wrong shape. Whether the engine accepts a key or value is
+ *   core's question at session creation, against the engine's advertised
+ *   surface — not this function's.
+ */
+export function liveConfigFor(engineId: string): LiveEngineConfig {
+  const file = liveConfigPath(engineId);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(file, 'utf8'));
+  } catch (error) {
+    throw new Error(
+      `live config: cannot read ${file}: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error(`live config: ${file} must contain a JSON object`);
+  }
+  const obj = parsed as Record<string, unknown>;
+  const result: {
+    config?: Record<string, string | boolean>;
+    env?: Record<string, string>;
+  } = {};
+  if (obj['config'] !== undefined) {
+    const config: unknown = obj['config'];
+    if (typeof config !== 'object' || config === null || Array.isArray(config)) {
+      throw new Error(`live config: ${file} 'config' must be an object of string|boolean values`);
+    }
+    for (const [key, value] of Object.entries(config)) {
+      if (typeof value !== 'string' && typeof value !== 'boolean') {
+        throw new Error(`live config: ${file} config.${key} must be a string or boolean`);
+      }
+    }
+    result.config = config as Record<string, string | boolean>;
+    // The file must be valid on its own — a malformed file throws even when an
+    // override would have replaced the bad value.
+    const fileModel = result.config['model'];
+    if (fileModel !== undefined && (typeof fileModel !== 'string' || fileModel.trim() === '')) {
+      throw new Error(`live config: ${file} config.model must be a non-empty string`);
+    }
+  }
+  if (obj['env'] !== undefined) {
+    const env: unknown = obj['env'];
+    if (typeof env !== 'object' || env === null || Array.isArray(env)) {
+      throw new Error(`live config: ${file} 'env' must be an object of string values`);
+    }
+    for (const [key, value] of Object.entries(env)) {
+      if (typeof value !== 'string') {
+        throw new Error(`live config: ${file} env.${key} must be a string`);
+      }
+    }
+    result.env = env as Record<string, string>;
+  }
+  const override = process.env[liveModelEnvVar(engineId)];
+  if (override !== undefined && override !== '') {
+    if (override.trim() === '') {
+      throw new Error(`live config: ${liveModelEnvVar(engineId)} override must be a non-empty model id`);
+    }
+    result.config = { ...result.config, model: override };
+  }
+  return result;
+}
+
+/**
+ * Build the skip/waive reason for a live case whose pinned config the engine
+ * rejected. It names every pinned key and value, the file to edit and the
+ * override variable, because a silent skip would re-create the drift the pin
+ * exists to prevent — and naming only `model` would misidentify the value when
+ * the rejected key is another one (reasoning, mode, …).
+ * @param engineId - the engine id.
+ * @param config - the configuration the engine refused.
+ * @returns the human-readable reason.
+ * @throws `Error` when no adapter package resolves for the engine id (via
+ *   liveConfigPath).
+ */
+export function livePinRejectionReason(engineId: string, config: LiveEngineConfig): string {
+  const pinned = Object.entries(config.config ?? {}).map(([key, value]) => `${key} '${String(value)}'`);
+  return (
+    `engine '${engineId}' rejected the pinned live config` +
+    (pinned.length > 0 ? ` (${pinned.join(', ')})` : '') +
+    ` from ${liveConfigPath(engineId)} — edit that file or set ${liveModelEnvVar(engineId)}`
+  );
+}
+
+/**
+ * An engine's refusal of its own pinned live config at session creation.
+ *
+ * Distinct from a bare ConfigError on purpose: only the pin's rejection is an
+ * environment mismatch (this machine cannot serve the pinned value), while a
+ * ConfigError against config a case constructed itself — CF-10's creation
+ * key — is a real contract regression and must fail. The shared waiver rule
+ * recognises this class and never a bare ConfigError.
+ */
+export class LivePinRejectedError extends Error {
+  /** The engine that refused the pin. */
+  readonly engineId: string;
+
+  /**
+   * @param engineId - the engine id.
+   * @param config - the pinned configuration the engine refused.
+   * @param cause - the ConfigError the engine raised; its message is appended
+   *   so the engine's own explanation (the rejected key, the valid values)
+   *   survives into the case log.
+   * @throws `Error` when no adapter package resolves for the engine id (via
+   *   livePinRejectionReason).
+   */
+  constructor(engineId: string, config: LiveEngineConfig, cause: unknown) {
+    super(
+      `${livePinRejectionReason(engineId, config)}: ${cause instanceof Error ? cause.message : String(cause)}`,
+      { cause },
+    );
+    this.name = 'LivePinRejectedError';
+    this.engineId = engineId;
+  }
+}
 
 /** The opt-in group for expensive live message-format cases. */
 export const LIVE_E2E_EXTEND_GROUP = 'e2e-extend';
@@ -93,6 +241,7 @@ const ENVIRONMENTAL_ERROR_NAMES: ReadonlySet<string> = new Set([
   'EngineStartError',
   'UnauthenticatedError',
   'NotInstalledError',
+  'LivePinRejectedError',
 ]);
 
 /** Message fragments that mark auth/network/quota unavailability.
@@ -127,6 +276,14 @@ const CLEANUP_OPERATION = /(?:close|quit|cleanup)/i;
 export function isLiveEnvironmentalError(className: string, message: string, operation?: string): boolean {
   if (!ENVIRONMENTAL_ERROR_NAMES.has(className)) return false;
   if (operation !== undefined && CLEANUP_OPERATION.test(operation)) return false;
+  // A pin refusal qualifies on its class alone: LivePinRejectedError is only
+  // ever raised where a live suite applied the adapter's own pin at session
+  // creation, so it is the engine declining that pin on this machine — an
+  // environment mismatch, not a code defect. Its message names the value, the
+  // file and the override variable, which is the skip reason. A bare
+  // ConfigError does NOT qualify: that is a rejection of config a case built
+  // itself (e.g. CF-10's creation key), which is a real defect.
+  if (className === 'LivePinRejectedError') return true;
   if (ENVIRONMENTAL_MESSAGE.test(message)) return true;
   // Timeouts are environmental only during session setup (measured parallel-
   // startup contention); a prompt-path timeout is a potential real regression
@@ -151,7 +308,8 @@ export function isLiveEnvironmentUnavailable(error: unknown): boolean {
     !(error instanceof EngineOperationError) &&
     !(error instanceof EngineStartError) &&
     !(error instanceof UnauthenticatedError) &&
-    !(error instanceof NotInstalledError)
+    !(error instanceof NotInstalledError) &&
+    !(error instanceof LivePinRejectedError)
   )
     return false;
   const cause = 'cause' in error ? error.cause : undefined;
@@ -167,8 +325,9 @@ export function isLiveEnvironmentUnavailable(error: unknown): boolean {
  * Classify a CLI `[error] <ClassName>: <message> { …fields }` line with the
  * shared waiver rule. The formatter prints own enumerable fields, so an
  * EngineOperationError line carries its `operation: "…"` for the cleanup
- * exclusion. `unexpected:` lines (CLI bugs) and non-environmental classes
- * (e.g. ConfigError) never qualify.
+ * exclusion. `unexpected:` lines (CLI bugs) never qualify; neither does a
+ * bare ConfigError line — the CLI live suite recognises a declined `-c` pin
+ * itself, at the session-creation point where the pin was applied.
  * @param line - the first `[error]` line of the CLI output, if any.
  * @returns true when the failure is environmental and may waive an assertion.
  */

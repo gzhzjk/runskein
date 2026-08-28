@@ -37,6 +37,10 @@
     "typescript": "^5.7.2",
     "@types/node": "^22.10.0",
     "@vitest/coverage-v8": "^2.1.8",
+    "@runskein/adapter-claude-code": "workspace:*",
+    "@runskein/adapter-codex": "workspace:*",
+    "@runskein/adapter-kimi": "workspace:*",
+    "@runskein/adapter-opencode": "workspace:*",
     "@runskein/adapter-pi": "workspace:*"
   }
 }

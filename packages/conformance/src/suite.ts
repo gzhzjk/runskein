@@ -14,17 +14,20 @@
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it, type TaskContext } from 'vitest';
 import {
   createHub,
   jsonlStore,
   policies,
   CancelledError,
+  ConfigError,
   type EngineAdapter,
   type Hub,
   type PermissionRule,
+  type Session,
   type TranscriptEvent,
 } from '@runskein/core';
+import { livePinRejectionReason } from './liveSupport.js';
 
 export interface CoreGateOptions {
   /** A prompt that finishes quickly with a short deterministic reply. */
@@ -50,6 +53,15 @@ export interface CoreGateOptions {
   cancelEnv?: Record<string, string>;
   /** Extra adapter env for the env-hygiene case only (mock toggles). */
   envHygieneEnv?: Record<string, string>;
+  /**
+   * Pinned live config applied at every session creation — the live branch
+   * passes the engine's adapter live.config.json record. When set and the
+   * engine rejects it with a ConfigError, the case skips rather than fails:
+   * the pin names the machine's environment, not a gate regression. The mock
+   * branch must leave this unset — the mock has no config surface and would
+   * rightly refuse one.
+   */
+  config?: Record<string, string | boolean>;
 }
 
 /**
@@ -92,6 +104,39 @@ export function coreGateSuite(adapter: EngineAdapter, opts: CoreGateOptions = {}
     }
     const cwd = () => mkdtempSync(join(tmpdir(), `runskein-gate-ws-`));
 
+    /**
+     * Create a session with the pinned live config when one is set. A live
+     * engine that rejects the pin skips the case (see CoreGateOptions.config);
+     * the reason is logged first because ctx.skip() carries no note.
+     * @param h - the case's hub.
+     * @param ctx - the test context, used to skip on a rejected pin.
+     * @param params - session parameters, minus the engine id, which the gate owns.
+     * @returns the created session.
+     * @throws anything that is not a pin rejection.
+     */
+    async function gateSession(
+      h: Hub,
+      ctx: TaskContext,
+      params: Omit<Parameters<Hub['session']>[0], 'engine' | 'config'>,
+    ): Promise<Session> {
+      try {
+        return await h.session({
+          ...params,
+          engine: adapter.id,
+          ...(opts.config !== undefined ? { config: opts.config } : {}),
+        });
+      } catch (error) {
+        if (opts.config !== undefined && error instanceof ConfigError) {
+          // The engine's own message names the rejected key and valid values.
+          console.log(
+            `SKIP core gate ${adapter.id}: ${livePinRejectionReason(adapter.id, { config: opts.config })}: ${error.message}`,
+          );
+          ctx.skip();
+        }
+        throw error;
+      }
+    }
+
     afterAll(async () => {
       // Cleanup is part of the registration contract: a quit failure must
       // fail the gate instead of being silently discarded.
@@ -111,9 +156,9 @@ export function coreGateSuite(adapter: EngineAdapter, opts: CoreGateOptions = {}
 
     it(
       'spawn → initialize → session/new → prompt → streamed updates → stop reason → cleanup',
-      async () => {
+      async (ctx) => {
         const h = hub();
-        const s = await h.session({ engine: adapter.id, cwd: cwd() });
+        const s = await gateSession(h, ctx, { cwd: cwd() });
         expect(s.status).toBe('idle');
 
         const updates: TranscriptEvent[] = [];
@@ -155,14 +200,14 @@ export function coreGateSuite(adapter: EngineAdapter, opts: CoreGateOptions = {}
 
     it(
       'env hygiene: a polluted host-agent environment does not break the spawn',
-      async () => {
+      async (ctx) => {
         // Simulates running inside a parent agent session: leaked CLAUDE*
         // markers were measured to make claude-code-acp refuse to start.
         process.env['CLAUDE_GATE_MARKER'] = 'leaky-parent-session';
         process.env['CODEX_SANDBOX_GATE'] = '1';
         try {
           const h = hub(withEnv(adapter, opts.envHygieneEnv));
-          const s = await h.session({ engine: adapter.id, cwd: cwd() });
+          const s = await gateSession(h, ctx, { cwd: cwd() });
           const result = await s.prompt(quickPrompt);
           expect(result.stopReason).toBe('end_turn');
           await s.close();
@@ -176,9 +221,9 @@ export function coreGateSuite(adapter: EngineAdapter, opts: CoreGateOptions = {}
 
     it(
       'cancel mid-turn: active prompt RESOLVES stopReason=cancelled; session survives',
-      async () => {
+      async (ctx) => {
         const h = hub(withEnv(adapter, opts.cancelEnv));
-        const s = await h.session({ engine: adapter.id, cwd: cwd() });
+        const s = await gateSession(h, ctx, { cwd: cwd() });
         const firstChunk = new Promise<void>((res) => {
           const un = s.on('update', (e) => {
             if (
@@ -210,11 +255,10 @@ export function coreGateSuite(adapter: EngineAdapter, opts: CoreGateOptions = {}
       const permission = opts.permission;
       it(
         'permission round-trip under policies.rules answers the engine',
-        async () => {
+        async (ctx) => {
           const h = hub(withEnv(adapter, opts.permissionEnv));
           let requests = 0;
-          const s = await h.session({
-            engine: adapter.id,
+          const s = await gateSession(h, ctx, {
             cwd: cwd(),
             permissionPolicy: (req) => {
               requests++;
