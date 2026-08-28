@@ -1,6 +1,6 @@
 ---
 source: README.md
-source-sha256: 99545dfe9023da6fb68b3a5c24ac457aad433ba76b96a26db5bf00e576208a6d
+source-sha256: b8b08bb971025a7bf164a3ca4a111904a1aa5818eea0ae3f56f48bd4855fcf90
 ---
 
 # runskein
@@ -15,7 +15,7 @@ runskein 是一个**运行时层（runtime layer），不是编排器（orchestr
 负责把 coding agent 跑起来。它不决定哪个 agent 接哪个任务（task），不限制它们花多
 少钱，也不隔离它们的文件。这些是你的程序要做的，或者是你在它之上再搭一层要做的。
 
-> **状态：预览版。** 当前发布版本是 `0.1.0-alpha.24`。这套 API 可以拿来开发和
+> **状态：预览版。** 当前发布版本是 `0.1.0-alpha.25`。这套 API 可以拿来开发和
 > 评估，但还不保证保持兼容。每个 Engine 能做什么，也取决于机器上装的是哪个版本。
 > 依赖某个特性之前，先看[实测矩阵](docs/conformance/matrix.public.json)。
 

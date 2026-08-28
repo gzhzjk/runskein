@@ -7,7 +7,6 @@
  * `@agentclientprotocol/sdk`. Everything it exposes to the rest of core
  * is runskein-owned structural typing.
  */
-import { createRequire } from 'node:module';
 import { Readable, Writable } from 'node:stream';
 import * as acp from '@agentclientprotocol/sdk';
 import {
@@ -20,21 +19,9 @@ import {
 import { normalizeCapabilities, type RawAgentCapabilities } from './capabilities.js';
 import { AcpInbound, AcpOutbound } from './inbound.js';
 
-/**
- * This package's version, reported to every engine in the `initialize`
- * handshake.
- *
- * Read from the manifest rather than written out here, because a literal is
- * wrong the moment it is written: this line said `0.0.0` from the day it was
- * added until alpha.24, and every engine was told so on every connection. The
- * relative path holds for both the source tree and the compiled output — `dist`
- * mirrors `src`, so this module sits two levels below the package root either
- * way — and npm ships `package.json` in every tarball regardless of `files`.
- */
-const CLIENT_VERSION: string = (createRequire(import.meta.url)('../../package.json') as { version: string })
-  .version;
 import type { WireObserver } from './wireTrace.js';
 import type { CapabilityMatrix } from '../types.js';
+import { CLIENT_VERSION } from '../version.js';
 
 // ── Structural result shapes (runskein-owned; ACP fields pass through) ────────
 

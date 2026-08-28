@@ -208,6 +208,13 @@ describe('terminals run for the agent', () => {
   it('leaves no command running when the session closes', async () => {
     // The agent starts something long-running and walks away without releasing
     // it. Nothing else will ever collect that process, so the session must.
+    //
+    // This case has failed on a loaded machine and passed alone on the same
+    // tree. Whether it should be sensitive to load at all is a real question —
+    // the assertion is "the process is gone after close()", and whether that
+    // takes 200ms or 8s is a different question from whether it happens — but
+    // it is not answerable until a failure says which. That is what the wait
+    // below now reports; deciding it on the evidence comes after.
     const cwd = scratch();
     const pidFile = join(cwd, 'pid.txt');
     const h = hub(
@@ -222,12 +229,16 @@ describe('terminals run for the agent', () => {
     );
     const s = await h.session({ engine: 'mock', cwd });
     await s.prompt('run it');
-    await waitFor(() => existsSync(pidFile));
+    await waitFor(() => existsSync(pidFile), `the command to write its pid to ${pidFile}`);
     const pid = Number(readFileSync(pidFile, 'utf8'));
     expect(alive(pid)).toBe(true);
 
     await s.close();
-    await waitFor(() => !alive(pid));
+    await waitFor(
+      () => !alive(pid),
+      () =>
+        `the command process ${String(pid)} to exit after close(); it is ${alive(pid) ? 'still alive' : 'gone'}`,
+    );
     expect(alive(pid)).toBe(false);
   }, 30_000);
 });
@@ -246,20 +257,87 @@ function alive(pid: number): boolean {
   }
 }
 
+/** How often the poller re-tests its condition. */
+const POLL_INTERVAL_MS = 25;
+
 /**
  * Poll until a condition holds.
+ *
+ * The budget is deliberately smaller than the case's vitest timeout, so this is
+ * always the error a reader sees. That made the message load-bearing and it used
+ * to be `condition never held` — identical for every call in this file, naming
+ * neither what was awaited nor for how long. A contributor hitting it on a busy
+ * machine could not tell a slow teardown from a regression in the thing under
+ * test, and the two conclusions available to them — "I broke it" and "the suite
+ * is unreliable" — were both worse than the truth.
+ *
+ * The budget is not the lever. Ten seconds for a `SIGTERM` to be observed is
+ * already generous, and raising it buys quiet by making the case blind to the
+ * regression it exists to catch.
+ *
  * @param condition - the predicate to wait for.
+ * @param describe - what is being awaited. A function is called at the deadline,
+ *   so it can report the state that is still wrong rather than the state at the
+ *   start.
  * @param timeoutMs - how long to keep trying.
- * @throws `Error` when the condition never holds.
+ * @throws `Error` naming the wait, its budget, and what was still true at the end.
  */
-async function waitFor(condition: () => boolean, timeoutMs = 10_000): Promise<void> {
-  const deadline = Date.now() + timeoutMs;
+async function waitFor(
+  condition: () => boolean,
+  describe: string | (() => string),
+  timeoutMs = 10_000,
+): Promise<void> {
+  const started = Date.now();
+  const deadline = started + timeoutMs;
   while (Date.now() < deadline) {
     if (condition()) return;
-    await new Promise((resolve) => setTimeout(resolve, 25));
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
   }
-  throw new Error('condition never held');
+  const what = typeof describe === 'function' ? describe() : describe;
+  throw new Error(
+    `waited ${String(Date.now() - started)}ms (budget ${String(timeoutMs)}ms, ` +
+      `polling every ${String(POLL_INTERVAL_MS)}ms) for ${what}`,
+  );
 }
+
+describe('waitFor', () => {
+  it('says what it waited for, for how long, and what was still true', async () => {
+    // The message is the whole point of this helper, so it is asserted rather
+    // than assumed. `condition never held` was the same string for every call
+    // in this file, and a contributor who hit it could not tell a slow teardown
+    // from a regression in the thing under test.
+    let polls = 0;
+    const error = await waitFor(
+      () => {
+        polls += 1;
+        return false;
+      },
+      () => `something that never happens (polled ${String(polls)} times)`,
+      120,
+    ).catch((cause: unknown) => cause as Error);
+
+    expect(error.message).toMatch(/^waited \d+ms \(budget 120ms, polling every 25ms\) for /);
+    expect(error.message).toContain('something that never happens');
+    // The describer runs at the deadline, not at the start, so it can report the
+    // state that is still wrong. Asserted by comparing the count it captured
+    // against the final one rather than against a number: how many polls fit in
+    // 120ms is exactly the machine-speed question this whole change is about,
+    // and an assertion on it would be the defect it is meant to remove.
+    expect(error.message).toContain(`polled ${String(polls)} times`);
+  });
+
+  it('does not call the describer when the condition holds', async () => {
+    let described = false;
+    await waitFor(
+      () => true,
+      () => {
+        described = true;
+        return 'never';
+      },
+    );
+    expect(described).toBe(false);
+  });
+});
 
 describe('a session with a live command', () => {
   it('keeps its engine while a command is still running', async () => {
@@ -299,7 +377,7 @@ describe('a session with a live command', () => {
 
     const s = await h.session({ engine: 'mock', cwd, sessionIdleTimeoutMs: 50 });
     await s.prompt('run it');
-    await waitFor(() => existsSync(pidFile));
+    await waitFor(() => existsSync(pidFile), `the command to write its pid to ${pidFile}`);
 
     // Several idle periods with no turn in flight.
     await new Promise((resolve) => setTimeout(resolve, 500));

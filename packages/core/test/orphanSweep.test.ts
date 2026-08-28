@@ -15,6 +15,8 @@ import {
   fileOwnershipRegistry,
   identityMatches,
   isPidAlive,
+  readProcessInfo,
+  START_TIME_TOLERANCE_MS,
   sweepOrphans,
   type OrphanSweepResult,
   type OwnershipEntry,
@@ -665,17 +667,81 @@ describe('pid recycling', () => {
   });
 });
 
+/**
+ * What `identityMatches` saw, for a verdict that came out wrong.
+ *
+ * The verdict is one word and both of its `mismatch` paths produce it, so a
+ * failure says nothing about which check fired. This reads the process again
+ * and reports both inputs — and says plainly that it is a second read, because
+ * a re-read that now looks right is itself the answer: the state was transient.
+ * @param pid - the process the verdict was about.
+ * @param entry - the record it was checked against.
+ * @returns a message naming the command line, the drift, and which check fails.
+ */
+async function whyIdentityFailed(pid: number, entry: OwnershipEntry): Promise<string> {
+  const info = await readProcessInfo(pid);
+  if (info === undefined)
+    return `re-read of pid ${pid}: ps returned nothing (the process is gone or unreadable)`;
+  // These two restate what `identityMatches` computes. A diagnostic that has
+  // drifted from the thing it explains is worse than none, so both branches are
+  // driven against the real function in the case below rather than trusted.
+  const nameMatches = info.command.includes(entry.argv0);
+  const drift = Math.abs(Date.now() - info.elapsedSeconds * 1_000 - entry.startedAt);
+  return [
+    `re-read of pid ${pid} (a second ps, not the one the verdict used):`,
+    `  command:  ${JSON.stringify(info.command)}`,
+    `  looking for argv0: ${JSON.stringify(entry.argv0)} → ${nameMatches ? 'present' : 'ABSENT (this is the mismatch)'}`,
+    `  elapsed:  ${String(info.elapsedSeconds)}s`,
+    `  drift:    ${String(drift)}ms against a ${String(START_TIME_TOLERANCE_MS)}ms tolerance` +
+      `${drift <= START_TIME_TOLERANCE_MS ? '' : ' → OUT OF TOLERANCE (this is the mismatch)'}`,
+  ].join('\n');
+}
+
 describe('identityMatches', () => {
   it('matches a live process it really describes', async () => {
     const child = plantProcess('runskein-identity-live');
-    const verdict = await identityMatches(child.pid!, {
+    const entry: OwnershipEntry = {
       enginePid: child.pid!,
       engineId: 'mock',
       ownerPid: process.pid,
       argv0: 'runskein-identity-live',
       startedAt: Date.now(),
-    });
-    expect(verdict).toBe('match');
+    };
+    const verdict = await identityMatches(child.pid!, entry);
+    // This case has failed on CI with `mismatch` for a process it spawned
+    // milliseconds earlier, on a commit whose only diff was Markdown. The
+    // verdict alone cannot say which of the two checks produced it, so the
+    // failure carries what the process actually looks like.
+    expect(verdict, verdict === 'match' ? '' : await whyIdentityFailed(child.pid!, entry)).toBe('match');
+  });
+
+  it('the failure report names which of the two checks produced the mismatch', async () => {
+    // The helper above restates the drift arithmetic `identityMatches` owns, so
+    // it can drift from it and start describing the wrong branch. Both branches
+    // are driven here against the real function: whatever the verdict is for, the
+    // report has to agree.
+    const child = plantProcess('runskein-identity-report');
+    const base: OwnershipEntry = {
+      enginePid: child.pid!,
+      engineId: 'mock',
+      ownerPid: process.pid,
+      argv0: 'runskein-identity-report',
+      startedAt: Date.now(),
+    };
+
+    const wrongName = { ...base, argv0: 'a-tag-this-process-does-not-carry' };
+    expect(await identityMatches(child.pid!, wrongName)).toBe('mismatch');
+    const nameReport = await whyIdentityFailed(child.pid!, wrongName);
+    expect(nameReport).toContain('ABSENT (this is the mismatch)');
+    expect(nameReport).not.toContain('OUT OF TOLERANCE');
+
+    // A recorded start time far from the observed one is the other path, and
+    // the only one a command-line check cannot see.
+    const wrongClock = { ...base, startedAt: Date.now() - START_TIME_TOLERANCE_MS * 10 };
+    expect(await identityMatches(child.pid!, wrongClock)).toBe('mismatch');
+    const clockReport = await whyIdentityFailed(child.pid!, wrongClock);
+    expect(clockReport).toContain('OUT OF TOLERANCE (this is the mismatch)');
+    expect(clockReport).not.toContain('ABSENT');
   });
 
   it('reports unknown — not mismatch — when the process cannot be inspected', async () => {

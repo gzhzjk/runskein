@@ -35,8 +35,9 @@ the test suite, so they still resolve to something.
 
 Some numbers are absent. That is expected, and none of them will be reused:
 
-- **010 and 038** are not part of this repository: they record internal project
-  matters. Nothing here cites either one.
+- **010, 038 and 041** are not part of this repository: they record internal
+  project matters — how this project is run rather than what it promises.
+  Nothing here cites any of them.
 - **017–021** were reserved for work that never landed under those numbers.
   Nothing references them. Do not reassign them.
 

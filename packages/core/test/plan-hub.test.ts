@@ -151,6 +151,35 @@ describe('I — error contract, auth (ER-03) + out-of-scope (OS)', () => {
     await s.close();
   });
 
+  it("reports this package's real version to the engine, from a constant a bundler can inline", async () => {
+    // The version used to be read out of package.json at load time. That is
+    // right for an installed package and wrong for a bundled one: a bundler
+    // carries the literal path into its own output, where it resolves two
+    // levels above the consumer's build directory — a downstream consumer got
+    // MODULE_NOT_FOUND before anything it exported was reachable, and where a
+    // file happens to sit there the read succeeds and reports a stranger's
+    // version to every engine. The constant is generated from the manifest and
+    // `pnpm quality` compares the two; this asserts the value that actually
+    // goes on the wire.
+    const record = join(tmp('runskein-clientinfo-'), 'init.json');
+    const hub = makeHub({ MOCK_RECORD_INIT_FILE: record });
+    const s = await hub.session({ engine: 'mock', cwd: tmp('runskein-clientinfo-') });
+    await s.prompt('hi');
+    const init = JSON.parse(readFileSync(record, 'utf8')) as {
+      params: { clientInfo: { name: string; version: string } };
+    };
+    const manifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
+      version: string;
+    };
+
+    expect(init.params.clientInfo.name).toBe('runskein');
+    expect(init.params.clientInfo.version).toBe(manifest.version);
+    // The value this replaced was `0.0.0`, told to every engine on every
+    // connection from the day the field was added until alpha.24.
+    expect(init.params.clientInfo.version).not.toBe('0.0.0');
+    await s.close();
+  });
+
   it('OS-03: explicit engine selection only — "auto" is NotInstalledError, no spawn', async () => {
     const trace = join(tmp('runskein-os03-'), 'spawns.log');
     const hub = makeHub({ MOCK_TRACE_FILE: trace });

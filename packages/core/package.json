@@ -1,6 +1,6 @@
 {
   "name": "@runskein/core",
-  "version": "0.1.0-alpha.24",
+  "version": "0.1.0-alpha.25",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
   "scripts": {
     "build": "tsc && node ../../scripts/build-assets.mjs",
     "generate:vocabulary": "node scripts/generate-vocabulary.mjs",
+    "generate:version": "node scripts/generate-version.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"

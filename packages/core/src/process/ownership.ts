@@ -133,7 +133,7 @@ export function isPidAlive(pid: number): boolean {
 }
 
 /** What `ps` reports about a live process. */
-interface ProcessInfo {
+export interface ProcessInfo {
   command: string;
   /** Seconds the process has been running, from `ps -o etime=`. */
   elapsedSeconds: number;
@@ -163,10 +163,14 @@ function parseElapsed(value: string): number | undefined {
  * separately would leave a window in which the pid could be recycled between
  * the two reads, and the whole point of pairing them is to identify one
  * specific process.
+ * Exported for diagnosis rather than for use: `identityMatches` returns a
+ * verdict and discards what it read, so a test that sees the wrong verdict has
+ * no way to say which of the two checks produced it. Nothing outside this file
+ * and its tests should call it — the verdict is the contract.
  * @param pid - the process to inspect.
  * @returns its command line and elapsed time, or undefined when unreadable.
  */
-async function readProcessInfo(pid: number): Promise<ProcessInfo | undefined> {
+export async function readProcessInfo(pid: number): Promise<ProcessInfo | undefined> {
   if (process.platform === 'win32') return undefined;
   return new Promise((resolve) => {
     // -ww disables width-based truncation. Output here has no tty, so ps does
@@ -199,7 +203,7 @@ async function readProcessInfo(pid: number): Promise<ProcessInfo | undefined> {
  * recycled pid would have to be reissued within this window to slip through,
  * which needs the entire pid space to wrap in half a minute.
  */
-const START_TIME_TOLERANCE_MS = 30_000;
+export const START_TIME_TOLERANCE_MS = 30_000;
 
 /** Whether a live pid is the process the registry recorded, or cannot be told. */
 export type IdentityVerdict = 'match' | 'mismatch' | 'unknown';
