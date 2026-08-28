@@ -1,6 +1,7 @@
 /**
  * The shim launch path: how core spawns an engine that cannot speak the
- * protocol itself, and what it records about the process it started.
+ * protocol itself, and what it records about the process it started — plus the
+ * environment every engine is launched with, which is the same spawn.
  *
  * These are core-side cases only — nothing here knows what pi is. They cover
  * the shim entry point being resolved and vetted at load, the child being the
@@ -111,5 +112,46 @@ describe('shim launch path', () => {
     // executable is deliberately absent: a sweep matches on this string before
     // killing, and `node` alone would match half the machine.
     expect(spawned.argv0).toBe(`${shim} engine-binary --mode rpc`);
+  });
+});
+
+describe('engine launch environment', () => {
+  it('replaces the inherited variable a Windows host would resolve the adapter to', async () => {
+    // `launch.env` is promised to win over the scrub. On a host that resolves
+    // names without case the adapter's spelling has to displace the inherited
+    // one rather than sit beside it — and this runner is not such a host, so
+    // the platform is stubbed. Without the stub the old spread and the merge
+    // are indistinguishable here: both leave the two spellings side by side,
+    // and a case asserting that would pass whichever one was in place.
+    const dir = mkdtempSync(join(tmpdir(), 'runskein-launch-env-'));
+    const out = join(dir, 'env.json');
+    const platform = Object.getOwnPropertyDescriptor(process, 'platform');
+    if (platform === undefined) throw new Error('process.platform is not describable');
+    const previous = process.env['RUNSKEIN_LAUNCH_CASE'];
+    process.env['RUNSKEIN_LAUNCH_CASE'] = 'host';
+    Object.defineProperty(process, 'platform', { ...platform, value: 'win32' });
+    try {
+      const adapter: EngineAdapter = {
+        specVersion: 1,
+        id: 'launch-env',
+        launch: {
+          command: process.execPath,
+          args: [
+            '-e',
+            `require('node:fs').writeFileSync(${JSON.stringify(out)}, JSON.stringify([process.env.RUNSKEIN_LAUNCH_CASE ?? null, process.env.runskein_launch_case ?? null]))`,
+          ],
+          env: { runskein_launch_case: 'adapter' },
+        },
+      };
+
+      const spawned = spawnEngine(adapter, { cwd: dir });
+      await new Promise((resolve) => spawned.child.on('exit', resolve));
+
+      expect(JSON.parse(readFileSync(out, 'utf8'))).toEqual([null, 'adapter']);
+    } finally {
+      Object.defineProperty(process, 'platform', platform);
+      if (previous === undefined) delete process.env['RUNSKEIN_LAUNCH_CASE'];
+      else process.env['RUNSKEIN_LAUNCH_CASE'] = previous;
+    }
   });
 });

@@ -1,6 +1,6 @@
 ---
 source: docs/application-guide.md
-source-sha256: c104fe0b9b0590199088166d6db676daf37de9152000f59ecd77a3bbbb1d5a10
+source-sha256: 103762f0821a607c2207b0fe8163a051b1759a0f86d7fbfee4ec3703b11d6027
 ---
 
 # 在应用中使用 runskein
@@ -197,6 +197,9 @@ import { createHub, jsonlStore } from 'runskein';
 import { scriptedAdapter } from '@runskein/testkit';
 
 const hub = createHub({
+  // 五个内置 adapter 仍然是注册着的——`adapters` 是加在它们之上，不是替换它们，
+  // 而 `discovery: false`（默认值）只管动态扫描。让这段保持封闭的，是下面那句
+  // 选择 `engine: 'scripted'`。
   discovery: false,
   adapters: [scriptedAdapter({ env: { RUNSKEIN_TESTKIT_ASK_PERMISSION: '1' } })],
   store: jsonlStore('.transcripts'),

@@ -22,7 +22,7 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { realpathSync } from 'node:fs';
 import { isAbsolute, relative, resolve } from 'node:path';
 import { StringDecoder } from 'node:string_decoder';
-import { ENV_SCRUB_PATTERNS, scrubEnv, stopTreeByPid } from './spawn.js';
+import { ENV_SCRUB_PATTERNS, matchesEnvName, mergeEnv, scrubEnv, stopTreeByPid } from './spawn.js';
 
 /** Output retained per terminal when the agent names no limit: 1 MiB. */
 const DEFAULT_OUTPUT_BYTE_LIMIT = 1024 * 1024;
@@ -34,6 +34,32 @@ const DEFAULT_OUTPUT_BYTE_LIMIT = 1024 * 1024;
  * able to take the host down with it.
  */
 const MAX_OUTPUT_BYTE_LIMIT = 16 * 1024 * 1024;
+/**
+ * The retention limit a request actually gets.
+ *
+ * Total on purpose. `Math.min(x, MAX)` is `NaN` for any non-numeric `x`, and
+ * every comparison against `NaN` is false — so the truncation loop below would
+ * neither return early nor trim, and the buffer would grow without bound while
+ * reporting itself truncated. The ceiling exists to stop exactly that, so the
+ * function that applies it may not have an input that defeats it.
+ *
+ * The wire boundary refuses a non-numeric limit before a process is created;
+ * this is the second line, for callers that reach `SessionTerminals` directly
+ * through `@runskein/core/internal`.
+ *
+ * A fractional limit is floored rather than refused: the wire check accepts
+ * `1.9` because a fractional byte count can still be honoured, and honouring it
+ * means keeping no more than 1 byte.
+ *
+ * @param requested - the agent's requested limit, or null/undefined for the default.
+ * @returns a finite whole byte count between 1 and the ceiling.
+ */
+function clampOutputByteLimit(requested: number | null | undefined): number {
+  if (requested === null || requested === undefined) return DEFAULT_OUTPUT_BYTE_LIMIT;
+  if (!Number.isFinite(requested)) return DEFAULT_OUTPUT_BYTE_LIMIT;
+  return Math.max(1, Math.min(Math.floor(requested), MAX_OUTPUT_BYTE_LIMIT));
+}
+
 /** Grace between asking a command to stop and killing it outright. */
 const KILL_GRACE_MS = 2_000;
 
@@ -65,28 +91,20 @@ const ENV_DENY_PATTERNS: readonly RegExp[] = [
 ];
 
 /**
- * Whether a variable name matches any of the patterns.
- * @param patterns - the patterns to try.
- * @param name - the variable name.
- * @returns true on the first match.
- */
-function matchesAny(patterns: readonly RegExp[], name: string): boolean {
-  return patterns.some((pattern) => {
-    pattern.lastIndex = 0;
-    return pattern.test(name);
-  });
-}
-
-/**
- * Check the environment an agent asked a terminal to run with.
+ * Check the environment overrides an agent asked a terminal to run with.
  *
  * Called before the permission policy as well as at spawn time, so the policy
- * sees exactly the environment the command would get and never has to reason
- * about one that would later be rejected.
+ * sees the override entries the child's environment is built from — layered
+ * there over the scrubbed host one — and never has to reason about an override
+ * that would later be rejected. Entries are returned in the order they were
+ * requested, one per name: a repeated name is refused, compared without case on
+ * every platform, so that what a policy reads for a variable is the value the
+ * command runs with wherever the session is hosted.
  * @param entries - the request's env, as ACP sends it.
  * @param extraScrub - the adapter's scrub patterns, as used for the engine itself.
  * @returns the entries, once every one of them is allowed.
- * @throws `Error` naming the first variable that is malformed, reserved, or refused.
+ * @throws `Error` naming the first variable that is malformed, reserved,
+ *   repeated, or refused.
  */
 export function authorizeTerminalEnv(
   entries: readonly { name: string; value: string }[] | undefined,
@@ -97,6 +115,7 @@ export function authorizeTerminalEnv(
   }
   const reserved = [...ENV_SCRUB_PATTERNS, ...extraScrub];
   const checked: { name: string; value: string }[] = [];
+  const seen = new Set<string>();
   for (const entry of entries ?? []) {
     const name = entry?.name;
     const value = entry?.value;
@@ -109,14 +128,26 @@ export function authorizeTerminalEnv(
     if (value.includes('\0')) {
       throw new Error(`environment variable '${name}' contains a NUL byte`);
     }
-    if (matchesAny(ENV_DENY_PATTERNS, name)) {
+    if (matchesEnvName(ENV_DENY_PATTERNS, name)) {
       throw new Error(`environment variable '${name}' may not be set on a terminal`);
     }
     // The markers scrubbed from the engine's own environment: letting the
     // agent put them back would undo the hygiene child agents start on.
-    if (matchesAny(reserved, name)) {
+    if (matchesEnvName(reserved, name)) {
       throw new Error(`environment variable '${name}' is reserved by the host`);
     }
+    // A request that names one variable twice does not have a single meaning,
+    // and every way of resolving it hides something from the policy: an exact
+    // repeat collapses at spawn to the last value, and a case variant is one
+    // variable on Windows and two on POSIX. Refused rather than resolved --
+    // an agent setting a variable twice cannot mean both, and choosing for it
+    // would decide what it asked. Compared without case on every platform, so
+    // that what a request means does not depend on the host it reaches.
+    const key = name.toUpperCase();
+    if (seen.has(key)) {
+      throw new Error(`environment variable '${name}' is set more than once`);
+    }
+    seen.add(key);
     checked.push({ name, value });
   }
   return checked;
@@ -241,14 +272,11 @@ export class SessionTerminals {
    */
   create(params: TerminalCreateParams): string {
     const cwd = this.resolveCwd(params.cwd);
-    const requestedLimit = params.outputByteLimit ?? DEFAULT_OUTPUT_BYTE_LIMIT;
-    const byteLimit = Math.max(1, Math.min(requestedLimit, MAX_OUTPUT_BYTE_LIMIT));
-    const env = {
-      ...scrubEnv(process.env, this.envScrubExtra),
-      ...Object.fromEntries(
-        authorizeTerminalEnv(params.env, this.envScrubExtra).map((entry) => [entry.name, entry.value]),
-      ),
-    };
+    const byteLimit = clampOutputByteLimit(params.outputByteLimit);
+    const env = mergeEnv(
+      scrubEnv(process.env, this.envScrubExtra),
+      authorizeTerminalEnv(params.env, this.envScrubExtra),
+    );
     // No shell: the agent supplies a command and an argument array, and turning
     // that back into a shell string would re-introduce quoting bugs the array
     // form exists to avoid.
@@ -278,18 +306,32 @@ export class SessionTerminals {
       if (text === '') return;
       record.buffer += text;
       // The schema is explicit that the client truncates from the beginning:
-      // the tail is what a caller reading a long build log needs. Trim by
-      // bytes, since that is what the limit is expressed in.
-      let size = Buffer.byteLength(record.buffer);
-      if (size <= record.byteLimit) return;
+      // the tail is what a caller reading a long build log needs.
+      //
+      // The limit is a hard ceiling, not a budget: it exists so an engine
+      // asking for a gigabyte of build log cannot take the host down, and a
+      // rule that may sit one character above its own maximum does not serve
+      // that. Where the cut lands inside a character, the whole character
+      // goes, so the result is at or under the limit and never over.
+      // Measured before copied: `byteLength` scans, `Buffer.from` scans *and*
+      // allocates the whole retained buffer. Under the limit — which is every
+      // append until the command has produced more than the limit allows —
+      // there is nothing to trim, so the copy would be pure waste on the path
+      // that runs for every chunk of output.
+      if (Buffer.byteLength(record.buffer) <= record.byteLimit) return;
       record.truncated = true;
-      while (size > record.byteLimit && record.buffer.length > 0) {
-        // Drop whole characters; the excess is a byte count, and one character
-        // is never fewer than one byte, so this always makes progress.
-        const excess = size - record.byteLimit;
-        record.buffer = record.buffer.slice(Math.max(1, Math.min(excess, record.buffer.length)));
-        size = Buffer.byteLength(record.buffer);
-      }
+      const bytes = Buffer.from(record.buffer, 'utf8');
+      let start = bytes.length - record.byteLimit;
+      // `start` is in [1, bytes.length) here — the early return above proves
+      // `bytes.length > byteLimit`, so the subtraction is positive — which is
+      // what makes the indexing below safe.
+      //
+      // A UTF-8 continuation byte is 10xxxxxx. Stepping forward off one lands
+      // on a character boundary, which is what keeps a surrogate pair whole:
+      // slicing by UTF-16 code units instead used to cut between the halves
+      // of a non-BMP character and leave an unpaired surrogate at the front.
+      while (start < bytes.length && (bytes[start]! & 0xc0) === 0x80) start++;
+      record.buffer = bytes.subarray(start).toString('utf8');
     };
     // One decoder per stream: a multi-byte character split across two chunks
     // would otherwise be decoded as two replacement characters, and command

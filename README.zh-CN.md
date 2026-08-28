@@ -1,6 +1,6 @@
 ---
 source: README.md
-source-sha256: b8b08bb971025a7bf164a3ca4a111904a1aa5818eea0ae3f56f48bd4855fcf90
+source-sha256: 6f270e923ef0357d6a2d36c688a8cf1ea5a317f24ce56c4d6701fa4a4a6e8304
 ---
 
 # runskein
@@ -15,9 +15,11 @@ runskein 是一个**运行时层（runtime layer），不是编排器（orchestr
 负责把 coding agent 跑起来。它不决定哪个 agent 接哪个任务（task），不限制它们花多
 少钱，也不隔离它们的文件。这些是你的程序要做的，或者是你在它之上再搭一层要做的。
 
-> **状态：预览版。** 当前发布版本是 `0.1.0-alpha.25`。这套 API 可以拿来开发和
-> 评估，但还不保证保持兼容。每个 Engine 能做什么，也取决于机器上装的是哪个版本。
-> 依赖某个特性之前，先看[实测矩阵](docs/conformance/matrix.public.json)。
+> **状态：beta。** 当前发布版本是 `0.1.0-beta.1`。v1 的接口面已经冻结——见
+> [engine adapter API](docs/engine-adapter-api.md)——改动它需要一条编号决策记录，
+> 所以你现在依赖的东西就是正式版会带的东西。但它还不是兼容性承诺：版本号是 `0.x`，
+> 而各个 Engine 的实测行为仍在变。每个 Engine 能做什么，也取决于机器上装的是哪个
+> 版本。依赖某个特性之前，先看[实测矩阵](docs/conformance/matrix.public.json)。
 
 不用 runskein：
 
@@ -61,16 +63,18 @@ runskein 来做：
 ### 安装
 
 ```bash
-npm install runskein@alpha        # 或者：pnpm add runskein@alpha
+npm install runskein@beta         # 或者：pnpm add runskein@beta
 ```
 
 `runskein` 就是你要装的那个包，五个 Engine 的 Adapter 都打包在里面，多数应用只
 需要这一行。
 
-**`@alpha` 不能省。** 裸写包名时 npm 解析的是 `latest` 这个 tag，而预发布版本不会
-带上它；`latest` 指向的是一个已标记废弃、占名用的空壳包，所以省掉 `@alpha` 不会
-报错，只会带着一条警告装到一个没有代码的包。要单独装某个包也一样，写
-`@runskein/core@alpha`。
+**`@beta` 不能省**，而且两类包漏掉它之后坏的方式还不一样。裸写包名时 npm 解析的是
+`latest` 这个 tag，而预发布版本不会带上它。对 `runskein` 本身，`latest` 指向的是一个
+已标记废弃、占名用的两文件空壳包，所以省掉 `@beta` 不会报错，只会带着一条警告装到一个
+没有代码的包。对带 scope 的那几个——`@runskein/core` 以及你直接引用的其它包——`latest`
+指向 `0.1.0-alpha.24`，那是一个已被取代的版本，它的打包缺陷会让打包后的产物根本加载
+不起来。把 tag 写上。
 
 需要 Node.js 22 或更高版本，只支持 ESM。装这个包不会装任何 Engine。runskein 只
 会去找你 `PATH` 上已有的 Engine。

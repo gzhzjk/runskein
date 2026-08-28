@@ -12,11 +12,14 @@ does not decide which agent gets which task, cap what they spend, or keep them
 out of each other's files — that is your program's job, or the job of a layer
 you build on top.
 
-> **Status: preview.** The current release is `0.1.0-alpha.25`. The API is good
-> enough to build against and evaluate, but it is not yet a promise to stay
-> compatible. What an engine can do also depends on the version installed on the
-> machine — check the [measured matrix](docs/conformance/matrix.public.json) before you
-> depend on a feature.
+> **Status: beta.** The current release is `0.1.0-beta.1`. The v1 surface is
+> frozen — see [the engine adapter API](docs/engine-adapter-api.md) — and a
+> change to it takes a numbered decision note, so what you build against now is
+> what a stable release will carry. It is not yet a compatibility promise: the
+> version is `0.x` and the measured behaviour of each engine still moves under
+> it. What an engine can do also depends on the version installed on the
+> machine — check the [measured matrix](docs/conformance/matrix.public.json)
+> before you depend on a feature.
 
 Without runskein:
 
@@ -62,17 +65,20 @@ the ACP SDK and you do not think about the wire. See
 ### Install
 
 ```bash
-npm install runskein@alpha        # or: pnpm add runskein@alpha
+npm install runskein@beta         # or: pnpm add runskein@beta
 ```
 
 `runskein` is the package you want: it bundles all five engine adapters, so this
 is the only line most applications need.
 
-**`@alpha` is not optional.** A bare package name resolves the `latest` tag, and
-no prerelease carries it — `latest` points at a deprecated name-reservation
-placeholder with no code in it, so dropping `@alpha` installs an empty package
-with a warning rather than failing outright. The same goes for
-`@runskein/core@alpha` and the rest, if you reach for one directly.
+**`@beta` is not optional**, and the two packages fail differently without it.
+A bare name resolves the `latest` tag, which no prerelease carries. For
+`runskein` itself `latest` is a deprecated two-file name reservation with no
+code in it, so dropping `@beta` installs an empty package with a warning rather
+than failing outright. For the scoped packages — `@runskein/core` and the rest,
+if you reach for one directly — `latest` is `0.1.0-alpha.24`, a superseded
+release whose bundling defect stops a bundled artifact from loading at all.
+Name the tag.
 
 Node.js 22 or newer, ESM only. Installing this installs no engine — runskein
 finds engines already on your `PATH`.

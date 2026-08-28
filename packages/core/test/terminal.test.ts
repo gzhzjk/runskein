@@ -12,7 +12,14 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFil
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { createHub, jsonlStore, type EngineAdapter, type Hub, type TranscriptEvent } from '../src/index.js';
+import {
+  createHub,
+  jsonlStore,
+  policies,
+  type EngineAdapter,
+  type Hub,
+  type TranscriptEvent,
+} from '../src/index.js';
 import { authorizeTerminalEnv, SessionTerminals } from '../src/process/terminal.js';
 import { mockAdapter } from './testkit.js';
 
@@ -116,10 +123,14 @@ describe('terminals run for the agent', () => {
     expect(seen).toHaveLength(1);
     expect(seen[0]).toMatchObject({ tool: 'terminal', kind: 'execute' });
     expect((seen[0]?.input as { command?: string })?.command).toBe(process.execPath);
+    // The frozen API names the exact shape a rule table matches on. A field
+    // added or removed here changes what a policy is deciding about without
+    // any consumer being told, so the shape is pinned rather than sampled.
+    expect(Object.keys(seen[0]?.input as object).sort()).toEqual(['args', 'command', 'cwd', 'env']);
     expect(terminalReport(updates)?.['output']).toBe('ran');
   }, 30_000);
 
-  it('shows the policy the environment the command would run with', async () => {
+  it('shows the policy the environment overrides the command would run with', async () => {
     const h = hub({
       command: process.execPath,
       args: ['-e', 'process.stdout.write(process.env.MY_FLAG ?? "unset")'],
@@ -140,6 +151,60 @@ describe('terminals run for the agent', () => {
 
     expect((seen[0] as { env?: unknown })?.env).toEqual([{ name: 'MY_FLAG', value: 'set' }]);
     expect(terminalReport(updates)?.['output']).toBe('set');
+  }, 30_000);
+
+  it('lets a rule table decide on an environment variable alone', async () => {
+    // The API promises env names and values are text a rule matches on. The
+    // pattern appears nowhere but the env value, so a match proves the rule
+    // saw the environment rather than the command or the working directory.
+    const h = hub({
+      command: process.execPath,
+      args: ['-e', 'process.stdout.write("ran")'],
+      env: [{ name: 'MY_FLAG', value: 'smuggled-secret' }],
+    });
+    const s = await h.session({
+      engine: 'mock',
+      cwd: scratch(),
+      permissionPolicy: policies.rules([
+        { tool: 'terminal', pattern: '*smuggled-secret*', action: 'deny' },
+        { tool: '*', pattern: '*', action: 'allow' },
+      ]),
+    });
+    const updates: TranscriptEvent[] = [];
+    s.on('update', (event) => updates.push(event));
+    await s.prompt('run it');
+
+    expect(String(terminalReport(updates)?.['error'])).toMatch(/refused by permission policy/);
+  }, 30_000);
+
+  it('refuses a variable set twice, before the policy sees it', async () => {
+    // The spawn keeps the last of a repeated name. Presenting both to the
+    // policy would let it approve a value the command never runs with, so the
+    // request is refused rather than resolved on the agent's behalf.
+    const h = hub({
+      command: process.execPath,
+      args: ['-e', 'process.stdout.write(process.env.MY_FLAG ?? "unset")'],
+      env: [
+        { name: 'MY_FLAG', value: 'judged' },
+        { name: 'MY_FLAG', value: 'executed' },
+      ],
+    });
+    let asked = 0;
+    const s = await h.session({
+      engine: 'mock',
+      cwd: scratch(),
+      permissionPolicy: () => {
+        asked++;
+        return { outcome: 'allow' };
+      },
+    });
+    const updates: TranscriptEvent[] = [];
+    s.on('update', (event) => updates.push(event));
+    await s.prompt('run it');
+
+    expect(String(terminalReport(updates)?.['error'])).toMatch(/'MY_FLAG' is set more than once/);
+    expect(asked).toBe(0);
+    expect(terminalReport(updates)?.['output']).toBeUndefined();
   }, 30_000);
 
   it('refuses a request that would redirect an allowed command, before the policy sees it', async () => {
@@ -386,6 +451,115 @@ describe('a session with a live command', () => {
   }, 30_000);
 });
 
+describe('an illegal retention limit is refused at the wire', () => {
+  it('refuses before the policy is asked, so nothing is spent on it', async () => {
+    // `Math.min(x, MAX)` is NaN for a non-numeric x, and every comparison
+    // against NaN is false, so the ceiling stopped applying and the buffer grew
+    // without bound while reporting itself truncated. Refused here rather than
+    // where the limit is applied: everything past this point costs something —
+    // the policy is asked, which may put a prompt in front of a person, and
+    // then a process is spawned.
+    const seen: unknown[] = [];
+    const h = hub({
+      command: process.execPath,
+      args: ['-e', 'process.stdout.write("ran")'],
+      outputByteLimit: 'not-a-number',
+    });
+    const s = await h.session({
+      engine: 'mock',
+      cwd: scratch(),
+      permissionPolicy: (request) => {
+        seen.push(request);
+        return { outcome: 'allow' };
+      },
+    });
+    const updates: TranscriptEvent[] = [];
+    s.on('update', (event) => updates.push(event));
+    await s.prompt('run it');
+
+    // The agent is told what was wrong with its request, by name.
+    expect(String(terminalReport(updates)?.['error'] ?? '')).toMatch(/outputByteLimit/);
+    // And no one was asked to approve a command that was never going to run.
+    expect(seen).toHaveLength(0);
+  }, 30_000);
+});
+
+describe('retained output stays inside its limit, and stays well formed', () => {
+  /** Run a command that writes `text`, then read back what was retained. */
+  const retain = async (text: string, outputByteLimit?: number | null) => {
+    const terminals = new SessionTerminals(scratch());
+    const create: Parameters<SessionTerminals['create']>[0] = {
+      command: process.execPath,
+      args: ['-e', `process.stdout.write(${JSON.stringify(text)})`],
+    };
+    if (outputByteLimit !== undefined) create.outputByteLimit = outputByteLimit;
+    const id = terminals.create(create);
+    await terminals.waitForExit(id);
+    return terminals.output(id);
+  };
+
+  // A ceiling guard, not regression cover for the surrogate defect: the old
+  // code sliced by the wrong unit but did still honour the byte ceiling, so
+  // this case stays green against it. It is here to keep the ceiling itself
+  // from regressing.
+  it('never keeps more bytes than the limit allows (ceiling guard)', async () => {
+    const { output, truncated } = await retain('x'.repeat(5000), 1000);
+    expect(truncated).toBe(true);
+    expect(Buffer.byteLength(output)).toBeLessThanOrEqual(1000);
+    // Truncation is from the front: the tail is what a caller reading a long
+    // build log needs.
+    expect(output.endsWith('x')).toBe(true);
+  });
+
+  it('cuts on a character boundary rather than mid-surrogate', async () => {
+    // The limit lands inside the emoji. Slicing by UTF-16 code units used to
+    // keep its low half and produce an unpaired surrogate, which survives
+    // `JSON.stringify` and can make a strict consumer reject the record.
+    const { output } = await retain('ab\u{1F600}cd', 5);
+    expect(Buffer.byteLength(output)).toBeLessThanOrEqual(5);
+    const lone = output.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '');
+    expect(/[\uD800-\uDFFF]/.test(lone)).toBe(false);
+    expect(output).toBe('cd');
+    // The limit is a ceiling, not a budget: the whole character goes rather
+    // than the result sitting one character above its own maximum.
+    expect(JSON.parse(JSON.stringify(output))).toBe(output);
+  });
+
+  it('keeps a whole character that fits, rather than discarding everything', async () => {
+    // The other half of slicing a byte budget by UTF-16 units: `excess` was a
+    // byte count used as a code-unit index, so it over-counted on non-BMP text
+    // and cut away more than the limit required. Two emoji against a 4-byte
+    // limit retained nothing at all, where one of them fits exactly.
+    const { output } = await retain('\u{1F600}\u{1F600}', 4);
+    expect(Buffer.byteLength(output)).toBeLessThanOrEqual(4);
+    expect(output).toBe('\u{1F600}');
+  });
+
+  it('keeps nothing rather than exceed a limit smaller than one character', async () => {
+    // The price of choosing a ceiling over a budget, stated rather than left to
+    // be discovered: a 2-byte limit against 4-byte output retains nothing,
+    // because keeping the character would put the buffer over its own maximum.
+    const { output, truncated } = await retain('\u{1F600}', 2);
+    expect(truncated).toBe(true);
+    expect(output).toBe('');
+  });
+
+  it('a non-numeric limit cannot disable the ceiling', async () => {
+    // `Math.min(x, MAX)` is NaN for a non-numeric x, and every comparison
+    // against NaN is false — so the buffer grew without bound while reporting
+    // itself truncated. A reader reaching SessionTerminals through
+    // `@runskein/core/internal` bypasses the wire check, so the clamp is total.
+    const bogus = 'not-a-number' as unknown as number;
+    const { output, truncated } = await retain('y'.repeat(5000), bogus);
+    expect(Number.isNaN(Buffer.byteLength(output))).toBe(false);
+    expect(Buffer.byteLength(output)).toBeLessThanOrEqual(1024 * 1024);
+    // It falls back to the default rather than retaining nothing, so the
+    // output is still usable.
+    expect(truncated).toBe(false);
+    expect(output.length).toBe(5000);
+  });
+});
+
 describe('SessionTerminals directly', () => {
   it('narrows a relative cwd and rejects an escaping absolute one', () => {
     const root = scratch();
@@ -423,16 +597,75 @@ describe('SessionTerminals directly', () => {
     expect(() => authorizeTerminalEnv([{ name: 'CLAUDECODE', value: '1' }])).toThrow(
       /reserved by the host/,
     );
+    // Windows resolves a name without case, so the spelling an agent chooses
+    // may not decide whether a guard applies: `Path` is `PATH` there, and a
+    // session marker put back as `Claudecode` is the marker.
+    expect(() => authorizeTerminalEnv([{ name: 'Path', value: '/tmp/evil' }])).toThrow(/may not be set/);
+    expect(() => authorizeTerminalEnv([{ name: 'Node_Options', value: '--require=x' }])).toThrow(
+      /may not be set/,
+    );
+    expect(() => authorizeTerminalEnv([{ name: 'Claudecode', value: '1' }])).toThrow(
+      /reserved by the host/,
+    );
+    // An adapter's own pattern is matched the same way, whichever case its
+    // author wrote it in — upper-casing the name instead would have quietly
+    // stopped a lower-case pattern from matching anything at all.
+    expect(() => authorizeTerminalEnv([{ name: 'MOCK_X', value: '1' }], [/^mock_/])).toThrow(
+      /reserved by the host/,
+    );
     expect(() => authorizeTerminalEnv([{ name: 'MOCK_X', value: '1' }], [/^MOCK_/])).toThrow(
       /reserved by the host/,
     );
     expect(() => authorizeTerminalEnv([{ name: 'not a name', value: 'x' }])).toThrow(/invalid environment/);
     expect(() => authorizeTerminalEnv([{ name: 'OK', value: 'a\u0000b' }])).toThrow(/NUL byte/);
+    expect(() =>
+      authorizeTerminalEnv([
+        { name: 'DUP', value: 'first' },
+        { name: 'DUP', value: 'second' },
+      ]),
+    ).toThrow(/'DUP' is set more than once/);
+    // Windows has one variable here, not two, and the boundary may not depend
+    // on which host the session happens to be running on.
+    expect(() =>
+      authorizeTerminalEnv([
+        { name: 'Dup', value: 'first' },
+        { name: 'DUP', value: 'second' },
+      ]),
+    ).toThrow(/'DUP' is set more than once/);
+    // Refusing a repeat must not refuse two different names, which is the
+    // ordinary case every request with an environment relies on.
+    expect(
+      authorizeTerminalEnv([
+        { name: 'A', value: '1' },
+        { name: 'B', value: '2' },
+      ]),
+    ).toEqual([
+      { name: 'A', value: '1' },
+      { name: 'B', value: '2' },
+    ]);
     expect(authorizeTerminalEnv([{ name: 'MY_FLAG', value: '1' }])).toEqual([
       { name: 'MY_FLAG', value: '1' },
     ]);
     expect(authorizeTerminalEnv(undefined)).toEqual([]);
   });
+
+  it('refuses a repeated variable at spawn as well as at the policy', async () => {
+    // create() validates for itself, so a consumer holding SessionTerminals
+    // directly gets the same refusal as one that went through a session. The
+    // session's check passing is not what makes this path safe.
+    const terminals = new SessionTerminals(scratch());
+    expect(() =>
+      terminals.create({
+        command: process.execPath,
+        args: ['-e', ''],
+        env: [
+          { name: 'DUP', value: 'first' },
+          { name: 'DUP', value: 'second' },
+        ],
+      }),
+    ).toThrow(/'DUP' is set more than once/);
+    await terminals.releaseAll();
+  }, 30_000);
 
   it('flushes a stream that ends mid-character', async () => {
     // Half a UTF-8 sequence at the end of the stream is still output: it has

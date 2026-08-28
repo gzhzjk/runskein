@@ -1842,6 +1842,18 @@ export class Session {
     // would actually run in rather than the one the agent proposed.
     const cwd = terminals.resolveCwd(params.cwd);
     const args = Array.isArray(params.args) ? params.args : [];
+    // Checked here rather than where it is applied, because everything below
+    // this line costs something: the policy is asked, which may put a prompt in
+    // front of a person, and then a process is spawned. A request that cannot
+    // be honoured should cost neither.
+    const outputByteLimit = params.outputByteLimit;
+    if (outputByteLimit !== undefined && outputByteLimit !== null) {
+      if (typeof outputByteLimit !== 'number' || !Number.isFinite(outputByteLimit) || outputByteLimit < 1) {
+        throw new Error(
+          `terminal/create: outputByteLimit must be a positive finite number, got ${JSON.stringify(outputByteLimit)}`,
+        );
+      }
+    }
     // Checked before asking, and part of what is asked: the environment decides
     // which program an allowed command turns out to be, so a policy that could
     // not see it would be authorising a name rather than an execution.
@@ -1866,7 +1878,7 @@ export class Session {
     }
     const create: TerminalCreateParams = { command, args, cwd };
     if (env.length > 0) create.env = env;
-    if (params.outputByteLimit != null) create.outputByteLimit = params.outputByteLimit;
+    if (outputByteLimit != null) create.outputByteLimit = outputByteLimit;
     return { terminalId: terminals.create(create) };
   }
 

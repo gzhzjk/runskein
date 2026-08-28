@@ -21,10 +21,20 @@ export const builtinAdapters: readonly EngineAdapter[] = [opencode, kimi, claude
 /**
  * createHub with the built-in adapters pre-registered.
  *
- * Note: the built-ins form discovery layer 1, so
- * `discovery: false` disables them too — pass explicit `adapters` for fully
- * static wiring.
- * @param options - HubOptions; the built-in adapters are always the discovery base layer.
+ * The built-ins are registered unconditionally, and neither option here
+ * narrows that set. `discovery` opts into *dynamic* discovery — scanning
+ * workspace and installed adapter packages — and is off by default because
+ * importing an adapter executes code with host privileges; it says nothing
+ * about the built-ins. Explicit `adapters` are added alongside them, replacing
+ * only a built-in that shares an `id`, so passing one adapter of your own
+ * yields every built-in plus yours rather than yours alone.
+ *
+ * For a hub holding only the adapters you name, construct the `Hub` this
+ * package re-exports: `new Hub({ adapters: [...] })` registers no built-ins at
+ * all.
+ *
+ * @param options - HubOptions; the built-in adapters are always the discovery
+ *   base layer, and `discovery` governs only the layers above them.
  * @returns a Hub with the built-in adapters pre-registered.
  */
 export function createHub(options: HubOptions = {}): Hub {

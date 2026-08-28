@@ -42,6 +42,7 @@ the permission mechanism exists to govern. The request arrives as
 `tool: 'terminal'`, `kind: 'execute'`, with `{command, args, cwd}` as input and
 the resolved cwd as its location, so existing rule tables match it without
 learning a new vocabulary. A refusal means the process is never spawned.
+(Amended below: the input carries `env` as a fourth field.)
 
 **3. The session's cwd is a ceiling, not a default.** A relative cwd resolves
 inside it; an absolute one must be within it; anything else is refused with a
@@ -128,6 +129,15 @@ the policy. Rule tables match a glob over the stringified input, so env values
 now join args as text a rule can match on; what keeps that from becoming an
 execution decision is the deny list, not the rule.
 
+_(Bounding this, 2026-08-28: "everything else" is everything that survives the
+entry checks too — an entry must be a well-formed `{ name, value }` pair with a
+valid variable name and no NUL byte. And the deny list is a fixed list, not a
+proof that no surviving variable can influence a command: it removes the
+questions a rule table cannot usefully answer and leaves the rest to the policy,
+which is where that judgement belongs. `env` is what the agent asked to add; the
+child's environment is those entries layered over the host's scrubbed one at
+spawn.)_
+
 **Containment is decided on resolved paths.** The cwd check compared spellings,
 which a symlink inside the session defeats: `escape -> /somewhere/else` reads as
 a session-relative path and runs outside the boundary. The check now also
@@ -135,3 +145,52 @@ compares the real paths of the session cwd and the target, and a cwd that does
 not exist is refused with that reason rather than passed to spawn — there is
 nothing for containment to be true about. The path the command runs in is still
 the one the agent named, so policy rules and locations are unchanged.
+
+## Amendment (2026-08-28) — one entry per variable
+
+The 2026-08-28 note bounded what the first amendment claimed; this closes the
+gap it left. `env` reached the policy as the agent sent it, duplicates included,
+while the spawn built the child's environment from the same entries through an
+object and so kept only the last of a repeated name. A policy that judged one
+entry per variable — a map, a `find`, a summary for a human — could approve
+`X=safe` while the command ran with `X=evil`: the same defect the first
+amendment fixed for the environment as a whole, surviving inside it for a single
+variable.
+
+A repeated name is now refused before the policy is asked, alongside the other
+requests a rule table cannot usefully answer. Collapsing to the last value was
+the alternative, and it was rejected: an agent that sets one variable twice
+cannot mean both, and choosing for it would decide the thing it asked. The
+refusal names the variable, so the agent can report which one it sent twice.
+
+Names are compared without case on every platform, and an override displaces the
+host variable the host itself would resolve it to. Windows spells one variable
+`Path` and `PATH` alike: a request could otherwise name a variable twice without
+repeating a key, or set one spelling while the inherited environment held the
+other, and the child would receive whichever the platform picked -- not
+something the policy could have read. The rule does not vary by host, because a
+boundary that moved with the machine would be no boundary at all. What the
+policy reads for a variable is now what the command runs with.
+
+## Amendment (2026-08-28) — a name is a name in whatever case it is written
+
+The rule above was applied to duplicate identity and to the host merge, and not
+to the guards that decide whether a variable may be set at all. `PATH` was
+refused; `Path` was not. On Windows those are one variable, so a host that
+allowed `git status` was allowing a name again — the request supplied `Path`,
+the policy saw an ordinary variable it had no reason to refuse, and the command
+ran as whatever program that path selected. The same held for the session
+markers: `Claudecode` restored what scrubbing exists to remove.
+
+Every environment name guard now matches without regard to case — the deny
+list, the host's scrub list, an adapter's own additions, and the scrub applied
+to the environment an engine itself is spawned with. The patterns are recompiled
+case-insensitively rather than the name being upper-cased to meet them, so a
+pattern an adapter wrote in lower case keeps matching what its author meant; the
+other way round it would have silently stopped matching anything.
+
+This refuses requests that were legal on POSIX, where `path` and `PATH` really
+are two variables and the lower-case one is nobody's loader. That is the price
+of one rule instead of one per platform: a boundary that moved with the machine
+would not be a boundary, and the variable an agent gets to set should not depend
+on which host the session landed on.

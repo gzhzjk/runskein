@@ -214,6 +214,9 @@ import { createHub, jsonlStore } from 'runskein';
 import { scriptedAdapter } from '@runskein/testkit';
 
 const hub = createHub({
+  // The five built-ins stay registered — `adapters` adds to them rather than
+  // replacing them, and `discovery: false` (the default) governs only dynamic
+  // scanning. Selecting `engine: 'scripted'` below is what keeps this hermetic.
   discovery: false,
   adapters: [scriptedAdapter({ env: { RUNSKEIN_TESTKIT_ASK_PERMISSION: '1' } })],
   store: jsonlStore('.transcripts'),

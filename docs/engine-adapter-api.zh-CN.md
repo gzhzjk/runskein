@@ -1,6 +1,6 @@
 ---
 source: docs/engine-adapter-api.md
-source-sha256: 1ed7b43a855e5f4bef061c7b55ec47f7e35a7f78270805770a420df2d960ea10
+source-sha256: ff1f7935cff51537bf4fe3f91ab04b9180ac9f553c29cef10e696d34585998bf
 ---
 
 # runskein —— API 规范（v1，已冻结）
@@ -659,8 +659,24 @@ policies.rules([{ tool, pattern, action: 'allow' | 'deny' }]); // declarative ta
 **runskein 替 Engine 运行的命令也到这里。** 有些 Engine 在自己的进程里执行；
 另一些通过 ACP 的 `terminal/*` 方法委托给客户端，而 runskein 实现了它们（决策 029）。
 既然此时是 runskein 在启动进程，每个 `terminal/create` 都是一次权限请求，
-带 `tool: 'terminal'`、`kind: 'execute'`、`input: { command, args, cwd }`，
+带 `tool: 'terminal'`、`kind: 'execute'`、`input: { command, args, cwd, env }`，
 并以解析出的工作目录作为其位置——因此为 `execute` 写的规则表已经覆盖了它。
+`env` 是 agent 请求追加的环境——启动时它会覆盖在宿主已擦除的环境之上——
+而且它到达策略时已经过校验。每一项都必须是格式良好、变量名合法、值中不含 NUL
+字节的 `{ name, value }`，并且同一个变量名不得设置两次——在所有平台上比较时都不区分
+大小写。一个把同一个变量写两遍的请求没有唯一含义：完全相同的重名会在启动时坍缩成最后
+一个取值，而只差大小写的两个名字在 Windows 上是一个变量、在 POSIX 上是两个——所以它
+会被拒绝，而不是背着策略替它作出决定。覆盖项会顶掉宿主自己会解析到的那个变量，因此
+无论 Session 跑在什么宿主上，策略读到的取值就是命令实际运行时的取值。上述每一项检查
+读取变量名时都不区分大小写，理由相同：Windows 上 `Path` 和 `PATH` 是同一个变量，
+一个只认得自己预期那种拼写的守卫，在一个宿主上是边界，在另一个宿主上就是缺口。
+落在宿主拒绝清单上的变量名同样会被拒绝，而且是在策略被询问之前。
+该清单收录了那些决定一个命令名最终是哪个程序、或者它会加载什么的变量——`PATH`、
+`LD_*`/`DYLD_*`、`NODE_OPTIONS`、`GIT_SSH_COMMAND` 之类——
+以及宿主会擦除的 Session 标记。它是一份固定清单，而不是“其余变量都无法影响一个命令”
+的证明：它排除掉的是规则表无法有意义回答的那些问题，例如“我可以在一个我自己挑的
+`PATH` 下运行它吗”，其余的则交由策略判断。通过该清单的部分对规则可见——
+规则用它的 glob 匹配字符串化后的 input，因此 env 的名字与取值也是规则可以匹配的文本。
 拒绝意味着进程从未启动，而工作目录可以在 Session`cwd` 之内收窄，
 但绝不能移到它之外。
 
@@ -794,7 +810,8 @@ interface EngineAdapter {
   launch: {
     command: string; // e.g. 'kimi'
     args?: string[]; // e.g. ['acp']
-    env?: Record<string, string>; // applied AFTER core's env scrub
+    env?: Record<string, string>; // applied AFTER core's env scrub; one entry
+    // per name, compared without case (decision 042)
     startTimeoutMs?: number; // npx wrappers need generous budgets
   };
   supervise?: boolean; // launch behind a parent-death watchdog (default false)
@@ -888,6 +905,13 @@ Engine 原生名称；每个 `meta` 是该值在创建请求 `_meta` 对象内�
 initialize → session/new → prompt → 更新流 → cancel →`s.close()` 语义，
 外加 §8 中的 Core 各行。线路级的 `session/close` 是可选的，
 作为协商 Capability 测试，而不是 Core 注册要求。由测试而非评审来强制执行。
+
+在这一切运行之前，候选者会先被校验：一个含义无法唯一确定的 Adapter 声明根本不会加载，
+`hub.engines()` 会把它报为一条带着理由的 `InvalidEngineInfo`，而不是让它先注册、
+然后在不同宿主上表现不同。`launch.env` 把同一个变量写两遍——`PATH_EXTRA` 和
+`Path_Extra`，在 Windows 上会被解析成一个——就是这样被拒绝的，并且在所有平台上都拒绝，
+因为被拒绝的是这种对宿主的依赖本身，而不是某一个宿主对它的解读。见
+[决策 042](decisions/042-a-launch-environment-names-each-variable-once.md)。
 
 ---
 

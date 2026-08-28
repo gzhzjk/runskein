@@ -1,6 +1,6 @@
 ---
 source: docs/adapter-guide.md
-source-sha256: aea9f2ea2c00a43834b664f97cb396871a6b2cd7fdcd501684c3b3153f775b0b
+source-sha256: 1b06536bb0324cbbc8b0d48be096550dd3fd75dc0574b3f7ba7f6ac13e04694f
 ---
 
 # 编写 Engine Adapter
@@ -112,8 +112,12 @@ export default {
 在热缓存下实测，spawn 加 `initialize` 对原生二进制约 0.6 秒，对 npx 包装器约
 1.6 秒——这份预算是为冷启动准备的，不是为常态准备的。
 
-`launch.env` 在 core 的环境清洗**之后**应用，因此它会胜出。用它设置 Engine 在启动时
-读取的配置，而不是每个 Session 的配置：一个进程服务多个 Session，其环境在启动时即固定。
+`launch.env` 在 core 的环境清洗**之后**应用，因此它会胜出——在一个解析变量名时不区分
+大小写的宿主上，你写的 `Path` 会顶掉继承来的 `PATH`，而不是并排放着。出于同样的理由，
+同一个名字不得写成两种拼写：`{ PATH_EXTRA: …, Path_Extra: … }` 在这里是两个变量，
+在 Windows 上是一个，因此注册阶段会拒绝它，而不是让 Engine 的环境取决于它在哪台机器上
+启动。用它设置 Engine 在启动时读取的配置，而不是每个 Session 的配置：一个进程服务多个
+Session，其环境在启动时即固定。
 
 ### 3a.`supervise`—— 仅当你的 Engine 忽略 stdin EOF 时
 

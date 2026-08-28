@@ -715,11 +715,33 @@ and awaits the reply. No separate mode exists.
 their own process; others delegate to the client over ACP's `terminal/*`
 methods, and runskein implements them (decision 029). Because runskein is then the
 one spawning the process, each `terminal/create` is a permission request with
-`tool: 'terminal'`, `kind: 'execute'`, `input: { command, args, cwd }`, and the
-resolved working directory as its location — so a rules table written for
-`execute` already covers it. A denial means the process is never started, and
-the working directory can be narrowed within the session's `cwd` but never
-moved outside it.
+`tool: 'terminal'`, `kind: 'execute'`, `input: { command, args, cwd, env }`, and
+the resolved working directory as its location — so a rules table written for
+`execute` already covers it. `env` is the environment the agent asked to add,
+layered at spawn time over the host's scrubbed environment, and it reaches the
+policy already checked. Entries must be well-formed `{ name, value }` pairs with
+a valid variable name and no NUL byte, and no name may be set twice, compared
+without case on every platform. A request naming one variable twice has no
+single meaning — an exact repeat collapses at spawn to the last value, and a
+case variant is one variable on Windows and two on POSIX — so it is refused
+rather than resolved behind the policy's back. An override displaces the host
+variable the host itself would resolve it to, so what a policy reads for a
+variable is what the command runs with, wherever the session is hosted. Every
+one of these checks reads a name without regard to case, for the same reason:
+Windows spells one variable `Path` and `PATH` alike, and a guard that saw only
+the spelling it expected would be a boundary on one host and an opening on
+another. A name on the host's deny list
+is refused too, before the policy is asked at all. That list holds the variables
+that decide which program a command name turns out to be or what it loads —
+`PATH`, `LD_*`/`DYLD_*`, `NODE_OPTIONS`, `GIT_SSH_COMMAND` and the like — plus
+the session markers the host scrubs. It is a fixed list, not a proof that no
+remaining variable can influence a command: it removes the questions a rule
+table cannot usefully answer, such as "may I run this under a `PATH` I chose",
+and leaves the rest to be judged. What survives it is visible to a rule, which
+matches its glob over the stringified input, so env names and values are text a
+rule can match on. A denial means the process is never started, and the
+working directory can be narrowed within the session's `cwd` but never moved
+outside it.
 
 `s.on('permission')` is a **read-only notification** (observability). The
 policy is the single answer path — no race between event handlers and policy.
@@ -869,7 +891,8 @@ interface EngineAdapter {
   launch: {
     command: string; // e.g. 'kimi'
     args?: string[]; // e.g. ['acp']
-    env?: Record<string, string>; // applied AFTER core's env scrub
+    env?: Record<string, string>; // applied AFTER core's env scrub; one entry
+    // per name, compared without case (decision 042)
     startTimeoutMs?: number; // npx wrappers need generous budgets
   };
   supervise?: boolean; // launch behind a parent-death watchdog (default false)
@@ -971,6 +994,15 @@ An adapter is registrable iff it passes the **conformance suite**
 cancel → `s.close()` semantics, plus the Core rows of §8. Wire-level
 `session/close` is optional and tested as a negotiated capability, not a Core
 registration requirement. Enforcement by test, not by review.
+
+A candidate is validated before any of that runs, and one whose declaration
+cannot mean one thing does not load: `hub.engines()` reports it as an
+`InvalidEngineInfo` carrying the reason, instead of it registering and behaving
+differently per host. `launch.env` naming one variable twice — `PATH_EXTRA`
+beside `Path_Extra`, which Windows resolves as one — is refused that way, on
+every platform, because it is the host-dependence being rejected rather than
+one host's reading of it. See
+[decision 042](decisions/042-a-launch-environment-names-each-variable-once.md).
 
 ---
 

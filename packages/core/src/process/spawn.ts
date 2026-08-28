@@ -17,6 +17,28 @@ export const ENV_SCRUB_PATTERNS: readonly RegExp[] = [
 ];
 
 /**
+ * Whether a variable name matches any of the patterns, ignoring case.
+ *
+ * Windows resolves environment variable names without case: `Path` and `PATH`
+ * are one variable there, so a guard that matched only the spelling it expected
+ * would hold on one host and not another. The patterns are recompiled
+ * case-insensitively rather than the name upper-cased, so that a pattern an
+ * adapter wrote in lower case still means what its author wrote. The recompiled
+ * pattern is always a fresh object, which is also what keeps a `g`-flagged
+ * pattern from carrying `lastIndex` between calls.
+ * @param patterns - the patterns to try.
+ * @param name - the variable name.
+ * @returns true on the first match.
+ */
+export function matchesEnvName(patterns: readonly RegExp[], name: string): boolean {
+  return patterns.some((pattern) =>
+    new RegExp(pattern.source, pattern.flags.includes('i') ? pattern.flags : `${pattern.flags}i`).test(
+      name,
+    ),
+  );
+}
+
+/**
  * Filter environment variables, dropping host-agent session markers that make
  * child engines refuse to start; adapter-scoped extras extend the scrub list.
  * @param env - The environment to filter.
@@ -27,12 +49,7 @@ export function scrubEnv(env: NodeJS.ProcessEnv, extra: readonly RegExp[] = []):
   const patterns = [...ENV_SCRUB_PATTERNS, ...extra];
   return Object.fromEntries(
     Object.entries(env).filter(
-      (entry): entry is [string, string] =>
-        entry[1] !== undefined &&
-        !patterns.some((pattern) => {
-          pattern.lastIndex = 0;
-          return pattern.test(entry[0]);
-        }),
+      (entry): entry is [string, string] => entry[1] !== undefined && !matchesEnvName(patterns, entry[0]),
     ),
   );
 }
@@ -52,6 +69,41 @@ export interface SpawnedEngine {
 }
 
 /**
+ * Layer overrides over the environment a child inherits.
+ *
+ * Both callers need this: an adapter's `launch.env`, which the adapter guide
+ * promises wins over the scrub, and the environment an agent asked a terminal
+ * to run with. Windows resolves variable names without case, so an override
+ * there has to displace the host's spelling of the same variable rather than
+ * sit beside it: a child handed both `MY_FLAG` and `my_flag` receives one of
+ * them, and which one is neither the adapter's choice nor something a policy
+ * could have read. On POSIX the two are separate variables and the host's own
+ * must survive.
+ * @param base - the scrubbed host environment.
+ * @param overrides - the overrides to apply, already one per name.
+ * @param caseless - whether the host resolves names without case; defaults to
+ *   the running platform.
+ * @returns the environment to spawn with.
+ */
+export function mergeEnv(
+  base: NodeJS.ProcessEnv,
+  overrides: readonly { name: string; value: string }[],
+  caseless: boolean = process.platform === 'win32',
+): NodeJS.ProcessEnv {
+  const displaced = new Set(overrides.map((entry) => entry.name.toUpperCase()));
+  // Without a null prototype, assigning `__proto__` runs a setter instead of
+  // creating a variable, and an approved name would never reach the child.
+  // Variable names belong to whoever asked for them, not to our object.
+  const merged: NodeJS.ProcessEnv = Object.create(null) as NodeJS.ProcessEnv;
+  for (const [name, value] of Object.entries(base)) {
+    if (caseless && displaced.has(name.toUpperCase())) continue;
+    merged[name] = value;
+  }
+  for (const entry of overrides) merged[entry.name] = entry.value;
+  return merged;
+}
+
+/**
  * Launch the adapter's engine command in its own process group with scrubbed
  * env; spawn failures surface later via the child's 'error' event.
  * @param adapter - The adapter whose launch config drives the spawn.
@@ -59,10 +111,10 @@ export interface SpawnedEngine {
  * @returns The spawned child plus a stderrTail() accessor for diagnostics.
  */
 export function spawnEngine(adapter: EngineAdapter, opts: { cwd: string }): SpawnedEngine {
-  const env = {
-    ...scrubEnv(process.env, adapter.envScrubExtra ?? []),
-    ...adapter.launch.env,
-  };
+  const env = mergeEnv(
+    scrubEnv(process.env, adapter.envScrubExtra ?? []),
+    Object.entries(adapter.launch.env ?? {}).map(([name, value]) => ({ name, value })),
+  );
   // An engine that speaks no ACP is reached through a shim: a separate process
   // that talks ACP on this stdio and the engine's own protocol to a child it
   // spawns itself. Everything downstream — supervision, ownership, reaping —

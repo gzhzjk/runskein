@@ -136,7 +136,30 @@ const adapterSchema = z.object({
   launch: z.object({
     command: z.string().min(1),
     args: z.array(z.string()).optional(),
-    env: z.record(z.string()).optional(),
+    env: z
+      .record(z.string())
+      .optional()
+      .superRefine((env, ctx) => {
+        // Windows resolves variable names without case, so two spellings of one
+        // name are two variables here and one there -- and which value the
+        // engine ends up with is then decided by key order and the platform's
+        // collapsing rather than by the adapter. Refused where the author can
+        // still act on it, rather than passed on to mean different things on
+        // different machines.
+        const seen = new Map<string, string>();
+        for (const name of Object.keys(env ?? {})) {
+          const first = seen.get(name.toUpperCase());
+          if (first !== undefined) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [name],
+              message: `launch.env sets '${first}' and '${name}', which are one variable on Windows`,
+            });
+            continue;
+          }
+          seen.set(name.toUpperCase(), name);
+        }
+      }),
     startTimeoutMs: z.number().int().positive().optional(),
   }),
   shim: z.string().optional(),

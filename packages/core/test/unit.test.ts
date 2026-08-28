@@ -5,7 +5,7 @@
  * metadata riding the transcript.
  */
 import { describe, expect, it } from 'vitest';
-import { scrubEnv, ENV_SCRUB_PATTERNS } from '../src/process/spawn.js';
+import { mergeEnv, scrubEnv, ENV_SCRUB_PATTERNS } from '../src/process/spawn.js';
 import { HealthMachine } from '../src/process/health.js';
 import { applyCapabilityOverride, normalizeCapabilities } from '../src/acp/capabilities.js';
 import { ConfigError } from '../src/errors.js';
@@ -16,7 +16,7 @@ import { foldUsage, readCost, readSessionMeta, sessionMetaUpdate } from '../src/
 import { foldSessionMeta, matchesFilter } from '../src/transcript/store.js';
 import type { TranscriptEvent } from '../src/transcript/event.js';
 
-describe('scrubEnv (env hygiene)', () => {
+describe('process environment hygiene', () => {
   const dirty = {
     PATH: '/usr/bin',
     CLAUDE_SESSION_ID: 'abc',
@@ -43,6 +43,44 @@ describe('scrubEnv (env hygiene)', () => {
     expect(scrubEnv({ SECRET_A: 'a', SECRET_B: 'b', KEEP: 'x' }, [/^SECRET_/g])).toEqual({
       KEEP: 'x',
     });
+  });
+
+  it('recognises a session marker whatever case the host spells it in', () => {
+    // Windows resolves variable names without case, so a marker spelled
+    // `Claudecode` there is the marker the scrub exists to remove, and an
+    // engine handed it back refuses to start with "active session".
+    expect(scrubEnv({ Claudecode: '1', Codex_Sandbox_Mode: 'on', KEEP: 'x' })).toEqual({
+      KEEP: 'x',
+    });
+    // The adapter's pattern is read the same way round: its author's case is
+    // preserved rather than the name being folded to match it.
+    expect(scrubEnv({ Pi_Session_Id: 's', KEEP: 'x' }, [/^pi_session_/])).toEqual({ KEEP: 'x' });
+  });
+
+  it('lets an override displace the host variable the host would resolve it to', () => {
+    // The caseless side is the one this Darwin runner never reaches by default,
+    // so both are driven directly: a Windows child handed `MY_FLAG` and
+    // `my_flag` receives one of them, and which one is not something the policy
+    // could have read.
+    expect(mergeEnv({ MY_FLAG: 'host' }, [{ name: 'my_flag', value: 'agent' }], true)).toEqual({
+      my_flag: 'agent',
+    });
+    // On POSIX they are two variables, and the host's own is not the agent's
+    // to remove.
+    expect(mergeEnv({ MY_FLAG: 'host' }, [{ name: 'my_flag', value: 'agent' }], false)).toEqual({
+      MY_FLAG: 'host',
+      my_flag: 'agent',
+    });
+    // The ordinary case on both: the override replaces the host's value.
+    expect(mergeEnv({ MY_FLAG: 'host' }, [{ name: 'MY_FLAG', value: 'agent' }], false)).toEqual({
+      MY_FLAG: 'agent',
+    });
+    // A variable named `__proto__` is a variable, not a key into our own
+    // object: assigning it on a plain object runs a setter and the child would
+    // never receive what the policy approved.
+    const proto = mergeEnv({}, [{ name: '__proto__', value: 'agent' }], false);
+    expect(Object.prototype.hasOwnProperty.call(proto, '__proto__')).toBe(true);
+    expect(proto['__proto__']).toBe('agent');
   });
 
   it('drops undefined values', () => {

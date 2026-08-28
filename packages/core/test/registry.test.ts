@@ -74,6 +74,39 @@ describe('validateAdapter', () => {
     expect(validateAdapter(okAdapter('foo')).id).toBe('foo');
   });
 
+  it('rejects a launch environment that spells one variable two ways', () => {
+    // On Windows these are one variable, and which value the engine got would
+    // then be decided by key order rather than by the adapter. The author is
+    // told here, where they can still change what they meant.
+    const base = okAdapter('foo');
+    expect(() =>
+      validateAdapter({ ...base, launch: { ...base.launch, env: { PATH_EXTRA: 'a', Path_Extra: 'b' } } }),
+    ).toThrow(/'PATH_EXTRA' and 'Path_Extra', which are one variable on Windows/);
+    // Two variables that differ by more than case are two variables everywhere.
+    expect(
+      validateAdapter({ ...base, launch: { ...base.launch, env: { A: '1', B: '2' } } }).launch.env,
+    ).toEqual({ A: '1', B: '2' });
+  });
+
+  it('isolates the adapter that declares one, and names both spellings', async () => {
+    // What an author actually sees: the hub keeps serving, and the reason is
+    // on the invalid candidate rather than thrown at whoever built the hub.
+    const base = okAdapter('doubled');
+    const r = new Registry({
+      adapters: [
+        okAdapter('good'),
+        { ...base, launch: { ...base.launch, env: { PATH_EXTRA: 'a', Path_Extra: 'b' } } },
+      ],
+      discovery: false,
+    });
+
+    expect([...(await r.adapters()).keys()]).toEqual(['good']);
+    const invalid = await r.invalidCandidates();
+    expect(invalid).toHaveLength(1);
+    expect(invalid[0]).toMatchObject({ id: 'doubled', health: 'invalid' });
+    expect(invalid[0]!.error).toMatch(/'PATH_EXTRA' and 'Path_Extra'/);
+  });
+
   it('rejects wrong specVersion / bad id / missing launch', () => {
     expect(() => validateAdapter({ ...okAdapter('foo'), specVersion: 2 })).toThrow();
     expect(() => validateAdapter({ ...okAdapter('Bad_Id') })).toThrow();

@@ -123,9 +123,14 @@ on first run, so the bundled npx-based engines use 120 s. Measured on a warm
 cache, spawn plus `initialize` was ~0.6 s for a native binary and ~1.6 s for
 an npx wrapper — the budget exists for the cold case, not the normal one.
 
-`launch.env` is applied **after** core's environment scrub, so it wins. Use it
-for settings the engine reads at startup, not for per-session configuration:
-one process serves many sessions, and its environment is fixed when it starts.
+`launch.env` is applied **after** core's environment scrub, so it wins — on a
+host that resolves variable names without case, your `Path` displaces the
+inherited `PATH` rather than sitting beside it. For the same reason you may not
+spell one name two ways: `{ PATH_EXTRA: …, Path_Extra: … }` is two variables
+here and one on Windows, so registration refuses it rather than let the engine's
+environment depend on which machine it started on. Use it for settings the
+engine reads at startup, not for per-session configuration: one process serves
+many sessions, and its environment is fixed when it starts.
 
 ### 3a. `supervise` — only if your engine ignores stdin EOF
 

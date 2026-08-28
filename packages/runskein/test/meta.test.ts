@@ -4,9 +4,10 @@
  * quickstart works without any adapter configuration.
  */
 import { describe, expect, it } from 'vitest';
-import { builtinAdapters, createHub, policies, jsonlStore } from '../src/index.js';
+import { Hub, builtinAdapters, createHub, policies, jsonlStore } from '../src/index.js';
 import { createDiffCoverageJudge, createFolder } from '../src/fold.js';
 import { validateAdapter } from '@runskein/core/internal';
+import type { EngineAdapter } from '@runskein/core';
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -28,6 +29,45 @@ describe('runskein meta-package', () => {
       // The shipped adapters must clear the same zod gate discovery enforces.
       expect(() => validateAdapter(adapter)).not.toThrow();
     }
+  });
+
+  // What `createHub`'s note says, pinned against what it does. The note used to
+  // claim `discovery: false` disabled the built-ins and that explicit
+  // `adapters` gave "fully static wiring"; measured, neither was true, and a
+  // consumer who believed it would expose five engines from a deployment meant
+  // to expose one.
+  describe('what narrows the adapter set, and what does not', () => {
+    /**
+     * A stand-in that shares no id with a built-in, written out rather than
+     * spread from one: spreading would tie what these cases prove to whatever
+     * shape `opencode` happens to have, and the registry path being exercised
+     * is the same either way.
+     */
+    const mine: EngineAdapter = { specVersion: 1, id: 'mine-only', launch: { command: 'true' } };
+
+    it('discovery: false leaves every built-in registered', async () => {
+      const hub = createHub({ discovery: false });
+      const ids = (await hub.engines()).map((e) => e.id).sort();
+      expect(ids).toEqual(['claude-code', 'codex', 'kimi', 'opencode', 'pi']);
+    });
+
+    it('explicit adapters are added to the built-ins, not substituted for them', async () => {
+      const hub = createHub({ discovery: false, adapters: [mine] });
+      const ids = (await hub.engines()).map((e) => e.id).sort();
+      expect(ids).toEqual(['claude-code', 'codex', 'kimi', 'mine-only', 'opencode', 'pi']);
+    });
+
+    it('Hub built directly registers only the adapters it is given', async () => {
+      // The path the corrected note sends a consumer to for a closed hub, so
+      // the recommendation is checked rather than asserted.
+      const hub = new Hub({ adapters: [mine] });
+      const engines = await hub.engines();
+      expect(engines.map((e) => e.id)).toEqual(['mine-only']);
+      // Asserting ids alone would pass on an adapter that failed validation and
+      // was listed as `health: 'invalid'` — registered in name only. The note
+      // sends consumers here for a working hub, so check it is one.
+      expect(engines[0]?.health).not.toBe('invalid');
+    });
   });
 
   it('createHub() registers the built-ins; engines() never spawns', async () => {
