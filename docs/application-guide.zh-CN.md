@@ -1,7 +1,7 @@
----
+<!--
 source: docs/application-guide.md
-source-sha256: 103762f0821a607c2207b0fe8163a051b1759a0f86d7fbfee4ec3703b11d6027
----
+source-sha256: 6f53bcb498ce364162cf07f03095c7edf6f88e9eb6b45f2df225867137592894
+-->
 
 # 在应用中使用 runskein
 
@@ -100,14 +100,23 @@ Engine 之间不同的不是调用方式，而是一个键在**何时**可以写
 选项说明这一点：
 
 ```ts
-const { configOptions } = await hub.describe('claude-code');
-configOptions.find((o) => o.id === 'reasoning')?.settable; // 'creation'
+const { configOptions } = await hub.describe(engineId);
+configOptions.find((o) => o.id === 'effort')?.settable; // undefined | 'creation'
 ```
 
 `settable: 'creation'` 意味着该 Engine 只在构建 Session 时接受这个设置。
 `hub.session({ config })` 会把它放在创建请求上，之后调用 `setConfig()` 则会以
 `NotSupportedError` 拒绝，而不会发送一个 Engine 会忽略的写入。没有 `settable`
 字段就是通常情形：创建时以及创建后的任何时候均可写入。
+
+**目前没有任何内置 Engine 报告 `settable: 'creation'`。** claude-code 曾经会——
+那是 Adapter 声明出来的——直到它的包装器开始自己发布思考深度选项：一个可写的选项，
+而那条声明正遮蔽着它。但仍然要读 `settable`：第三方 Adapter 用它，而任何 Engine
+都可能在下一个版本开始报告它。这也是上面那些选项 id 用 Engine 自己叫法的原因：
+claude-code 的思考深度现在叫 `effort`，而 Adapter 声明当初把它叫作 `reasoning`。
+你**写入**时用的键没有变——`config: { reasoning: 'high' }` 仍然会送到 Engine
+自己的叫法上——但凡是拿 `describe()` 返回的 id 去匹配的代码，匹配的是 Engine
+的词汇表，不是 runskein 的。
 
 由此得出两点。如果你完全不想针对不同 Engine 分支，请在创建时完成所有配置——
 这条路径在每个 Engine 上的工作方式都相同。如果想在 UI 中提供实时控件，请读取
@@ -182,9 +191,36 @@ await hub.quit();
 被 `SIGKILL` 杀死的宿主根本无法运行它。pipe 关闭后仍不退出的 Engine 会被遗留，
 而 runskein 会自行回收它们：下一次运行首次获取 Engine 时，会扫描 ownership registry，
 回收它自己的宿主所遗留的进程，之后还会进行周期性扫描。扫描被刻意绑定到获取而不是启动，
-所以仅执行检查（`engines()`、`describe()`）的程序永远不会回收任何进程。内置 Engine
-中只有 claude-code 能在宿主的 `SIGKILL` 后继续存活，这正是为什么只有它在
-watchdog 后方启动。
+所以仅执行检查（`engines()`、`describe()`）的程序永远不会回收任何进程。目前没有任何
+内置 Engine 能活过宿主的 `SIGKILL`；claude-code 曾经可以，直到它的包装器被替换，
+而 watchdog 正是因此存在。别把这当成承诺——Engine 的下一个版本就可能改变它，
+所以那道扫描无论如何都会跑。
+
+## 把 runskein 打包进单个产物
+
+runskein 附带的两个文件是被**作为进程启动**的，不是被 import 的：pi 的 shim，
+以及声明了 `supervise` 的 Adapter 用来运行 Engine 的那个「父进程死亡看门狗」。
+两者都是相对于需要它们的模块定位的，所以把多个包压平成一个文件的打包器
+会搬走代码、把文件留在原地。
+
+这件事不会静默发生。打包后的 Hub 会报出来：
+
+```text
+pi  health: 'invalid'
+    shim entry point not found: /app/shim.mjs — this path is resolved from the
+    module's own location, so a bundler that flattens the package will move it…
+```
+
+而声明了 `supervise` 的 Adapter 会在第一次创建 Session 时以 `EngineStartError`
+失败，对看门狗说同样的话。补救办法二选一：
+
+- **把运行时资产拷到产物旁边**，保持消息里点明的那个布局；或者
+- **把 `runskein` 排除在 bundle 之外**，让它像未打包安装那样在 `node_modules`
+  里解析这些文件。
+
+其余一切都能扛过打包。五个内置 Engine 里有四个是靠 `PATH` 上的命令启动的，
+自身不带任何文件，所以丢了 pi 的 bundle 仍然保有其余四个 —— 这也正是 Hub 报告
+一个 Adapter 无效、而不是拒绝启动的原因。
 
 ## 不使用 Engine 测试你的应用
 

@@ -9,4 +9,4 @@
  * being bundled into a consumer's own artifact — a runtime path lookup does
  * not. See `scripts/generate-version.mjs` for what that cost.
  */
-export const CLIENT_VERSION = '0.1.0';
+export const CLIENT_VERSION = '0.1.1';

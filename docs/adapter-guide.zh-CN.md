@@ -1,7 +1,7 @@
----
+<!--
 source: docs/adapter-guide.md
-source-sha256: 3862c7fd452065d351d345107474c1ecfe4d7fd821d05b8a87ee4d07fd66d734
----
+source-sha256: c018888ffc20c03b306a88c5ed3ef0f8464d44c6e186492b5472ed00d1161d45
+-->
 
 # 编写 Engine Adapter
 
@@ -31,7 +31,7 @@ Session 逻辑，那说明别处的设计出了问题——请提出来，而不
 
 在动笔之前，手工运行它的命令，检查它是否能在 stdio 上响应 `initialize`。
 多数 Engine 为此提供子命令——`kimi acp`、`opencode acp`——或提供包装器——
-`npx @zed-industries/claude-code-acp`。
+`npx @agentclientprotocol/claude-agent-acp`。
 
 如果它不说该协议，你需要一个 shim（`shim.mjs`）：一个独立进程，在 runskein 给它的
 stdio 上说 ACP，并对它自己启动的子进程说 Engine 自身的协议。那是比 Adapter 大得多的
@@ -104,6 +104,8 @@ meta-package 会在动态发现之前静态 import 它们。第三层不会扫�
 
 ### 3. 写 launch 块
 
+<!-- from: adapters/kimi/index.mjs -->
+
 ```js
 export default {
   specVersion: 1,
@@ -158,7 +160,7 @@ creationConfig: {
 },
 ```
 
-（来自内置的 claude-code Adapter。）键是 **runskein 配置键**（`reasoning`、
+键是 **runskein 配置键**（`reasoning`、
 `model`……），绝不是 Engine 原生名称；`meta` 是该值在创建请求 `_meta` 对象内的
 路径；`values` 把 runskein 的档位映射到 Engine 期望的值，因为"high 是什么意思"是
 你的 Adapter 的知识、不是 core 的。runskein 在创建请求上投递该值，并通过
@@ -169,19 +171,32 @@ creationConfig: {
 ——遮蔽一个真实可写面会产生一个能通过校验却无法应用的值，与过期的
 `configHints` 条目（见下方“最费时间的那些错误”一节）是同一种最坏结果。
 
+上面那段代码来自内置的 claude-code Adapter，直到它被删除为止：它启动的包装器
+开始自己发布思考深度选项，于是这条声明变成了本段警告的那个错误本身——运行时写入
+被拒为不支持，而创建时那条路被接受却什么也没做。**目前没有任何内置 Adapter 声明
+`creationConfig`。** 这个特性没有被废弃；当一个 Engine 确实只读一次某设置、之后
+再也不读时，你需要的正是它。但请先看 `describe(id).configOptions`，并在你所包装的
+Engine 发生变化时再看一次——它开始发布这个选项的那天，就是你的声明开始造成伤害
+的那天。
+
 ### 3c.`errorPatterns`—— 这个 Engine 的失败意味着什么
 
 Engine 的错误措辞属于 Engine 自己，所以对就绪之后的失败，core 只通过你声明的
 模式来分类：
 
+<!-- from: adapters/kimi/index.mjs -->
+
 ```js
 errorPatterns: [
-  { cause: 'rate-limit', match: 'reached your usage limit|quota will be refreshed' },
+  {
+    cause: 'rate-limit',
+    match: 'reached your [^.]{0,40}usage limit|quota will (be refreshed|reset)|purchase extra usage|subscription\\?tab=quota',
+  },
   { cause: 'auth', match: 'Authentication required' },
 ],
 ```
 
-两条规则，都是用代价换来的：
+三条规则，都是用代价换来的：
 
 - **把 `rate-limit` 声明在 `auth` 之前。** 先匹配者胜，而 Engine 完全可能把一次
   限流写成认证问题 —— kimi 无论何种原因，都会给上游的拒绝加上
@@ -193,8 +208,51 @@ errorPatterns: [
   那一段，并留得足够长，以排除仅仅提到某个上限或某个数字的句子。没有命中的失败
   是一个诚实的、没有 `kind` 的 `EngineOperationError`；而命中错消息的模式，是一个
   说得很有把握的错误答案。
+- **一旦你有了两份负载，就锚定在它们的共同部分上**（决策 044）。上面的例子取自
+  kimi，它之所以有四个候选项，是因为第一版声明的两个片段都取自同一份负载，
+  而供应商的一次改写在一次编辑里把两个都打断了 —— 一个限定词插进了 `your` 与
+  `usage limit` 之间，`refreshed` 变成了 `reset`。活下来的是消息里补救指引的那一半，
+  也就是没人会把它当成错误正文的那部分。这件事比读上去更要紧：当一条模式不再命中，
+  失败并不会变成未分类，而是落到后面第一个命中的模式上 —— 对于给每次拒绝都加上
+  `Authentication required:` 前缀的 Engine，那就是拆除。模式失效会朝着伤害最大的
+  方向倒，所以把锚点分散开，并把每一份实测负载连同日期一起留在你的测试里。
+
+### 3d.`usage`—— 这个 Engine 的 token 核算在哪里
+
+可选，只有当 Engine 确实报告 token 时才值得写。什么都不声明恰恰就是声明之前的行为：
+core 仍然会读取那些用它已知字段名承载 token 的 `usage_update`。
+
+```js
+usage: {
+  // 要么 { kind: 'usage_update' }，要么一条指向提示响应结果内部的路径
+  source: { kind: 'prompt_response_meta', path: ['_meta', 'accounting'] },
+  // 按 RunSkein Usage 键列出 core 尚不认识的名字
+  tokens: { cacheRead: ['cached_input'], thought: ['reasoning_tokens'] },
+  semantics: 'per-turn',
+},
+```
+
+三条规则：
+
+- **别名是叠加的。** 它们扩展内置名字表，而不是替换它。`inputTokens`、
+  `outputTokens` 与 `totalTokens` 都已经是已知名字；重复声明其中之一，
+  等于给同一件事多造一个需要维护的地方。
+- **`semantics` 要实测，绝不要猜。** `cumulative` 与 `per-turn` 都合法，
+  选错的那一个会静默地把每一轮都报错。`pnpm st:usage <engine>` 会在同一个 Session
+  里跑四轮，交替一个极简回答和一个啰嗦回答，并逐轮打印线上数字：累计型计数只会增长，
+  逐轮型计数会在第三轮回落。
+
+  **看 output 那一列，别看 total。** 在 claude-code 上实测：`totalTokens` 四轮一路上升，
+  而上报其实一直是逐轮的——它上升是因为缓存读取计数随对话增长。按 total 判断会声明成
+  `cumulative`，此后每一轮都报错。
+
+- **成本不属于这里。** `cost` 与 `currency` 会从任何携带 `{cost: {amount, currency}}`
+  的 Engine `usage_update` 抵达 `session.usage()`，完全不需要声明。
+  不要试图把它塞进 `tokens`。
 
 ### 4. 写 `detect()`
+
+<!-- from: adapters/kimi/index.mjs -->
 
 ```js
 async detect() {
@@ -258,6 +316,14 @@ Engine probe 刷新——拿一份只有一个 Engine 的 `matrix.json` 去投�
 在 PR 里说明 probe 测到了什么。`conformance.json` 是后续漂移的度量基线，任何会
 改动它的变更都要在同一次改动里刷新它。
 
+**probe 在写出这个文件之前会先做投影，你不应该手写它。** 它是要发布的，所以能进
+到里面的只是属于你的 Engine 的那部分：每个 config option 保留它的 id、name、
+category、type，再加上它提供了多少个设置项的计数，而设置项本身被丢掉；Engine 的
+回复正文也被丢掉。这两样都属于跑 probe 的那台机器，而不属于 Engine——某个操作者
+的 option 列表就是他的 provider、他装的插件，或者某个本地 hook 追加到回复后面的
+东西。一个 option **是什么**、有多少个设置项，才是值得记录的漂移，也正是被保留下
+来的部分。完整取值留在 `matrix.json` 里，而它不会离开测出它的那个仓库。
+
 ## 最费时间的那些错误
 
 **以为包装器会原样转发你给的东西。** 通过包装器抵达的 Engine 是两个进程，
@@ -282,18 +348,32 @@ Engine 准备的回退方案，而且它们是静态的，会过时。添加之�
 
 ## 环境卫生
 
-core 在启动任何 Engine 前，会清洗宿主 agent 的 Session 标记（`CLAUDE*`、`CLAUDECODE`、
-`CODEX_SANDBOX*`、`OPENCODE_SESSION*`、`OPENCODE_CALLER*`）。这是承重的，不是整洁
-问题：在一个编码 agent 内部运行 runskein 会把该 agent 的 Session 变量泄漏到子进程，
-至少有一个 Engine 会因此以 “active session” 拒绝启动。
+在一个编码 agent 内部运行 runskein，会把该 agent 的 Session 变量泄漏到它启动的每一个
+子进程；而一个 Engine 拿到“你已经在一个 Session 里”这样的标记，是可能拒绝启动的——
+Claude Code 的 ACP wrapper 就以 “active session” 拒绝，这是实测出来的。这是承重的，
+不是整洁问题。
 
-如果你的 Engine 有同样问题的自有标记，把它们加上：
+**声明这些标记是你的 Adapter 的职责，不是 core 的。** core 自己什么都不清洗；每个内置
+Adapter 各自声明它自己的 Engine 会留下什么，你的也一样：
 
 ```js
 envScrubExtra: [/^MYENGINE_(SESSION|CALLER)/],
 ```
 
-清洗那些标识** Session **的变量，而不是那些配置 Engine 的变量——过度清洗会剥掉用户自己的配置。
+这些 pattern 会在**你的** Engine 被启动时生效，也会作用于你的 Session 运行的任何
+Terminal——在那里它们还会阻止 agent 把标记再放回去。标记属于留下它的那个 Engine：
+`MYENGINE_SESSION` 对你的 Engine 意味着“你已经在一个 Session 里”，对其他 Engine 则
+什么都不是——所以声明它保护的是你的 Engine，不是它们的。理由见决策 045。
+
+两条规则，都是做错之后学到的：
+
+- **清洗那些标识 Session 的变量，而不是那些配置 Engine 的变量。** 过宽的 pattern 会
+  剥掉用户自己的配置，现有的两个例子都只差放松一个锚点就会被误伤：
+  `PI_CODING_AGENT_DIR` 是用户的 pi 配置目录，`/^PI_CODING_AGENT/` 少一个 `$` 就会
+  把它带走；`OPENCODE_CONFIG_CONTENT` 是 live 套件给 opencode 传权限设置的方式，
+  一个光秃秃的 `/^OPENCODE_/` 就会把它带走。
+- **没有实测过的，就不要声明。** kimi 的 Adapter 一个 pattern 都没有声明，因为没有观测
+  到任何 kimi 的 Session 标记。缺席是诚实的；猜出来的那个，在下一个人读来就是证据。
 
 ## 注册它
 

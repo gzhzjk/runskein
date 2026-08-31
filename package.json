@@ -14,7 +14,7 @@
     "test": "pnpm -r --workspace-concurrency=1 test",
     "test:coverage": "pnpm -r --if-present --workspace-concurrency=1 test:coverage",
     "typecheck": "pnpm -r typecheck",
-    "quality": "node scripts/quality.mjs && node scripts/verify-license-files.mjs && node scripts/verify-published-documents.mjs && node scripts/project-conformance-matrix.mjs && node scripts/generate-capability-tables.mjs --check && pnpm --filter @runskein/core generate:vocabulary -- --check && pnpm --filter @runskein/core generate:version -- --check && pnpm --filter @runskein/adapter-pi build:check",
+    "quality": "node scripts/quality.mjs && node scripts/verify-license-files.mjs && node scripts/verify-published-documents.mjs && node scripts/verify-readme-example.mjs && node scripts/verify-quoted-code.mjs && node scripts/verify-api-surface.mjs && node scripts/project-conformance-matrix.mjs && node scripts/generate-capability-tables.mjs --check && pnpm --filter @runskein/core generate:vocabulary -- --check && pnpm --filter @runskein/core generate:version -- --check && pnpm --filter @runskein/adapter-pi build:check",
     "docs:translations:check": "node scripts/verify-published-documents.mjs",
     "conformance": "node scripts/conformance.mjs"
   },

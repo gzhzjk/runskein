@@ -592,11 +592,18 @@ describe('SessionTerminals directly', () => {
     for (const name of ['PATH', 'NODE_OPTIONS', 'LD_PRELOAD', 'DYLD_INSERT_LIBRARIES', 'GIT_SSH_COMMAND']) {
       expect(() => authorizeTerminalEnv([{ name, value: 'x' }])).toThrow(/may not be set/);
     }
-    // Host hygiene the engine spawn already depends on, and the adapter's own
-    // additions: an agent may not restore either.
-    expect(() => authorizeTerminalEnv([{ name: 'CLAUDECODE', value: '1' }])).toThrow(
+    // Host hygiene the engine spawn already depends on: an agent may not put
+    // back a marker its own adapter asked to have scrubbed. The pattern is
+    // passed in because that is where it lives now — a claude-code session
+    // reaches this code carrying claude-code's declaration (decision 045), and
+    // core holds none of its own.
+    expect(() => authorizeTerminalEnv([{ name: 'CLAUDECODE', value: '1' }], [/^CLAUDE/])).toThrow(
       /reserved by the host/,
     );
+    // The other half of the same decision: without that adapter's pattern the
+    // marker is an ordinary variable, so this case goes red if an engine name
+    // is written back into core's list.
+    expect(() => authorizeTerminalEnv([{ name: 'CLAUDECODE', value: '1' }])).not.toThrow();
     // Windows resolves a name without case, so the spelling an agent chooses
     // may not decide whether a guard applies: `Path` is `PATH` there, and a
     // session marker put back as `Claudecode` is the marker.
@@ -604,7 +611,7 @@ describe('SessionTerminals directly', () => {
     expect(() => authorizeTerminalEnv([{ name: 'Node_Options', value: '--require=x' }])).toThrow(
       /may not be set/,
     );
-    expect(() => authorizeTerminalEnv([{ name: 'Claudecode', value: '1' }])).toThrow(
+    expect(() => authorizeTerminalEnv([{ name: 'Claudecode', value: '1' }], [/^CLAUDE/])).toThrow(
       /reserved by the host/,
     );
     // An adapter's own pattern is matched the same way, whichever case its

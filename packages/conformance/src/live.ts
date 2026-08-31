@@ -44,7 +44,9 @@ import { fileOwnershipRegistry, readSessionMeta, type OwnershipRegistry } from '
 import { createLiveHub, type WireFrame } from './index.js';
 import {
   collectNativeSessionIds,
+  configOption,
   deleteEngineSessions,
+  discardsNatively,
   isLiveCaseOptedIn,
   isLiveEnvironmentUnavailable as providerUnavailable,
   liveCaseOptInLabel,
@@ -54,6 +56,10 @@ import {
   listEngineSessionIds,
   ownedLiveEnginePids,
   requiredModelFamilyPresent,
+  thoughtLevelExtremes,
+  thoughtLevelOption,
+  THOUGHT_EFFECT_RATIO,
+  wireOutputTokens,
   withLiveTimeout as timeout,
 } from './liveSupport.js';
 import { readTokenFields, readUsageUpdate, resolveObjectPath } from './usageSupport.js';
@@ -108,20 +114,6 @@ function emit(c: CaseResult): void {
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 const tmp = (p: string) => mkdtempSync(join(tmpdir(), p));
-
-/**
- * Find a descriptor config option by id, or by category as a fallback.
- * @param d - the engine descriptor.
- * @param id - the option id.
- * @param category - an optional category to match when the id is absent.
- * @returns the option or undefined.
- */
-function configOption(d: EngineDescriptor, id: string, category?: string) {
-  return (
-    d.configOptions.find((o) => o.id === id) ??
-    (category ? d.configOptions.find((o) => o.category === category) : undefined)
-  );
-}
 
 // ── Per-engine session fixture ─────────────────────────────────────────────
 
@@ -872,22 +864,19 @@ async function stDisc01(ctx: EngineCtx): Promise<void> {
   const log: string[] = [];
   let session: Awaited<ReturnType<typeof sessionFor>> | undefined;
   try {
-    if (!['kimi', 'codex'].includes(ctx.engine)) {
+    if (!discardsNatively(ctx.descriptor)) {
       emit({
         caseId: 'ST-DISC-01',
         engine: ctx.engine,
         verdict: 'skip',
-        log: ['INFO case is scoped to kimi and codex'],
+        log: ['INFO engine does not advertise session/delete; ST-DISC-02 covers it'],
         durationMs: 0,
-        waiver: 'engine-specific discard matrix',
+        waiver: 'engine does not advertise session/delete',
       });
       return;
     }
     const adapter = builtinAdapters.find((candidate) => candidate.id === ctx.engine);
     if (adapter === undefined) throw new Error(`missing adapter ${ctx.engine}`);
-    if (ctx.descriptor.capabilities.session['delete'] !== true) {
-      throw new Error(`${ctx.engine} does not advertise session/delete`);
-    }
     const before = new Set(await collectNativeSessionIds(ctx.store, ctx.engine));
     session = await sessionFor(ctx, tmp(`runskein-live-disc-${ctx.engine}-`));
     await timeout(session.prompt('Reply with exactly DISCARD-OK.'), TURN_TIMEOUT_MS, 'disc01 prompt');
@@ -928,19 +917,16 @@ async function stDisc02(ctx: EngineCtx): Promise<void> {
   const log: string[] = [];
   let session: Awaited<ReturnType<typeof sessionFor>> | undefined;
   try {
-    if (!['opencode', 'claude-code'].includes(ctx.engine)) {
+    if (discardsNatively(ctx.descriptor)) {
       emit({
         caseId: 'ST-DISC-02',
         engine: ctx.engine,
         verdict: 'skip',
-        log: ['INFO case is scoped to opencode and claude-code'],
+        log: ['INFO engine advertises session/delete; ST-DISC-01 covers it'],
         durationMs: 0,
-        waiver: 'engine-specific discard matrix',
+        waiver: 'engine advertises session/delete',
       });
       return;
-    }
-    if (ctx.descriptor.capabilities.session['delete'] === true) {
-      throw new Error(`${ctx.engine} unexpectedly advertises session/delete`);
     }
     session = await sessionFor(ctx, tmp(`runskein-live-disc-${ctx.engine}-`));
     await timeout(
@@ -1365,33 +1351,39 @@ async function cf05ModelList(ctx: EngineCtx): Promise<void> {
 async function cf06ThoughtLevels(ctx: EngineCtx): Promise<void> {
   const t0 = Date.now();
   const log: string[] = [];
-  const option =
-    configOption(ctx.descriptor, 'reasoning_effort', 'thought_level') ??
-    configOption(ctx.descriptor, 'reasoning', 'thought_level');
-  const values = (option?.options as { value: string }[] | undefined)?.map((o) => o.value) ?? [];
-  if (ctx.descriptor.source === 'hints' || option === undefined || values.length < 2) {
-    // Matrix: claude-code reports no live thought_level config; hint-only
-    // options cannot be switched via setConfig.
+  const option = thoughtLevelOption(ctx.descriptor);
+  // Ranked, not positional: the engine publishes this option and its order is
+  // arbitrary, so taking the first and last declared values named the wrong two
+  // levels on engines that do not declare them weakest-first.
+  const extremes = option === undefined ? undefined : thoughtLevelExtremes(option);
+  if (ctx.descriptor.source === 'hints' || option === undefined || extremes === undefined) {
+    // Hint-only options cannot be switched via setConfig, and an option whose
+    // values this suite cannot rank has no defensible "lowest and highest".
     emit({
       caseId: 'CF-06',
       engine: ctx.engine,
       verdict: 'skip',
-      log: ['INFO  engine reports no live thought_level option'],
+      log: ['INFO  engine reports no live thought_level option with two ranked values'],
       durationMs: Date.now() - t0,
-      waiver: 'matrix: no live thought_level option',
+      waiver: 'no live thought_level option with two rankable values',
     });
     return;
   }
   try {
     const s = await sessionFor(ctx, tmp('runskein-live-ws-'));
     let rejected: string | undefined;
-    for (const [label, value] of [
-      ['lowest', values[0]!],
-      ['highest', values[values.length - 1]!],
-    ] as const) {
+    // The step number is the position in the pair, not a count of what has
+    // gone wrong: keying it off `rejected` printed "STEP 1/2" twice on the
+    // healthy run, which is the run a reader checks least carefully.
+    for (const [step, [label, value]] of (
+      [
+        ['lowest', extremes.low],
+        ['highest', extremes.high],
+      ] as const
+    ).entries()) {
       try {
         await s.setConfig({ reasoning: value });
-        log.push(`STEP ${rejected === undefined ? '1/2' : '2/2'} reasoning=${value} accepted`);
+        log.push(`STEP ${step + 1}/2 ${label} reasoning=${value} accepted`);
       } catch (e) {
         if (e instanceof ConfigError) throw e; // core-side: value not advertised
         // A specific forced model can reject an advertised extreme (e.g. a
@@ -1498,20 +1490,30 @@ async function pe07Modes(ctx: EngineCtx): Promise<void> {
 }
 
 /**
- * CF-08: codex reports providers; others do not fabricate them.
+ * CF-08: an engine that advertises providers reports them; one that does not
+ * has none fabricated for it.
+ *
+ * The oracle is the engine's own `capabilities.providers`, not its name. This
+ * case used to read `ctx.engine === 'codex'`, which held on the day it was
+ * written and stopped holding the moment claude-code's wrapper started
+ * advertising `providers/list` — it failed with "providers fabricated" against
+ * an engine that had genuinely gained the capability. What the case is for is
+ * that runskein invents nothing; whether a given engine has providers is a
+ * measurement, and the measurement is right here in the descriptor.
  * @param ctx - the engine context.
  */
 async function cf08Providers(ctx: EngineCtx): Promise<void> {
   const t0 = Date.now();
   const log: string[] = [];
   try {
-    if (ctx.engine === 'codex') {
+    if (ctx.descriptor.capabilities.providers) {
       const providers = ctx.descriptor.providers ?? [];
-      if (providers.length === 0) throw new Error('codex reported no providers');
+      if (providers.length === 0)
+        throw new Error('engine advertises providers/list but reported no providers');
       log.push(`PASS providers=${providers.map((p) => p.id).join(', ')}`);
     } else {
       if (ctx.descriptor.providers !== undefined)
-        throw new Error('providers fabricated for non-codex engine');
+        throw new Error('providers fabricated for an engine that does not advertise providers/list');
       log.push(`PASS providers absent (not fabricated)`);
     }
     emit({ caseId: 'CF-08', engine: ctx.engine, verdict: 'pass', log, durationMs: Date.now() - t0 });
@@ -1574,27 +1576,141 @@ async function ad05ColdStart(ctx: EngineCtx): Promise<void> {
   }
 }
 
+/** The turn CF-10 measures: a question a model can answer either by thinking
+ *  or by guessing, so a raised thought level has somewhere to show up. */
+const CF10_PROMPT =
+  'Think carefully. A farmer has 17 sheep; all but 9 run away. He then buys 23 more, sells a third of the flock, and loses 2. How many sheep remain? Reply with just the number.';
+
+/** What one CF-10 turn observed about the engine's thinking. */
+interface ThoughtTurn {
+  stopReason: string;
+  /** Thought tokens broken out by the engine, when its adapter maps them. */
+  thoughtTokens: number | undefined;
+  /** Characters of thinking text streamed as `agent_thought_chunk`. */
+  thoughtChars: number;
+  /** Output tokens the engine reported for this turn. */
+  outputTokens: number | undefined;
+  /** Which surface `outputTokens` came from, for the case log. */
+  outputTokensFrom: 'usage.output' | 'wire';
+}
+
 /**
- * CF-10: creation-time config declared by an adapter reaches the engine.
+ * Run one CF-10 turn at a given thought level and report every thinking signal.
+ * @param ctx - the live engine context.
+ * @param option - the thought-level option being written.
+ * @param level - the level to write.
+ * @param pinned - the engine's pinned live config.
+ * @param creationOnly - whether the option is only accepted at session creation.
+ * @param assertRefusal - check that a creation-only key is refused at runtime.
+ *   Only the first turn of a case does this; the tier-3 control turn would
+ *   otherwise assert and log the same thing twice.
+ * @param log - the case log to append the runtime-refusal step to.
+ * @returns what the turn revealed about the engine's thinking.
+ * @throws whatever the session, the config write or the turn rejected with, and
+ *   an Error when a creation-only key turns out to be writable at runtime.
+ */
+async function runThoughtTurn(
+  ctx: EngineCtx,
+  option: EngineDescriptor['configOptions'][number],
+  level: string,
+  pinned: Record<string, string | boolean> | undefined,
+  creationOnly: boolean,
+  assertRefusal: boolean,
+  log: string[],
+): Promise<ThoughtTurn> {
+  // The pin rides along so the run stays machine-independent; the case's own
+  // key wins on a collision — that key is what the case measures.
+  const s = await withOneTimeoutRetry(ctx, 'session/new', () =>
+    ctx.hub.session({
+      engine: ctx.engine,
+      cwd: tmp('runskein-live-cf10-'),
+      config: creationOnly ? { ...pinned, [option.id]: level } : { ...pinned },
+    }),
+  );
+  try {
+    if (!creationOnly) await s.setConfig({ [option.id]: level });
+    let thoughtChars = 0;
+    s.on('update', (event) => {
+      const u = event.update as { sessionUpdate?: string; content?: { text?: string } };
+      if (u.sessionUpdate === 'agent_thought_chunk') thoughtChars += u.content?.text?.length ?? 0;
+    });
+    const { value: r, frames } = await withWireCapture(ctx, () =>
+      timeout(s.prompt(CF10_PROMPT), TURN_TIMEOUT_MS, 'cf10 turn'),
+    );
+    if (creationOnly && assertRefusal) {
+      // The refusal is part of the contract too: a creation-only key must not
+      // look writable at runtime, or a host will believe a write that did
+      // nothing.
+      const refused = await s.setConfig({ [option.id]: level }).then(
+        () => null,
+        (e: unknown) => e,
+      );
+      if (!(refused instanceof NotSupportedError)) {
+        throw new Error(`runtime write of '${option.id}' was not refused as NotSupportedError`);
+      }
+      log.push(`INFO  runtime write of '${option.id}' refused as NotSupportedError, as declared`);
+    }
+    // Prefer the public surface. `TurnResult.usage` always means this turn —
+    // a cumulative reporter is differenced against the turn-open snapshot — so
+    // `usage.output` is the per-turn count for any engine whose adapter
+    // declares a mapping at all, and on claude-code it was measured equal to
+    // the wire's `outputTokens` across four turns. An assertion a consumer can
+    // reproduce is worth more than one only this suite can see. The wire stays
+    // as the fallback for an engine that reports usage but declares no mapping,
+    // where the number exists and no consumer can reach it.
+    const reported = r.usage?.output;
+    return {
+      stopReason: r.stopReason,
+      thoughtTokens: r.usage?.thought,
+      thoughtChars,
+      outputTokens: reported ?? wireOutputTokens(frames),
+      outputTokensFrom: reported !== undefined ? 'usage.output' : 'wire',
+    };
+  } finally {
+    await s.close();
+  }
+}
+
+/**
+ * CF-10: raising the thought level changes what the engine actually does.
  *
- * The claude-code route rides a wrapper contract, not ACP: `session/new`'s
- * `_meta.claudeCode.options` is read once inside the wrapper's own session
- * construction. It can stop working on any upstream release without an error —
- * the setting would simply return to its default — so a declaration alone is
- * not evidence. This asks the engine to think and counts what came back.
+ * A thought level can stop working on any upstream release without an error —
+ * the request is accepted and the setting quietly returns to its default. CF-06
+ * cannot catch that: it asserts the write is *accepted*, which stays true when
+ * the value is then ignored. This case asks for the strongest level the engine
+ * advertises and looks for evidence the model did more work.
+ *
+ * The evidence is taken in order of how directly a caller could see it, and the
+ * log names which one was used:
+ *
+ *   1. `TurnResult.usage.thought` — the engine broke thinking tokens out.
+ *   2. streamed `agent_thought_chunk` text.
+ *   3. output tokens at the strongest level against the weakest, one control
+ *      turn, because an engine may think hard and stream none of it: Anthropic
+ *      bills thinking inside `output_tokens`, and claude-code's wrapper emits a
+ *      thought chunk only when the text is non-empty, which recent models omit.
+ *      Taken from `TurnResult.usage.output` where the adapter declares a usage
+ *      mapping, and off the wire where it does not.
+ *
+ * Counting thought chunks alone was the previous oracle and it is not
+ * sufficient: measured here, claude-code produced zero at every level while
+ * spending thousands of output tokens on thinking, and codex produced zero at
+ * its strongest level while reporting 31 thought tokens. When no tier applies
+ * the case skips saying so, rather than warning as though it had looked and
+ * found the engine merely quiet.
  *
  * An Observation, not a gate: how much a model thinks is its own business, and
- * a run where the low setting also produced thought is not a defect. What is
- * recorded is whether the high setting produced any thought at all, which is
- * the signal that dies if the contract drifts.
+ * a run where the weak setting also produced thought is not a defect. What is
+ * recorded is whether the strongest setting produced any thinking at all, which
+ * is the signal that dies if the contract drifts.
  *
  * The session also carries the engine's pinned live config, like every live
  * session; a rejection of a pin key waives (environment mismatch), while a
- * rejection of the declared creation key itself fails — that is the defect
- * this case exists to catch.
+ * rejection of the thought level itself fails — that is the defect this case
+ * exists to catch.
  * @param ctx - the live engine context.
  */
-async function cf10CreationConfig(ctx: EngineCtx): Promise<void> {
+async function cf10ThoughtLevelTakesEffect(ctx: EngineCtx): Promise<void> {
   const t0 = Date.now();
   const log: string[] = [];
   const pinned = liveConfigFor(ctx.engine).config;
@@ -1602,66 +1718,84 @@ async function cf10CreationConfig(ctx: EngineCtx): Promise<void> {
   // case's own value apart from a rejection of a pin key.
   let measuredKey: string | undefined;
   try {
-    const option = ctx.descriptor.configOptions.find((o) => o.settable === 'creation');
+    const option = thoughtLevelOption(ctx.descriptor);
     if (option === undefined) {
       emit({
         caseId: 'CF-10',
         engine: ctx.engine,
         verdict: 'skip',
-        log: ['INFO engine declares no creation-time config'],
+        log: ['INFO  engine publishes no thought-level option'],
         durationMs: 0,
-        waiver: 'no creation-time config declared for this engine',
+        waiver: 'no thought level on this engine',
       });
       return;
     }
-    // The declared values, in declaration order — the adapter lists them from
-    // least to most, so the last one is the setting worth measuring.
-    const levels = (option.options ?? []).flatMap((entry) =>
-      'value' in entry ? [entry.value] : entry.options.map((o) => o.value),
-    );
-    const highest = levels[levels.length - 1];
-    if (highest === undefined) throw new Error(`'${option.id}' declares no values`);
-    measuredKey = option.id;
-    // The pin rides along so the run stays machine-independent; the case's own
-    // key wins on a collision — that key is what the case measures.
-    const s = await withOneTimeoutRetry(ctx, 'session/new', () =>
-      ctx.hub.session({
+    const extremes = thoughtLevelExtremes(option);
+    if (extremes === undefined) {
+      emit({
+        caseId: 'CF-10',
         engine: ctx.engine,
-        cwd: tmp('runskein-live-cf10-'),
-        config: { ...pinned, [option.id]: highest },
-      }),
-    );
-    let thought = 0;
-    s.on('update', (event) => {
-      if ((event.update as { sessionUpdate?: string }).sessionUpdate === 'agent_thought_chunk') thought++;
-    });
-    const r = await timeout(
-      s.prompt('Think step by step, then answer: what is 17 * 23? Reply with just the number.'),
-      TURN_TIMEOUT_MS,
-      'cf10 turn',
-    );
-    log.push(`STEP 1/2 ${option.id}=${highest} accepted at creation`);
-    log.push(`STEP 2/2 stopReason=${r.stopReason} agent_thought_chunk=${thought}`);
-
-    // The refusal is part of the contract too: a creation-only key must not
-    // look writable at runtime, or a host will believe a write that did
-    // nothing.
-    const refused = await s.setConfig({ [option.id]: highest }).then(
-      () => null,
-      (e: unknown) => e,
-    );
-    if (!(refused instanceof NotSupportedError)) {
-      throw new Error(`runtime write of '${option.id}' was not refused as NotSupportedError`);
+        verdict: 'skip',
+        log: [`INFO  '${option.id}' advertises fewer than two levels this suite can rank`],
+        durationMs: Date.now() - t0,
+        waiver: 'thought level offers no rankable pair',
+      });
+      return;
     }
-    await s.close();
+    measuredKey = option.id;
+    const creationOnly = option.settable === 'creation';
+    log.push(`STEP 1/2 ${option.id}=${extremes.high} at ${creationOnly ? 'creation' : 'runtime'}`);
+    const high = await runThoughtTurn(ctx, option, extremes.high, pinned, creationOnly, true, log);
+    log.push(
+      `INFO  stopReason=${high.stopReason} usage.thought=${high.thoughtTokens ?? 'n/a'} thoughtChars=${high.thoughtChars} ${high.outputTokensFrom}=${high.outputTokens ?? 'n/a'}`,
+    );
+
+    if (high.thoughtTokens !== undefined && high.thoughtTokens > 0) {
+      log.push(`STEP 2/2 oracle=usage.thought ${high.thoughtTokens} tokens`);
+      emit({ caseId: 'CF-10', engine: ctx.engine, verdict: 'pass', log, durationMs: Date.now() - t0 });
+      return;
+    }
+    if (high.thoughtChars > 0) {
+      log.push(`STEP 2/2 oracle=agent_thought_chunk ${high.thoughtChars} chars`);
+      emit({ caseId: 'CF-10', engine: ctx.engine, verdict: 'pass', log, durationMs: Date.now() - t0 });
+      return;
+    }
+    if (high.outputTokens === undefined) {
+      // Nothing to count and nothing to compare. Saying so is the point: a
+      // warn here would read as "we looked and the engine was probably fine",
+      // which is exactly the state this case exists to make visible.
+      log.push('STEP 2/2 no thought tokens, no thought text, and no reported usage');
+      emit({
+        caseId: 'CF-10',
+        engine: ctx.engine,
+        verdict: 'skip',
+        log,
+        durationMs: Date.now() - t0,
+        waiver: 'no observable oracle on this engine',
+      });
+      return;
+    }
+    const low = await runThoughtTurn(ctx, option, extremes.low, pinned, creationOnly, false, log);
+    const moved =
+      low.outputTokens !== undefined && high.outputTokens > low.outputTokens * THOUGHT_EFFECT_RATIO;
+    log.push(
+      `STEP 2/2 oracle=${high.outputTokensFrom} ${extremes.high}=${high.outputTokens} vs ${extremes.low}=${low.outputTokens ?? 'n/a'}`,
+    );
+    if (low.outputTokens === undefined) {
+      log.push(`WARN  the ${extremes.low} control reported no usage — nothing to compare against`);
+    }
     emit({
       caseId: 'CF-10',
       engine: ctx.engine,
-      verdict: thought > 0 ? 'pass' : 'warn',
-      log:
-        thought > 0 ? log : [...log, 'WARN  no thought observed — the wrapper contract may have drifted'],
+      verdict: moved ? 'pass' : 'warn',
+      log: moved
+        ? log
+        : [
+            ...log,
+            'WARN  the strongest level did not outspend the weakest — the contract may have drifted',
+          ],
       durationMs: Date.now() - t0,
-      ...(thought > 0 ? {} : { waiver: 'creation-time thinking produced no observable thought' }),
+      ...(moved ? {} : { waiver: 'thought level produced no measurable extra work (single sample)' }),
     });
   } catch (e) {
     // Only a rejection of a pin key waives. The measured key is excluded even
@@ -1691,6 +1825,14 @@ async function cf10CreationConfig(ctx: EngineCtx): Promise<void> {
 
 /**
  * PV-02 (Observation): record whether the turn emits an agent_thought_chunk.
+ *
+ * Absence is not evidence about the model. An engine may think hard and stream
+ * none of it: claude-code's wrapper emits a thought chunk only when the text is
+ * non-empty, and recent models default `thinking.display` to "omitted", so a
+ * turn that spent thousands of tokens thinking arrives here as silence. What
+ * this case observes is whether the *stream carries* thinking, which is what a
+ * host rendering a thought pane needs to know. Whether a thought level does
+ * anything is CF-10's question, and it has an oracle that survives this one.
  * @param ctx - the engine context.
  */
 async function pv02Thought(ctx: EngineCtx): Promise<void> {
@@ -1726,7 +1868,10 @@ async function pv02Thought(ctx: EngineCtx): Promise<void> {
       durationMs: Date.now() - t0,
       ...(thought
         ? {}
-        : { waiver: 'model emitted no agent_thought_chunk (Observation; CG-01 maps deterministically)' }),
+        : {
+            waiver:
+              'engine streamed no thought text — not evidence the model did not think (Observation; CG-01 maps deterministically, CF-10 measures the effect)',
+          }),
     });
   } catch (e) {
     emit({
@@ -2202,7 +2347,7 @@ async function runEngine(adapter: (typeof builtinAdapters)[number]) {
       await runCase(ctx, 'CF-07', cf07FastMode);
       await runCase(ctx, 'PE-07', pe07Modes);
       await runCase(ctx, 'CF-08', cf08Providers);
-      await runCase(ctx, 'CF-10', cf10CreationConfig);
+      await runCase(ctx, 'CF-10', cf10ThoughtLevelTakesEffect);
       await runCase(ctx, 'AD-05', ad05ColdStart);
       await runCase(ctx, 'PV-02', pv02Thought);
       await runCase(ctx, 'PV-07', pv07Image);

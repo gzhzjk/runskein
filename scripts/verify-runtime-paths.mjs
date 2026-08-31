@@ -28,10 +28,23 @@
  * named in that file, so this script never learns the word "pi" and there is
  * no blanket opt-out to reach for at the first inconvenience.
  *
- * What it cannot see is a path assembled from something that is not a literal —
- * a name from configuration, a string built by concatenation. That limit is
- * real and stated; the bundling case in `verify-runtime-paths.test.mjs` is what
- * tests the property itself rather than its spelling.
+ * The limit is narrower than "non-literal" and worth stating exactly, because a
+ * guard that overstates its reach is the defect this one exists to catch. A
+ * path whose *segments* are not literals is still refused — `join(dir, up, name)`
+ * is reported by name as unresolvable, since nothing can say where it lands.
+ * What escapes is a path whose *anchor* was built somewhere else:
+ *
+ *   // paths.js
+ *   export const here = import.meta.dirname;
+ *   // version.js
+ *   readFileSync(join(here, '../../package.json'), 'utf8')
+ *
+ * Analysis is per file and scope is lexical, so `here` is an ordinary import
+ * and the expression never reads as anchored. That is the CLIENT_VERSION defect
+ * one indirection away, and it is why the bundling cases in
+ * `verify-runtime-paths.test.mjs` exist: they run each published entry from a
+ * directory with none of this layout, which tests the property rather than its
+ * spelling. Measured — a laundered anchor passes this script and fails there.
  *
  * Usage: `node scripts/verify-runtime-paths.mjs` from the repository root,
  * after `pnpm -r build`. A publishable package with no built output is an

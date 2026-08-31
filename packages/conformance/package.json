@@ -25,7 +25,8 @@
     "st:cwd": "tsx src/st-cwd-shell.ts",
     "st:dig": "tsx src/st-dig.ts",
     "st:quota": "tsx src/st-quota.ts",
-    "st:orph05": "tsx src/st-orph-05.ts"
+    "st:orph05": "tsx src/st-orph-05.ts",
+    "st:usage": "tsx src/st-usage.ts"
   },
   "dependencies": {
     "@runskein/core": "workspace:*",

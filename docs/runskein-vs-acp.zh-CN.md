@@ -1,7 +1,7 @@
----
+<!--
 source: docs/runskein-vs-acp.md
-source-sha256: 8a2d1fa63ad10589125e562a2ef86e5b83f5360cbed69fab15b7b53bf6035998
----
+source-sha256: 8b2186c3a0f2ecddc9b8c4710de2bd6d33a1d992543a375f96c6e3801e3ade4e
+-->
 
 # runskein 与 ACP 对比
 
@@ -17,7 +17,7 @@ runskein 正是回答这些问题的那一层。底层仍是同一种协议，�
 
 |                 | ACP 提供什么                              | 你仍需自行构建                                                           | runskein 提供什么                                                                                                                                           |
 | --------------- | ----------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 进程            | 什么都没有——由你启动                      | 启动、退出、崩溃后重启、引用计数、空闲释放、宿主自身死亡后的孤儿进程清理 | 全部这些，外加经过实测而非猜测的环境清洗：从 Claude Code Session 内启动 Engine 会泄漏 `CLAUDE*` 标记，导致 `claude-code-acp` 拒绝启动                       |
+| 进程            | 什么都没有——由你启动                      | 启动、退出、崩溃后重启、引用计数、空闲释放、宿主自身死亡后的孤儿进程清理 | 全部这些，外加经过实测而非猜测的环境清洗：从 Claude Code Session 内启动 Engine 会泄漏 `CLAUDE*` 标记，导致 Claude Code 的 ACP 包装器拒绝启动                |
 | 多个 Engine     | 每个 agent 一条连接                       | 在各不相同的 Engine 之上提供一套 API；不说 ACP 的 Engine 根本无法加入    | 一套 API；即使 pi 不说 ACP，`engine: 'pi'` 的写法也与 `engine: 'codex'` 相同                                                                                |
 | 设置            | 各 Engine 自己的键                        | 你自己的映射表                                                           | 每项一个统一名称：OpenCode 用 `effort`、Kimi 用 `thinking`、Codex 用 `reasoning_effort`、Claude Code 使用创建时的思考预算——你只需写 `config: { reasoning }` |
 | Capability 缺口 | `initialize` 中的 boolean                 | 逐个缺口决定应该失败、Emulated 还是降级                                  | 三个层级，所以缺口是你可以选择的一条分支，绝不是一次悄无声息地什么都没做的调用                                                                              |

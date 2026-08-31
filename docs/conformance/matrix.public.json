@@ -31,7 +31,6 @@
       },
       "sawUsage": true,
       "permissionRequests": 0,
-      "replyText": "OK",
       "durationMs": 2697
     },
     "usage": {
@@ -82,7 +81,6 @@
       },
       "sawUsage": false,
       "permissionRequests": 0,
-      "replyText": "OK",
       "durationMs": 6769
     },
     "usage": {
@@ -95,12 +93,15 @@
   {
     "id": "claude-code",
     "agentInfo": {
-      "title": "Claude Code",
-      "version": "0.16.2"
+      "title": "Claude Agent",
+      "version": "0.70.0"
     },
     "capabilities": {
       "loadSession": true,
       "session": {
+        "additionalDirectories": true,
+        "close": true,
+        "delete": true,
         "fork": true,
         "list": true,
         "resume": true
@@ -113,24 +114,30 @@
         "http": true,
         "sse": true
       },
-      "providers": false
+      "providers": true
     },
     "prompt": {
       "stopReason": "end_turn",
       "updateKinds": {
-        "available_commands_update": 1,
-        "agent_message_chunk": 2
+        "available_commands_update": 2,
+        "usage_update": 4,
+        "agent_message_chunk": 3
       },
-      "sawUsage": false,
+      "sawUsage": true,
       "permissionRequests": 0,
-      "replyText": "OK",
-      "durationMs": 2702
+      "durationMs": 3572
     },
     "usage": {
-      "ok": false,
-      "source": "none",
-      "fields": [],
-      "semantics": "cumulative"
+      "ok": true,
+      "source": "prompt_response_meta",
+      "fields": [
+        "input",
+        "output",
+        "total",
+        "cacheRead",
+        "cacheCreation"
+      ],
+      "semantics": "per-turn"
     }
   },
   {
@@ -170,7 +177,6 @@
       },
       "sawUsage": true,
       "permissionRequests": 0,
-      "replyText": "OK",
       "durationMs": 5092
     },
     "usage": {
@@ -219,7 +225,6 @@
       },
       "sawUsage": true,
       "permissionRequests": 0,
-      "replyText": "OK",
       "durationMs": 4635
     },
     "usage": {

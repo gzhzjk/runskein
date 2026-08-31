@@ -1,20 +1,65 @@
 /**
  * Engine process spawning with env hygiene (measured finding):
  * host-agent session markers must be scrubbed or child agents refuse to start
- * (e.g. a parent Claude Code session's CLAUDE* vars make claude-code-acp
- * refuse with "active session"). Adapter env is applied AFTER the scrub.
+ * — a parent Claude Code session's `CLAUDE*` variables make the Claude Code
+ * ACP wrapper refuse with "active session". Which markers those are is each
+ * adapter's own declaration (`envScrubExtra`), not core's; see
+ * `ENV_SCRUB_PATTERNS` below. Adapter `env` is applied AFTER the scrub.
+ *
+ * **This module imports no other module of this package at run time, and must
+ * not.** `test/fixtures/orphan-host.ts` loads it on its own under
+ * `node --experimental-strip-types`, which resolves a `.js` specifier literally
+ * and cannot find its `.ts` file — so a single value import from a sibling
+ * breaks the parent-death fixture, and with it the only test that runs the
+ * supervisor the way production does. Type-only imports are erased and are
+ * fine. Anything else this needs is either passed in or thrown as a plain
+ * Error for a caller to type.
  */
 import { spawn, type ChildProcess } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type { EngineAdapter } from '../types.js';
 
 /** The parent-death watchdog launched for adapters that declare `supervise`. */
 const SUPERVISOR_PATH = fileURLToPath(new URL('./supervisor.mjs', import.meta.url));
 
-/** Core scrub list; adapters extend via envScrubExtra. */
-export const ENV_SCRUB_PATTERNS: readonly RegExp[] = [
-  /^(CLAUDE|CLAUDECODE|CODEX_SANDBOX|OPENCODE_(SESSION|CALLER))/,
-];
+/**
+ * What to say when a file this package has to spawn is not where it should be.
+ *
+ * Always the same three things, because one of them is what a reader is
+ * missing: the asset, where it was looked for, and that a bundler is the usual
+ * reason. These paths are resolved from the module's own location, so a build
+ * that flattens several packages into one artifact moves them without moving
+ * the files — measured, a bundled `runskein` looks for pi's shim beside the
+ * consumer's own artifact.
+ *
+ * Shared with the shim check at registration so the two read alike: a consumer
+ * who has met one of them has met both.
+ * @param asset - what is missing, named as a reader would recognise it.
+ * @param path - where it was looked for.
+ * @returns the message.
+ */
+export function missingRuntimeAsset(asset: string, path: string): string {
+  return (
+    `${asset} not found: ${path} — this path is resolved from the module's own ` +
+    'location, so a bundler that flattens the package will move it. Copy the ' +
+    "package's runtime assets beside the artifact, or leave it external to the bundle"
+  );
+}
+
+/**
+ * Scrub patterns that belong to no single engine — empty, and that is the
+ * design rather than a gap.
+ *
+ * A session marker is a statement an agent makes to itself: `CLAUDECODE=1`
+ * means "you are already inside a Claude Code session" and means nothing to
+ * kimi. So each engine's markers are declared by its own adapter, in
+ * `envScrubExtra`, and reach both scrub sites through the merge below. This
+ * list stays because a marker no engine owns would have nowhere else to go.
+ *
+ * See decision 045.
+ */
+export const ENV_SCRUB_PATTERNS: readonly RegExp[] = [];
 
 /**
  * Whether a variable name matches any of the patterns, ignoring case.
@@ -108,9 +153,21 @@ export function mergeEnv(
  * env; spawn failures surface later via the child's 'error' event.
  * @param adapter - The adapter whose launch config drives the spawn.
  * @param opts - cwd for the child process.
+ * @param supervisorPath - the watchdog a supervised adapter is launched
+ *   through; the real asset by default, overridden only to test that its
+ *   absence is reported rather than left to node.
  * @returns The spawned child plus a stderrTail() accessor for diagnostics.
+ * @throws Error when a supervised adapter's watchdog is not where it should be;
+ *   the manager types it as an EngineStartError at the `spawn` stage.
  */
-export function spawnEngine(adapter: EngineAdapter, opts: { cwd: string }): SpawnedEngine {
+export function spawnEngine(
+  adapter: EngineAdapter,
+  opts: { cwd: string },
+  // Injectable so a test can prove the check below fires. The default is the
+  // real asset, which exists in this tree — without the seam the case could
+  // only be argued, not run.
+  supervisorPath: string = SUPERVISOR_PATH,
+): SpawnedEngine {
   const env = mergeEnv(
     scrubEnv(process.env, adapter.envScrubExtra ?? []),
     Object.entries(adapter.launch.env ?? {}).map(([name, value]) => ({ name, value })),
@@ -131,8 +188,19 @@ export function spawnEngine(adapter: EngineAdapter, opts: { cwd: string }): Spaw
   // end and the supervisor sees EOF. The engine still inherits the same three
   // pipes, so no protocol traffic passes through the extra process.
   const supervised = adapter.supervise === true;
+  // Checked before spawning rather than left to node. Without this the failure
+  // is node's own "Cannot find module", which reaches the caller through the
+  // 2000-character stderr tail below with its beginning sliced off — measured,
+  // a consumer read a stack fragment starting mid-word at `odules/cjs/loader`.
+  if (supervised && !existsSync(supervisorPath)) {
+    // A plain Error on purpose; the process manager types it as an
+    // EngineStartError, which is where its JSDoc already promises one.
+    throw new Error(
+      missingRuntimeAsset("the parent-death supervisor this adapter's `supervise` needs", supervisorPath),
+    );
+  }
   const command = supervised ? process.execPath : engineCommand;
-  const args = supervised ? [SUPERVISOR_PATH, engineCommand, ...engineArgs] : engineArgs;
+  const args = supervised ? [supervisorPath, engineCommand, ...engineArgs] : engineArgs;
   const child = spawn(command, args, {
     cwd: opts.cwd,
     env,

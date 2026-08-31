@@ -1,7 +1,7 @@
----
+<!--
 source: docs/capability-matrix.md
-source-sha256: 27b20865bd065020052d82012907cb04814e26df973ca060cfe85065bf28155c
----
+source-sha256: 7dd44cad41c807c689176d1adfc63e71caf698669de4c4745e34145d48bd15a3
+-->
 
 # 能力矩阵
 
@@ -43,7 +43,7 @@ source-sha256: 27b20865bd065020052d82012907cb04814e26df973ca060cfe85065bf28155c
 | Prompt (turn promise) | Core                           | `s.prompt()` → `TurnResult`                        | ✅ ✅ ✅ ✅ ✅ · all `end_turn`                                                                                                                |
 | Cancel active turn    | Core                           | `s.cancel()`                                       | active prompt resolves `stopReason:'cancelled'`; queued prompts reject `CancelledError`; every bundled engine advertises `session/cancel` |
 | Streaming updates     | Core                           | `s.on('update')`                                   | ✅ ✅ ✅ ✅ ✅                                                                                                                                 |
-| Close session         | Core (API) / Negotiated (wire) | `s.close()`                                        | ✓ · ✓ · — · ✓ · ✓                                                                                                                         |
+| Close session         | Core (API) / Negotiated (wire) | `s.close()`                                        | ✓ · ✓ · ✓ · ✓ · ✓                                                                                                                         |
 | **Resume**            | **Emulated**                   | `hub.session({engine,cwd,resume})`, `s.resumeTier` | native `session/resume`: ✓ ✓ ✓ ✓ ✓                                                                                                        |
 | Load (history replay) | Negotiated (resume tier 2)     | internal                                           | `loadSession`: ✓ ✓ ✓ ✓ ✓                                                                                                                  |
 | Fork                  | Negotiated                     | `s.fork()`                                         | ✓ · ✓ · ✓ · — · ✓                                                                                                                         |
@@ -77,7 +77,7 @@ resume** 的原因——包括将来某个完全没有持久化的 Engine。
 | Capability                         | Tier                                | API                                     | Measured                                                                                                                                        |
 | ---------------------------------- | ----------------------------------- | --------------------------------------- | -----------------------------------------------------------------------------------------------                                                 |
 | Text out (chunks)                  | Core                                | `update: agent_message_chunk`           | ✅×5                                                                                                                                             |
-| Thinking out                       | Core (pass-through)                 | `agent_thought_chunk`                   | opencode & kimi emit heavily; others model-dependent                                                                                            |
+| Thinking out                       | Core (pass-through)                 | `agent_thought_chunk`                   | streamed by opencode, kimi and codex; claude-code streams none at any thought level — see the note below                                        |
 | Tool calls (kind/status/locations) | Core (pass-through)                 | `tool_call` / `tool_call_update`        | ACP ToolKind: read/edit/execute/…                                                                                                               |
 | Diffs                              | Negotiated (pass-through)           | `ToolCallContent.diff`                  |                                                                                                                                                 |
 | Plan / todo stream                 | Negotiated (pass-through)           | `plan` / `plan_update` / `plan_removed` |                                                                                                                                                 |
@@ -99,11 +99,36 @@ resume** 的原因——包括将来某个完全没有持久化的 Engine。
 | ----------- | ---------------- | ------------- | ---- | ---- | ---- | ------ | ----------- | -------- | ------- | --------- | ----------- |
 | OpenCode    | 1.18.25          | ✓             | ✓    | ✓    | ✓    | —      | ✓           | ✓        | ✓       | ✗         | ✓           |
 | Kimi Code   | 0.38.0           | ✓             | ✓    | ✓    | ✓    | ✓      | ✓           | ✓        | ✓       | ✗         | ✗           |
-| Claude Code | 0.16.2           | ✓             | ✓    | ✓    | ✓    | —      | ✓           | ✓        | ✓       | ✗         | ✗           |
+| Claude Code | 0.70.0           | ✓             | ✓    | ✓    | ✓    | ✓      | ✓           | ✓        | ✓       | ✓         | ✓           |
 | Codex       | 1.7.0            | ✓             | ✓    | —    | ✓    | ✓      | ✓           | ✓        | ✗       | ✓         | ✓           |
 | pi          | 0.84.2 (shim 1)  | ✓             | ✓    | ✓    | ✗    | ✗      | ✗           | ✗        | ✗       | ✗         | ✓           |
 
 <!-- /generated:builtin-support -->
+
+**Thinking out，以及提高 thought level 到底买到了什么。** 一个 Engine 会不会
+_流式输出_思考，和它会不会_真的多想_，是两个不同的问题，而且逐 Engine 的答案不一样。
+除 pi 外，每个 Engine 都公布了 thought level，但只有一部分让你看得见结果——而且被钉死
+的模型可能会收窄它真正接受的层级，所以在你自己机器上跑 `hub.describe()` 胜过这张表：
+
+| Engine      | 公布 thought level | 流式输出思考文本 | 报告 `usage.thought` | 提高层级后可见于        |
+| ----------- | ------------------ | ---------------- | -------------------- | ----------------------- |
+| opencode    | 是                 | 是               | 是                   | 两者皆可                |
+| kimi        | 是                 | 是               | 否                   | 流式文本                |
+| codex       | 是                 | 是，但并非总是   | 是                   | thought token           |
+| claude-code | 是                 | 否               | 否                   | runskein 无法呈现的任何 |
+| pi          | 否                 | 否               | 否                   | —                       |
+
+出处：thought token 那一列取自各 Engine 矩阵条目的 `usage.fields`；是否公布
+thought level 取自 2026-08-31 对 `hub.describe()` 的读取；流式输出那一列取自同日的
+实测运行（案例 CF-06、CF-10、PV-02）——kimi 那一格除外，该账号配额已耗尽，跑不了
+实测 turn，因此沿用矩阵中更早的实测值。
+
+claude-code 的 ACP 包装器只在思考文本非空时才发出 thought chunk，而近期的 Claude
+模型会省略该文本，于是一个花了数千 token 思考的 turn 到达时是一片寂静。**不要把缺失的
+`agent_thought_chunk` 读作「模型没有思考」。** 这些工作是真实的——它计费在该 turn 的
+output token 里，实测套件也正是在那里测量它（案例 CF-10）——但 Anthropic 并不把它单独
+拆出来，所以这个 Engine 永远不会有 `usage.thought` 到达你手里。要渲染思考面板的宿主
+应当按 Engine 分支，而不是假定每个 Engine 都会填充它。
 
 **Token usage** 的含义是：探测确实从那个 Engine 的 wire 上读到了真实的 token 数字
 ——它矩阵条目里的 `usage.fields` 列表非空，于是这些数字能到达 `TurnResult.usage` 与

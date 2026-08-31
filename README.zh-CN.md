@@ -1,9 +1,13 @@
----
+<!--
 source: README.md
-source-sha256: 45f4cbe6e2e421ec309fb7572e1351bc29a27d113d8c879636f938aee8ec3c0d
----
+source-sha256: 0012d25c6bb19e7cc2a87bfcabc0510a4b88a84aa07019e86ec296894546abe2
+-->
 
 # runskein
+
+[![CI](https://github.com/gzhzjk/runskein/actions/workflows/ci.yml/badge.svg)](https://github.com/gzhzjk/runskein/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/runskein)](https://www.npmjs.com/package/runskein)
+[![License](https://img.shields.io/npm/l/runskein)](LICENSE)
 
 <p align="center">
   <a href="README.md">English</a> | <b>简体中文</b>
@@ -16,20 +20,116 @@ source-sha256: 45f4cbe6e2e421ec309fb7572e1351bc29a27d113d8c879636f938aee8ec3c0d
        alt="Your TypeScript program calls one runskein API; runskein handles session lifecycle, typed errors, the transcript store and permission control, and drives OpenCode, Kimi Code, Claude Code, Codex and pi as child processes.">
 </p>
 
-runskein 让一个 TypeScript 程序用同一套调用去驱动 OpenCode、Kimi Code、
-Claude Code、Codex 和 pi。它负责启动和停止这些 coding agent 的进程（process），
-为每个 Session 保持一段对话，并把 agent 说过的每句话都保存进你自己的 Transcript。
+用它来做一个 CLI、一个开发工具，或者一个能在 OpenCode、Kimi Code、Claude Code、
+Codex 和 pi 之间切换的多 agent 应用——不必为进程生命周期、Session 和 Transcript
+维护五套各自独立的对接。
 
-runskein 是一个**运行时层（runtime layer），不是编排器（orchestrator）**。它只
-负责把 coding agent 跑起来。它不决定哪个 agent 接哪个任务（task），不限制它们花多
-少钱，也不隔离它们的文件。这些是你的程序要做的，或者是你在它之上再搭一层要做的。
+runskein 只负责把这些 agent 跑起来。它不决定哪个 agent 接哪个任务，不限制它们花多
+少钱，也不隔离它们的文件：它是一个**运行时层（runtime layer），不是编排器
+（orchestrator）**。
 
-> **状态：已发布。** 当前发布版本是 `0.1.0`——第一个不是预发布的版本，因此也是第一个
-> 裸写 `npm install runskein` 能装到真实代码的版本。v1 的接口面已经冻结——见
-> [engine adapter API](docs/engine-adapter-api.md)——改动它需要一条编号决策记录。
-> 但它仍然不是兼容性承诺：版本号是 `0.x`，而各个 Engine 的实测行为仍在变。每个
-> Engine 能做什么，也取决于机器上装的是哪个版本。依赖某个特性之前，先看
-> [实测矩阵](docs/conformance/matrix.public.json)。
+`0.1.1` · Node.js 22+ · 仅 ESM · 仍是 `0.x`，行为还可能变——[版本号意味着什么](docs/versioning.zh-CN.md)
+
+## 快速开始
+
+### 你需要什么
+
+- **Node.js 22 或更高版本。**
+- **一个已经装好并登录的 coding agent。** runskein 不会替你装任何 Engine，它只找
+  你 `PATH` 上已有的：
+
+| Agent       | 登录方式                                                       |
+| ----------- | -------------------------------------------------------------- |
+| OpenCode    | `opencode auth login`                                          |
+| Kimi Code   | `kimi acp --login`                                             |
+| Claude Code | `claude auth login`                                            |
+| Codex       | `codex login`——ChatGPT 登录或 API key                          |
+| pi          | 先配好一个 provider，再检查：`pi auth check --provider <name>` |
+
+### 三分钟
+
+```bash
+mkdir runskein-demo && cd runskein-demo
+npm init -y
+npm install runskein
+# 把下面的代码存成 demo.mjs
+node demo.mjs
+```
+
+```js
+import { createHub, policies, UnauthenticatedError } from 'runskein';
+
+const hub = createHub();
+
+// Which agents are on this machine? Cheap — it never starts one.
+const engines = await hub.engines();
+const usable = engines.filter((e) => e.installed && e.health !== 'invalid' && e.authenticated !== false);
+// Some agents cannot report their login state, so `authenticated` is undefined
+// for them. Take one that says it is logged in before one that cannot say.
+const engine = usable.find((e) => e.authenticated === true)?.id ?? usable[0]?.id;
+if (!engine) {
+  console.error('No coding agent found. Install one and log in, then run this again.');
+  process.exit(1);
+}
+console.log(`using ${engine}`);
+
+const session = await hub.session({
+  engine,
+  cwd: process.cwd(),
+  // Demo only: approves every permission request. cwd is not a sandbox.
+  permissionPolicy: policies.allowAll,
+});
+
+// The agent's reply arrives as it is written.
+session.on('update', (event) => {
+  const update = event.update;
+  if (update.sessionUpdate === 'agent_message_chunk' && update.content.type === 'text') {
+    process.stdout.write(update.content.text);
+  }
+});
+
+try {
+  const result = await session.prompt('Read package.json here and tell me the package name.');
+  console.log(`\n\nstop reason: ${result.stopReason}`);
+} catch (error) {
+  // The one failure a first run really hits: installed, but not logged in.
+  if (!(error instanceof UnauthenticatedError)) throw error;
+  console.error(`\n${engine} is not logged in — try: ${error.loginHint ?? 'its login command'}`);
+} finally {
+  await session.close();
+  await hub.quit();
+}
+```
+
+在一台已经配置好的机器上，输出大致是这样——你手上是哪个 agent，措辞就会不一样：
+
+```text
+using codex
+I’ll inspect the local `package.json` and report its package name.The package name is `runskein-demo`.
+
+stop reason: end_turn
+```
+
+这一轮已经落在 `.transcripts/` 里了，每个 Session 一个 JSONL 文件，归你读、归你渲染、
+归你用来 resume。同一份脚本也在
+[`examples/hello-world.mjs`](examples/hello-world.mjs)。
+
+> **第一次实验请在一个可以随手扔掉的目录里跑，或者跑在沙箱里。**
+> `policies.allowAll` 是 runskein 的默认策略，它会批准 agent 发出的每一个权限请求。
+> `cwd` 只是决定 agent 在哪里干活，并不限制它能碰到磁盘上的哪些路径，runskein 也不
+> 提供工作区隔离。`policies.denyAll` 拒绝每一个权限请求，`policies.rules([...])` 按
+> 工具逐个决定——它们完整的形状见 [API 规范](docs/engine-adapter-api.zh-CN.md)。
+
+## 你可以用它做什么
+
+- **给你自己的工具装一个可切换的 agent 后端。** 一条代码路径驱动五个 Engine，
+  Engine 从一个分支变成一个配置项。
+- **能保存、能恢复、能展示的 Session。** Transcript 是归你的文件，
+  [`runskein/fold`](docs/transcript-fold.zh-CN.md) 把它变成界面能画的状态。
+- **多个 agent 跑在同一个仓库上。** 一个设计、一个写码、一个评审——各自的 Session、
+  各自的进程、同一种 Transcript 格式——跑在你自己写的编排器下面。
+
+## 为什么用 runskein？
 
 不用 runskein：
 
@@ -50,8 +150,6 @@ const session = await hub.session({ engine: 'codex', cwd });
 await session.prompt('Fix the failing tests.');
 ```
 
-## 为什么用 runskein？
-
 每个 Engine 都是一个子进程。runskein 通过
 [Agent Client Protocol（ACP）](https://agentclientprotocol.com)和它通信。五个
 Engine 里有四个直接说 ACP，pi 则由一个小的翻译进程来驱动。
@@ -66,56 +164,7 @@ runskein 来做：
 - 补上一部分 Capability 缺口，所以不会有东西悄悄失效
 
 你看不到 ACP。公开类型都是 runskein 自己的，所以你不用引入 ACP SDK，也不用去想
-协议细节。完整对比见 [runskein 与 ACP](docs/runskein-vs-acp.md)。
-
-## 快速开始
-
-### 安装
-
-```bash
-npm install runskein          # 或者：pnpm add runskein
-```
-
-`runskein` 就是你要装的那个包，五个 Engine 的 Adapter 都打包在里面，多数应用只
-需要这一行。
-
-**不再需要写 tag。** 在这之前的每个版本都是预发布，而预发布不带 `latest`——所以裸写
-包名解析到的，要么是一个已标记废弃、没有代码的占名包，要么是一个已被取代的 alpha，
-取决于你要的是哪个包。`0.1.0` 在九个包上都发布在 `latest` 下，这正是上面那一行就是
-全部的原因。
-
-需要 Node.js 22 或更高版本，只支持 ESM。装这个包不会装任何 Engine。runskein 只
-会去找你 `PATH` 上已有的 Engine。
-
-### 跑第一个例子
-
-```ts
-import { createHub, policies } from 'runskein';
-
-const hub = createHub();
-
-const session = await hub.session({
-  engine: 'opencode',
-  cwd: process.cwd(),
-  permissionPolicy: policies.allowAll,
-});
-
-session.on('update', (event) => {
-  const update = event.update;
-  if (update.sessionUpdate === 'agent_message_chunk' && update.content.type === 'text') {
-    process.stdout.write(update.content.text);
-  }
-});
-
-const result = await session.prompt('Summarize this repository.');
-console.log(`\nstop reason: ${result.stopReason}`);
-
-await session.close();
-await hub.quit();
-```
-
-Transcript 写在 `.transcripts/` 目录下。Session 的 `cwd` 同时也是 Engine 的工作
-目录。
+协议细节。完整对比见 [runskein 与 ACP](docs/runskein-vs-acp.zh-CN.md)。
 
 ## 支持的 Engine
 
@@ -128,7 +177,7 @@ Transcript 写在 `.transcripts/` 目录下。Session 的 `cwd` 同时也是 Eng
 | pi          | ✓      | ✓      | ✓    | —    |
 
 Session 列表、删除、MCP 传输方式、provider 发现、token 用量，以及这些结果是在哪个
-Engine 版本上测的，都在[Engine 支持](docs/engine-support.md)里。实测数据在
+Engine 版本上测的，都在[Engine 支持](docs/engine-support.zh-CN.md)里。实测数据在
 [`docs/conformance/matrix.public.json`](docs/conformance/matrix.public.json)。
 
 加一个新 Engine，写一个 Adapter 就行，不用改 runskein。见
@@ -159,13 +208,13 @@ Session。一个 Hub 对每个 Engine 只保留一个进程，并且会替你关
 **Transcript** —— agent 产生的每个事件，边发生边存。runskein 把存下来的
 Transcript 当作 Session 历史和 resume 的 source of truth（唯一可信来源）。它不指望 Engine 一直替你留着
 这些数据。把 Transcript 变成能画到界面上的东西，是
-[`runskein/fold`](docs/transcript-fold.md) 的事，它是可选的，也是
+[`runskein/fold`](docs/transcript-fold.zh-CN.md) 的事，它是可选的，也是
 独立的。
 
 **Capability** —— 每个 Engine 都不一样，所以 runskein 用三种方式处理一个特性：
 必备的、看 Engine 的，或者由库自己模拟的。缺失的特性不会悄悄失效。你会拿到一个带
 类型的错误，里面写清楚是哪个 Engine 缺哪项 Capability。细节见
-[架构](docs/architecture.md)。
+[架构](docs/architecture.zh-CN.md)。
 
 ## 常见用法
 
@@ -176,11 +225,11 @@ Transcript 当作 Session 历史和 resume 的 source of truth（唯一可信来
 个任务，Transcript 也会一直变大。一个用到两个 Engine 的任务，就有两个 Session。
 
 **并发上限自己定。** 一个 Engine 就是一个进程、一条 pipe，runskein 不会替你排队。
-如果你要并发，就自己按 Engine 限流。跑在**不同** Engine 上的活各用各的进程，互不
-影响。
+如果你要并发，就自己按 Engine 限流。跑在**不同** Engine 上的活各用各的进程、各用各
+的 pipe，但它们仍然共用这台机器；只要你把它们指向同一个目录，工作区也是共用的。
 
 从创建 Hub 到关停的完整流程，包括空闲间隔、配置和错误处理，见
-[应用指南](docs/application-guide.md)。
+[应用指南](docs/application-guide.zh-CN.md)。
 
 ## 新增 Engine
 
@@ -199,7 +248,7 @@ adapters/<engine-id>/
 ```
 
 剩下的事情 —— Session、事件、权限、resume、进程管理 —— 都归 core 管，每个 Engine
-都一样。见 [Adapter 指南](docs/adapter-guide.md)。
+都一样。见 [Adapter 指南](docs/adapter-guide.zh-CN.md)。
 
 ## 包
 
@@ -222,7 +271,7 @@ adapters/<engine-id>/
   版本。
 - **调度、预算、workspace 隔离都不在这里** —— 见上面说的 runtime layer 边界。
   这条线按**触及范围**划：需要进程句柄或 ACP 连接的留在这里，能用 `prompt()`
-  加读取结果表达的属于上面那层。[架构](docs/architecture.md)里画了这条线。
+  加读取结果表达的属于上面那层。[架构](docs/architecture.zh-CN.md)里画了这条线。
 - **不用环境变量做配置。** 所有配置都传给 `createHub()` 和 `hub.session()`。
 - **没有批处理 CLI，也没有 Transcript 浏览界面。** CLI 是开发时用来交互式验证的。
 - **实测表会过时。** 它记录的是某一次探测、某一个 Engine 版本；你这台机器上
@@ -230,19 +279,30 @@ adapters/<engine-id>/
 
 ## 文档
 
-|                                               |                                        |
-| --------------------------------------------- | -------------------------------------- |
-| [应用指南](docs/application-guide.md)         | 在真实程序里怎么用 runskein            |
-| [架构](docs/architecture.md)                  | 什么跑在哪，为什么                     |
-| [Adapter 指南](docs/adapter-guide.md)         | 一步步加一个 Engine                    |
-| [Transcript 与 fold](docs/transcript-fold.md) | 怎么把 Session 渲染出来                |
-| [Engine 支持](docs/engine-support.md)         | 每个 Engine 能做什么                   |
-| [能力矩阵](docs/capability-matrix.md)         | 逐层级、逐引擎（表为生成物，保持英文） |
-| [CLI](docs/cli.md)                            | 从终端驱动它（英文单语）               |
-| [runskein 与 ACP](docs/runskein-vs-acp.md)    | 完整对比                               |
-| [API 规范](docs/engine-adapter-api.md)        | 冻结的公开接口                         |
-| [版本与发布](docs/versioning.md)              | 一个版本号意味着什么                   |
-| [参与贡献](CONTRIBUTING.md)                   | 门禁，以及一次改动要带上什么           |
+|                                                     |                                        |
+| --------------------------------------------------- | -------------------------------------- |
+| [应用指南](docs/application-guide.zh-CN.md)         | 在真实程序里怎么用 runskein            |
+| [架构](docs/architecture.zh-CN.md)                  | 什么跑在哪，为什么                     |
+| [Adapter 指南](docs/adapter-guide.zh-CN.md)         | 一步步加一个 Engine                    |
+| [Transcript 与 fold](docs/transcript-fold.zh-CN.md) | 怎么把 Session 渲染出来                |
+| [Engine 支持](docs/engine-support.zh-CN.md)         | 每个 Engine 能做什么                   |
+| [能力矩阵](docs/capability-matrix.zh-CN.md)         | 逐层级、逐引擎（表为生成物，保持英文） |
+| [CLI](docs/cli.md)                                  | 从终端驱动它（英文单语）               |
+| [runskein 与 ACP](docs/runskein-vs-acp.zh-CN.md)    | 完整对比                               |
+| [API 规范](docs/engine-adapter-api.zh-CN.md)        | 冻结的公开接口                         |
+| [版本与发布](docs/versioning.zh-CN.md)              | 一个版本号意味着什么                   |
+| [参与贡献](CONTRIBUTING.md)                         | 门禁，以及一次改动要带上什么           |
+
+## 反馈
+
+第一次试 runskein？告诉维护者跑得怎么样——[提一个 issue](https://github.com/gzhzjk/runskein/issues)：
+
+- **它根本没跑起来。** 贴上报错，以及你的 Node 版本和 runskein 版本。
+- **某个 Engine 的行为和上面那张表对不上。** 写清楚是哪个 Engine、哪个版本。
+  Capability 是按 Engine 版本实测的，没有版本号的报告没法复现。
+- **你用它做了东西。** 你在做什么，是最值得听的。
+
+安全问题请走私下渠道，方式见 [SECURITY.md](SECURITY.md)。
 
 ## 参与贡献
 
@@ -287,9 +347,6 @@ pnpm --filter @runskein/cli dev chat opencode --cwd .    # an interactive sessio
 `:config key=value`、`:fork`、`:status` 和 `:quit`。完整列表见
 [CLI 参考](docs/cli.md)。
 
-需要跑真实 Engine 时的登录方式：`opencode auth login`、`kimi acp --login`、
-`claude /login`，Codex 用 ChatGPT 登录或 API key。
-
-[API 规范](docs/engine-adapter-api.md)是冻结的公开约定，代码跟着它走，不是反过来。
+[API 规范](docs/engine-adapter-api.zh-CN.md)是冻结的公开约定，代码跟着它走，不是反过来。
 改动这个接口需要在 [`docs/decisions/`](docs/decisions/) 里加一份带编号的记录，
 并和代码在同一次改动里落地。

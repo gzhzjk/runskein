@@ -4,6 +4,8 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { EngineOperationError, EngineStartError, NotInstalledError, UnauthenticatedError } from 'runskein';
 import type { EngineAdapter, TranscriptStore } from '@runskein/core';
+import type { EngineDescriptor } from 'runskein';
+import type { WireFrame } from '@runskein/core/internal';
 import { ProcessManager, readSessionMeta } from '@runskein/core/internal';
 
 /**
@@ -340,9 +342,15 @@ export function isLiveEnvironmentErrorLine(line: string | undefined): boolean {
 }
 
 /**
- * The model family each engine must offer live. claude-code is absent on
- * purpose: it reports no live config options at all, only static hints, so
- * there is no model list to gate.
+ * The model family each engine must offer live.
+ *
+ * The gate asserts the family the *probe machine* is configured to serve, so
+ * an engine belongs here only once a family has been chosen for it. claude-code
+ * has not — the entry it used to lack for a different reason, that it reported
+ * no live config options at all, stopped being true at wrapper 0.70.0, which
+ * publishes `mode`, `model`, `effort`, `fast` and `agent`. Choosing its family
+ * is a configuration decision, not a defect fix; until one is chosen the engine
+ * is ungated, which `requiredModelFamilyPresent` already returns true for.
  */
 const MODEL_FAMILIES: Record<string, RegExp> = {
   opencode: /minimax/i,
@@ -360,6 +368,29 @@ export function requiredModelFamilyPresent(engine: string, values: readonly stri
   const family = MODEL_FAMILIES[engine];
   if (family === undefined) return true;
   return values.some((value) => family.test(value));
+}
+
+/**
+ * Whether an engine removes the native session on discard, or only closes
+ * locally — the fork in the road ST-DISC-01 and ST-DISC-02 sit either side of.
+ *
+ * Read from the descriptor rather than from a list of engine ids. The two cases
+ * used to name the engines they applied to and then assert the capability,
+ * which put the pairing one engine release out of date the moment claude-code's
+ * wrapper gained `session/delete`: it sat in the "cannot delete" case, whose
+ * own precondition it then failed, while no case exercised what it now does.
+ * The same shape CF-08 was fixed for.
+ *
+ * `=== true` rather than truthiness. Not because the two differ on any legal
+ * value — the matrix types the entry `boolean`, so an absent one is `undefined`
+ * and falsy either way — but because absent and `false` are both real answers
+ * here (opencode does not advertise the verb; pi advertises it `false`) and the
+ * comparison says at the call site that the three-way read was intended.
+ * @param descriptor - the engine descriptor probed for this live run.
+ * @returns true when `session/delete` is advertised.
+ */
+export function discardsNatively(descriptor: EngineDescriptor): boolean {
+  return descriptor.capabilities.session['delete'] === true;
 }
 
 /**
@@ -395,8 +426,9 @@ export function ownedLiveEnginePids(
  */
 export interface EngineSessionCleanup {
   engine: string;
-  /** False when the engine does not advertise `session/delete` (measured:
-   * opencode and claude-code) — nothing was attempted. */
+  /** False when the engine does not advertise `session/delete` — nothing was
+   * attempted. Read at run time, not from a list: claude-code was on that list
+   * until its wrapper gained the verb at 0.70.0. */
   supported: boolean;
   attempted: number;
   deleted: number;
@@ -510,8 +542,14 @@ export async function listEngineSessionIds(
  * Measured (2026-08-08, docs/todo.md item 10): kimi and codex really delete
  * (codex including the on-disk jsonl); a codex session that never had a
  * prompt returns `Internal error`, which is harmless (nothing was persisted)
- * and lands in `failed`. opencode and claude-code do not advertise the verb
- * and are skipped wholesale.
+ * and lands in `failed`. opencode and claude-code did not advertise the verb
+ * and were skipped wholesale.
+ *
+ * claude-code has since gained it — measured `session.delete: true` at wrapper
+ * 0.70.0 — so it is no longer skipped here, and the deletes this function
+ * performs for it have not been observed the way kimi's and codex's were. What
+ * decides is the engine's own advertisement, read per run; the 2026-08-08
+ * measurement is left as written because it is a record of that day.
  * @param adapter - the engine adapter to launch.
  * @param nativeIds - the native session ids to delete.
  * @returns the per-engine cleanup outcome; never throws for per-id failures.
@@ -558,4 +596,121 @@ export async function deleteEngineSessions(
   } finally {
     await manager.quit();
   }
+}
+
+/**
+ * Find a descriptor config option by id, or by category as a fallback.
+ * @param d - the engine descriptor.
+ * @param id - the option id.
+ * @param category - an optional category to match when the id is absent.
+ * @returns the option or undefined.
+ */
+export function configOption(d: EngineDescriptor, id: string, category?: string) {
+  return (
+    d.configOptions.find((o) => o.id === id) ??
+    (category ? d.configOptions.find((o) => o.category === category) : undefined)
+  );
+}
+
+// ── CF-10 / CF-06: reading a thought level and its effect ──────────────────
+//
+// These live here rather than in live.ts because live.ts runs every case at
+// import time and so cannot be imported by a test. The decisions they encode —
+// which two levels count as the extremes, which wire frame carries the turn's
+// output tokens, and how much separation counts as an effect — are the ones
+// worth holding red-testable without spending a turn on a real engine.
+
+/**
+ * The thought-level option an engine publishes, whatever it calls it.
+ * @param d - the engine descriptor.
+ * @returns the option, or undefined when the engine has none.
+ */
+export function thoughtLevelOption(d: EngineDescriptor) {
+  return (
+    configOption(d, 'reasoning_effort', 'thought_level') ?? configOption(d, 'reasoning', 'thought_level')
+  );
+}
+
+/**
+ * Every value a select option offers, flattening groups.
+ * @param option - the config option.
+ * @returns the values in declaration order.
+ */
+export function optionValues(option: EngineDescriptor['configOptions'][number]): string[] {
+  return (option.options ?? []).flatMap((entry) =>
+    'value' in entry ? [entry.value] : entry.options.map((o) => o.value),
+  );
+}
+
+// Thought-level names ordered least to most. Declaration order is not a
+// ranking and never was: opencode lists `none` last and claude-code lists
+// `default` first, so reading the last declared value as "the highest" picked
+// opencode's weakest setting. `default` is deliberately unranked — it means
+// "whatever this model does unasked", which is not a point on the scale, and
+// comparing against it measures the model rather than the setting.
+export const THOUGHT_LEVEL_RANK: Record<string, number> = {
+  none: 0,
+  off: 0,
+  minimal: 1,
+  low: 2,
+  medium: 3,
+  high: 4,
+  xhigh: 5,
+  max: 6,
+};
+
+/**
+ * The weakest and strongest levels an option advertises, by rank.
+ * @param option - the thought-level config option.
+ * @returns the two extremes, or undefined when fewer than two values are ranked.
+ */
+export function thoughtLevelExtremes(
+  option: EngineDescriptor['configOptions'][number],
+): { low: string; high: string } | undefined {
+  const ranked = optionValues(option)
+    .filter((v) => THOUGHT_LEVEL_RANK[v] !== undefined)
+    .sort((a, b) => THOUGHT_LEVEL_RANK[a]! - THOUGHT_LEVEL_RANK[b]!);
+  if (ranked.length < 2) return undefined;
+  return { low: ranked[0]!, high: ranked[ranked.length - 1]! };
+}
+
+/**
+ * How much more the strongest thought level must spend than the weakest before
+ * CF-10 counts the setting as having done something.
+ *
+ * Set from both sides, measured on claude-code. Two negative controls — the
+ * case run with both arms writing the same level, so nothing changes — came out
+ * 1.95x and 2.59x apart, so a bare inequality, or even a doubling, would have
+ * called run-to-run noise a working setting. Six runs at genuinely different
+ * levels separated by 18.6x, 74x, 602x, 1638x, 2346x and 3092x. 8x sits about
+ * three times above the noise and rather more than twice below the tightest
+ * real separation — a real gap, but not a comfortable one at the bottom end,
+ * because the weak arm's own output varies (3 to 86 tokens) far more than the
+ * strong arm's does. If a run ever lands between 2.6x and 8x, widen the sample
+ * before moving this number: one turn each way is a small sample, which is why
+ * the case warns rather than fails.
+ */
+export const THOUGHT_EFFECT_RATIO = 8;
+
+/**
+ * The output-token count the engine reported for a turn, read off the wire.
+ *
+ * The fallback for CF-10's third tier, reached only when `TurnResult.usage` is
+ * empty — which is what an engine whose adapter declares no usage mapping
+ * leaves behind. The number is on the `session/prompt` response either way, and
+ * on some engines it is the only thought-level evidence there is: Anthropic
+ * bills thinking inside `output_tokens` rather than breaking it out, so a model
+ * that thought harder shows up in that count and nowhere else.
+ * @param frames - the frames captured around the turn.
+ * @returns the last reported output-token count, or undefined when none was.
+ */
+export function wireOutputTokens(frames: WireFrame[]): number | undefined {
+  let out: number | undefined;
+  for (const frame of frames) {
+    if (frame.direction !== 'in') continue;
+    const usage = (frame.result as { usage?: Record<string, unknown> } | undefined)?.usage;
+    const reported = usage?.['outputTokens'];
+    if (typeof reported === 'number') out = reported;
+  }
+  return out;
 }

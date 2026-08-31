@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { ConfigError, EngineOperationError, UnauthenticatedError } from 'runskein';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import type { EngineDescriptor } from 'runskein';
 import {
+  discardsNatively,
   isLiveEnvironmentErrorLine,
   isLiveEnvironmentUnavailable,
   isLiveCaseOptedIn,
@@ -30,8 +34,55 @@ describe('live runner verdict boundaries', () => {
     expect(requiredModelFamilyPresent('codex', ['gpt-5.6-codex'])).toBe(true);
     expect(requiredModelFamilyPresent('kimi', ['gpt-5.6-codex'])).toBe(false);
     expect(requiredModelFamilyPresent('kimi', ['kimi-for-coding/k3'])).toBe(true);
-    // claude-code has no live family (matrix: hints) — never gated.
+    // claude-code has no family chosen for the probe machine, so it is never
+    // gated. It is not that the engine has no model list: wrapper 0.70.0
+    // publishes one, which is why the table's own note had to be corrected.
     expect(requiredModelFamilyPresent('claude-code', [])).toBe(true);
+  });
+
+  // ST-DISC-01 and ST-DISC-02 are the two halves of one fork and used to name
+  // the engines each applied to. Reading the descriptor instead is the whole
+  // fix, and this is the part of it that can go red without a live engine: the
+  // measured descriptors are on disk, including the claude-code row whose
+  // `session/delete` arriving at wrapper 0.70.0 put it in the wrong half.
+  //
+  // From the published projection, not `matrix.json`: the private matrix does
+  // not leave this repository, and this suite runs in the release repository
+  // too. The projection carries `capabilities` whole — opencode's absent
+  // `delete` included, which is the row that matters here — and
+  // `project-conformance-matrix.mjs --check` keeps the two in step.
+  describe('which half of the discard fork an engine falls in', () => {
+    const measured = JSON.parse(
+      readFileSync(resolve(import.meta.dirname, '../../../docs/conformance/matrix.public.json'), 'utf8'),
+    ) as Array<{ id: string; capabilities: EngineDescriptor['capabilities'] }>;
+    const descriptorFor = (id: string): EngineDescriptor =>
+      ({ capabilities: measured.find((e) => e.id === id)?.capabilities }) as EngineDescriptor;
+
+    it('reads every measured engine, and every engine lands in exactly one case', () => {
+      // Guards the fixture itself: a matrix that stopped carrying five engines
+      // would otherwise let the rows below pass by being absent.
+      expect(measured.map((e) => e.id).sort()).toEqual(['claude-code', 'codex', 'kimi', 'opencode', 'pi']);
+    });
+
+    it.each(['kimi', 'claude-code', 'codex'])('%s discards natively → ST-DISC-01', (id) => {
+      expect(discardsNatively(descriptorFor(id))).toBe(true);
+    });
+
+    it.each(['opencode', 'pi'])('%s closes locally → ST-DISC-02', (id) => {
+      expect(discardsNatively(descriptorFor(id))).toBe(false);
+    });
+
+    it('covers both ways an engine can lack the verb', () => {
+      // The two engines in ST-DISC-02 do not say the same thing: opencode does
+      // not report `delete` at all, pi reports it `false`. Pinned because the
+      // rows above would look identical either way, and a fixture that quietly
+      // lost the absent case would stop covering the shape that produced this
+      // issue — a capability read that has to answer three ways, not two.
+      const opencode = measured.find((e) => e.id === 'opencode')?.capabilities.session;
+      const pi = measured.find((e) => e.id === 'pi')?.capabilities.session;
+      expect(opencode).not.toHaveProperty('delete');
+      expect(pi?.['delete']).toBe(false);
+    });
   });
 
   it('selects crash-injection targets from exact ownership, not process text', () => {

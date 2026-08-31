@@ -3,10 +3,19 @@
  * (AC-1.1, live).
  *
  * This is the case the whole supervision capability exists for. Measured
- * evidence: `@zed-industries/claude-code-acp` does not exit on stdin EOF, so
+ * evidence: `@zed-industries/claude-code-acp` did not exit on stdin EOF, so
  * every host that died without a clean shutdown leaked one — 8 were reaped by
  * hand in a single working session, and 12 were once found accumulated on a dev
  * machine. This converts that into a recurring red/green signal.
+ *
+ * **What it proves changed with claude-code's wrapper.** No bundled adapter
+ * declares `supervise` any more, so this case no longer exercises the watchdog
+ * at real wrapper depth — it now proves the engines clean themselves up. The
+ * watchdog keeps hermetic coverage in `packages/core/test/st-orphans.test.ts`,
+ * whose fixture adapter declares the flag directly. Point this case at an
+ * engine that does declare it and the old meaning comes back; that is worth
+ * doing before trusting the flag again, because it is the depth a fixture
+ * cannot reach.
  *
  * It is the only case that exercises three things no fixture can:
  *   - the real wrapper depth, `npx -> node -> engine`, which is where the

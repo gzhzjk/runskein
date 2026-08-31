@@ -1,7 +1,7 @@
----
+<!--
 source: docs/versioning.md
-source-sha256: 9e6d1f8bfccdd337b677c24c3c99162db62aa19ced195c92bfa3bc6ea1bd7c98
----
+source-sha256: 00a4587387f592bff88b70e909d42648f3e76fd886a8965bd396555a017d8323
+-->
 
 # 版本与发布
 
@@ -23,36 +23,35 @@ source-sha256: 9e6d1f8bfccdd337b677c24c3c99162db62aa19ced195c92bfa3bc6ea1bd7c98
 | `@runskein/adapter-opencode`    |                                      |
 | `@runskein/adapter-pi`          |                                      |
 
-它们之间刻意没有兼容性矩阵。`@runskein/core` 0.1.0-alpha.24 只配
-`@runskein/fold` 0.1.0-alpha.24，别的都不配——混用版本既没测过也不支持，而元包
-把它的 adapter 钉死在自己这个版本上，就是为了让最常见的用法不可能弄错。
+它们之间刻意没有兼容性矩阵。`@runskein/core` 0.1.0 只配 `@runskein/fold`
+0.1.0，别的都不配——混用版本既没测过也不支持，而元包把它的 adapter 钉死在自己
+这个版本上，就是为了让最常见的用法不可能弄错。
 
 `packages/cli` 与 `packages/conformance` 是开发工具，不发布。想要它们就克隆仓库。
 
 ## 版本号的含义
 
-版本号形如 `0.1.0-alpha.24`。其中两半各自有含义：
+版本号形如 `0.1.0`，其中两半各自有含义：
 
-- **`0.1.0` —— 1.0 之前。** v1 这个*接口面*已经冻结，写在
+- **`0.x` —— 1.0 之前。** v1 这个*接口面*已经冻结，写在
   [API 规范](engine-adapter-api.md)里；而它的实现是预览版。只要版本还停在
   `0.x`，一次发布就可能改掉消费者依赖的行为。
-- **`alpha.24` —— 发布计数。** 每发布一次加一。没有并行的补丁线，也没有
-  backport：**最新的 alpha 是唯一受支持的版本**，修复走下一个版本。
+- **最后一个数字是发布计数。** 每发布一次加一。没有并行的补丁线，也没有
+  backport：**最新的发布版本是唯一受支持的版本**，修复走下一个版本。
 
-这就是预览版诚实的形状，也是下面那条安装命令不能省掉 tag 的原因。
+`0.1.0` 之前的每一个版本都是预发布——`0.1.0-alpha.25`、`0.1.0-beta.1`——只能通过
+它自己的 tag 拿到。那些 tag 现在仍然能解析，而它们背后的东西不再维护。
 
 ## 安装
 
-`npm install runskein@alpha`。`@alpha` 不能省——裸写包名解析的是 `latest` 这个
-tag，而它并不指向任何一个发布版本。[README](../README.zh-CN.md#安装) 里有细节，
-包括省掉之后会发生什么。
+`npm install runskein`。不需要 tag：`0.1.1` 在九个包上都发布在 `latest` 下。
 
 Node.js 22 或更高，仅 ESM。
 
 ## 去哪里看改了什么
 
 - **单次发布** —— 挂在该版本 tag 上的 GitHub Release。tag 就是裸版本号，不带
-  `v` 前缀：`0.1.0-alpha.24`。
+  `v` 前缀：`0.1.0`。
 - **接口面的变更** —— [`docs/decisions/`](decisions/)。冻结的 v1 接口面每改一次
   都有一份编号记录，写明决定了什么、为什么。release note 会点名它带的那几份记录。
 - **每个 engine 实测能做什么** —— [能力矩阵](capability-matrix.md)，由针对真实

@@ -55,7 +55,22 @@ const KEEP = ['id', 'agentInfo', 'capabilities', 'prompt', 'usage'];
 // the engine called itself on the day it ran — pi's row still names the shim by
 // the product's pre-rename name. Publishing that string would carry a stale
 // fact and a dead brand into the release repository for no reader's benefit.
-const DROP = [['agentInfo', 'name']];
+//
+// `prompt.replyText` is the engine's own words, generated on the probe machine,
+// and the only free-text field the projection would carry. Measured: a Stop
+// hook configured in the operator's Claude Code installation appended
+// "**Notice:** Stop says: …" to the engine's reply, and the projection
+// published it verbatim. A hook printing a ticket number, a hostname or a
+// customer name would travel the same path just as silently, and the export's
+// internal-content scan looks for known internal strings — it cannot recognise
+// an arbitrary sentence. What the field was evidence for, that the engine
+// answered and how, is carried structurally by `prompt.stopReason` and
+// `prompt.updateKinds`; the full text stays in `matrix.json`, which never
+// leaves this repository.
+const DROP = [
+  ['agentInfo', 'name'],
+  ['prompt', 'replyText'],
+];
 
 /**
  * @param {unknown[]} matrix - parsed `matrix.json`

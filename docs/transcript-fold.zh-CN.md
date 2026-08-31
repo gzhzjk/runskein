@@ -1,7 +1,7 @@
----
+<!--
 source: docs/transcript-fold.md
 source-sha256: 053167b6ef34f941dde29db9d5b29ee4f2409342929befbe9c5ca5e29dc24773
----
+-->
 
 # Transcript folding —— `@runskein/fold`
 

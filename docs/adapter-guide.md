@@ -31,7 +31,7 @@ expensive.
 
 Before writing anything, run its command by hand and check it answers
 `initialize` over stdio. Most engines expose a subcommand for this — `kimi acp`,
-`opencode acp` — or ship a wrapper — `npx @zed-industries/claude-code-acp`.
+`opencode acp` — or ship a wrapper — `npx @agentclientprotocol/claude-agent-acp`.
 
 If it does not speak the protocol, you need a shim (`shim.mjs`): a separate
 process that speaks ACP on the stdio runskein gives it and the engine's own
@@ -116,6 +116,8 @@ imports it directly under bare node.
 
 ### 3. Write the launch block
 
+<!-- from: adapters/kimi/index.mjs -->
+
 ```js
 export default {
   specVersion: 1,
@@ -177,7 +179,7 @@ creationConfig: {
 },
 ```
 
-(from the bundled claude-code adapter). The keys are **runskein config keys**
+The keys are **runskein config keys**
 (`reasoning`, `model`, …), never engine-native names; `meta` is the path inside
 the creation request's `_meta` object; `values` maps runskein's levels onto
 whatever the engine expects, because "what high means" is your adapter's
@@ -190,19 +192,34 @@ Do **not** use `creationConfig` for a setting the engine already reports in
 validates and then cannot be applied, the same worst outcome as a stale
 `configHints` entry (see "The mistakes that cost the most" below).
 
+That block was the bundled claude-code adapter's until it was deleted: the
+wrapper it launches began publishing a thought level of its own, and the
+declaration turned into exactly the mistake this paragraph warns about — a
+runtime write refused as unsupported while the creation-time path was accepted
+and did nothing. **No bundled adapter declares `creationConfig` today.** The
+feature is not deprecated; it is what you need when an engine really does read a
+setting once and never again. But check `describe(id).configOptions` first, and
+check it again when the engine you wrap changes, because the day it starts
+publishing the option is the day your declaration starts doing harm.
+
 ### 3c. `errorPatterns` — what the engine's failures mean
 
 Engine error wording belongs to the engine, so core classifies a post-ready
 failure only through patterns you declare:
 
+<!-- from: adapters/kimi/index.mjs -->
+
 ```js
 errorPatterns: [
-  { cause: 'rate-limit', match: 'reached your usage limit|quota will be refreshed' },
+  {
+    cause: 'rate-limit',
+    match: 'reached your [^.]{0,40}usage limit|quota will (be refreshed|reset)|purchase extra usage|subscription\\?tab=quota',
+  },
   { cause: 'auth', match: 'Authentication required' },
 ],
 ```
 
-Two rules, both learned the hard way:
+Three rules, all learned the hard way:
 
 - **Declare `rate-limit` before `auth`.** First match wins, and an engine is
   free to word a throttled request as an authentication problem — kimi prefixes
@@ -217,8 +234,58 @@ Two rules, both learned the hard way:
   unmatched failure is an honest `EngineOperationError` with no `kind`; a
   pattern that fires on the wrong message is a wrong answer stated
   confidently.
+- **Once you have two payloads, anchor on what they share** (decision 044). The
+  example above is kimi's, and it has four alternatives because the first
+  declaration had two fragments taken from a single payload and a vendor
+  rewording broke both in one edit — a qualifier moved between `your` and
+  `usage limit`, and `refreshed` became `reset`. What survived was the
+  remediation half of the message, which nobody thinks of as the error text.
+  This matters more than it reads: when a pattern stops matching, the failure
+  is not left unclassified, it falls to whichever later pattern does match —
+  and for an engine that prefixes every refusal with `Authentication required:`
+  that is the teardown. Pattern rot fails toward maximum damage, so spread the
+  anchors and keep every measured payload in your tests, dated.
+
+### 3d. `usage` — where the engine's token accounting lives
+
+Optional, and only worth writing if the engine actually reports tokens.
+Declaring nothing is exactly the pre-declaration behaviour: core still reads a
+`usage_update` that carries token fields under names it already knows.
+
+```js
+usage: {
+  // either { kind: 'usage_update' }, or a path into the prompt response result
+  source: { kind: 'prompt_response_meta', path: ['_meta', 'accounting'] },
+  // names core does not already know, per RunSkein Usage key
+  tokens: { cacheRead: ['cached_input'], thought: ['reasoning_tokens'] },
+  semantics: 'per-turn',
+},
+```
+
+Three rules:
+
+- **Aliases are additive.** They extend the built-in name table, they do not
+  replace it. `inputTokens`, `outputTokens` and `totalTokens` are already known;
+  restating one creates a second place to keep it right.
+- **Measure `semantics`, never guess it.** `cumulative` and `per-turn` are both
+  legal and the wrong one silently misreports every turn. `pnpm st:usage <engine>`
+  runs four turns of one session, alternating a terse answer with a verbose one,
+  and prints the wire numbers per turn: a cumulative counter only ever grows, a
+  per-turn counter falls back on turn 3.
+
+  **Read the output column, not the total.** Measured on claude-code,
+  `totalTokens` rose across all four turns while the report was per-turn all
+  along — it rises because the cached-read count grows with the conversation.
+  Judging by the total would have declared `cumulative` and misreported every
+  turn afterwards.
+
+- **Cost is not part of this.** `cost` and `currency` reach `session.usage()`
+  from any engine `usage_update` carrying `{cost: {amount, currency}}`, with no
+  declaration at all. Do not try to route it through `tokens`.
 
 ### 4. Write `detect()`
+
+<!-- from: adapters/kimi/index.mjs -->
 
 ```js
 async detect() {
@@ -289,6 +356,16 @@ Say in your pull request what the probe measured. `conformance.json` is the
 baseline later drift is compared against, so refresh it in the same change as
 anything that moves it.
 
+**The probe projects that file before writing it, and you should not write it
+by hand.** It is published, so what reaches it is what belongs to your engine:
+each config option keeps its id, name, category and type plus a count of the
+settings it offers, and loses the settings themselves; the engine's reply text
+is dropped. Both are the machine that ran the probe rather than the engine — one
+operator's option list is their providers, their installed plugins, or whatever
+a local hook appended to a reply. What an option _is_ and how many settings it
+has is the drift worth recording, and it is what survives. The full values stay
+in `matrix.json`, which does not leave the repository it was measured in.
+
 ## The mistakes that cost the most
 
 **Assuming a wrapper forwards what you give it.** An engine reached through a
@@ -320,20 +397,38 @@ core, which is the one thing the adapter layer exists to prevent.
 
 ## Environment hygiene
 
-Core scrubs host-agent session markers (`CLAUDE*`, `CLAUDECODE`,
-`CODEX_SANDBOX*`, `OPENCODE_SESSION*`, `OPENCODE_CALLER*`) before spawning any
-engine. This is load-bearing, not tidiness: running runskein from inside a coding
-agent leaks that agent's session variables into the child, and at least one
-engine refuses to start with "active session" as a result.
+Running runskein from inside a coding agent leaks that agent's session variables
+into every child it starts, and an engine handed a marker saying it is already
+in a session can refuse to start — measured on the Claude Code ACP wrapper,
+which refuses with "active session". This is load-bearing, not tidiness.
 
-If your engine has its own markers with the same problem, add them:
+**Declaring the markers is your adapter's job, not core's.** Core scrubs
+nothing on its own; each bundled adapter names what its own engine leaves
+behind, and yours does the same:
 
 ```js
 envScrubExtra: [/^MYENGINE_(SESSION|CALLER)/],
 ```
 
-Scrub what identifies a _session_, not what configures the engine — over-scrubbing
-strips the user's own configuration.
+The patterns are applied when _your_ engine is spawned, and again to any
+terminal a session of yours runs, where they also stop an agent putting a
+marker back. A marker belongs to the engine that leaves it — `MYENGINE_SESSION`
+means "you are already in a session" to your engine and nothing at all to the
+others — so declaring it protects your engine, not theirs. Decision 045 is the
+reasoning.
+
+Two rules, both learned from getting it wrong:
+
+- **Scrub what identifies a _session_, not what configures the engine.** An
+  over-broad pattern strips the user's own configuration, and the two live
+  examples are each one loosened anchor away from being caught:
+  `PI_CODING_AGENT_DIR` is the user's pi configuration directory, which
+  `/^PI_CODING_AGENT/` without the `$` would take, and
+  `OPENCODE_CONFIG_CONTENT` is how the live suite hands opencode its permission
+  settings, which a bare `/^OPENCODE_/` would take.
+- **Declare nothing you have not measured.** kimi's adapter declares no
+  patterns, because no kimi session marker has been observed. An absent
+  declaration is honest; a guessed one reads to the next person as evidence.
 
 ## Registering it
 

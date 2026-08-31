@@ -345,12 +345,22 @@ opaque and engine-scoped: of the built-in engines only codex reports anything, a
 its shape is its own, so runskein does not build a cross-engine vocabulary from a
 single example. Read `payload` against the engine named in `engineId`.
 
-It is **not a remaining allowance.** No engine currently reports a ceiling,
-reset, or balance — what codex labels quota is a per-turn token count — so this
-does not yet enable budget gating. runskein never back-fills the field from
-`usage_update`: that is the context-window and cost accounting runskein already
-owns as `usage`, and presenting it as headroom would give an unattended host a
-confidently wrong budget signal.
+It is **not a remaining allowance.** What codex labels quota is a per-turn
+token count, so this field does not enable budget gating, and runskein never
+back-fills it from `usage_update` — presenting token counts as headroom would
+give an unattended host a confidently wrong budget signal.
+
+One engine has begun reporting more than that, and this field still does not
+carry it. claude-code streams a rate-limit record on `usage_update`'s `_meta`,
+under `_claude/rateLimit`, carrying a `status`, a `resetsAt` and a
+`rateLimitType` (measured 2026-08-31) — a real reset, which no engine reported
+when this field was designed. It stays unfolded for two reasons: `quota` reads
+the prompt response and this arrives on a notification, and folding a key that
+names one vendor would build the cross-engine vocabulary from a single example
+that the paragraph above says runskein does not build. A host can read it
+verbatim today, from `on('update')` or from the transcript — the envelope stores
+`update` unchanged, `resetsAt` included. When a second engine reports a reset,
+what the two have in common is what a vocabulary could be made of.
 
 Streaming detail flows through `on('update')`. Both styles compose:
 `await s.prompt(...)` for simple flows; subscribe to updates for streaming UIs
@@ -572,6 +582,14 @@ interface DigestOptions {
   maxTokens?: number;
   truncation?: 'tail' | 'head' | 'head-tail'; // default tail
 }
+
+interface StructuredDigestOptions extends DigestOptions {
+  format: 'structured'; // narrows digest() to Promise<StructuredDigest>
+}
+
+interface TextDigestOptions extends DigestOptions {
+  format?: 'text'; // narrows digest() to Promise<TranscriptDigest>
+}
 ```
 
 Costs remain cumulative across rebuilt resume lives only while their currency
@@ -592,6 +610,14 @@ difference against the turn-open snapshot, clamped at zero. A
 transcript event in runskein's own field names — carrying the session-cumulative
 value and marked via a runskein `_meta` entry — so resume replays identically
 without the adapter.
+
+**That declaration governs tokens; cost is not part of it.** Three of the five
+bundled engines report cost today — opencode, claude-code and pi, all in the one
+shape `{amount, currency}` — and `session.usage().cost` is populated for them
+whether or not their adapter declares a token mapping at all. It is on
+`UsageSummary` rather than on `Usage` because those engines report a running
+session total, not a per-turn charge, so there is no honest per-turn figure for
+`TurnResult.usage` to carry.
 
 ### 4.2 Folding — consumer-side presentation state
 
@@ -734,10 +760,11 @@ another. A name on the host's deny list
 is refused too, before the policy is asked at all. That list holds the variables
 that decide which program a command name turns out to be or what it loads —
 `PATH`, `LD_*`/`DYLD_*`, `NODE_OPTIONS`, `GIT_SSH_COMMAND` and the like — plus
-the session markers the host scrubs. It is a fixed list, not a proof that no
-remaining variable can influence a command: it removes the questions a rule
-table cannot usefully answer, such as "may I run this under a `PATH` I chose",
-and leaves the rest to be judged. What survives it is visible to a rule, which
+the session markers the host scrubs, which are the ones the session's own engine
+declared in `envScrubExtra` and so differ between engines (decision 045). It is
+a fixed list, not a proof that no remaining variable can influence a command: it
+removes the questions a rule table cannot usefully answer, such as "may I run
+this under a `PATH` I chose", and leaves the rest to be judged. What survives it is visible to a rule, which
 matches its glob over the stringified input, so env names and values are text a
 rule can match on. A denial means the process is never started, and the
 working directory can be narrowed within the session's `cwd` but never moved
@@ -757,6 +784,8 @@ interface TranscriptStore {
     AsyncIterable<TranscriptEvent>;
   sessions(filter?: SessionFilter): Promise<SessionMeta[]>;
   digest(sessionId: string): Promise<TranscriptDigest>;
+  digest(sessionId: string, opts: StructuredDigestOptions): Promise<StructuredDigest>;
+  digest(sessionId: string, opts: TextDigestOptions): Promise<TranscriptDigest>;
   digest(sessionId: string, opts: DigestOptions): Promise<TranscriptDigest | StructuredDigest>;
   delete(sessionId: string): Promise<void>;
 }
@@ -905,7 +934,7 @@ interface EngineAdapter {
     string,
     { meta: string[]; values: Record<string, string | number | boolean>; description?: string }
   >;
-  envScrubExtra?: RegExp[]; // engine-specific env scrub additions
+  envScrubExtra?: RegExp[]; // this engine's own session markers; core declares none
   errorPatterns?: Array<{
     cause: 'auth' | 'rate-limit' | 'context' | 'internal';
     match: string; // RegExp source; compiled case-insensitively by default
@@ -972,13 +1001,13 @@ Built-in adapters (the `runskein` meta-package also exports this set as the
 read-only array `builtinAdapters`, for hosts that prefer explicit assembly via
 `createHub({ adapters: [...] })` — its contents are exactly the table below):
 
-| id            | launch                                | ACP source                             |
-| ------------- | ------------------------------------- | -------------------------------------- |
-| `opencode`    | `opencode acp`                        | native, built-in                       |
-| `kimi`        | `kimi acp`                            | native, built-in                       |
-| `claude-code` | `npx @zed-industries/claude-code-acp` | Zed wrapper                            |
-| `codex`       | `npx @agentclientprotocol/codex-acp`  | ACP org wrapper                        |
-| `pi`          | `pi --mode rpc`, behind a shim        | runskein shim (`adapters/pi/shim.mjs`) |
+| id            | launch                                      | ACP source                             |
+| ------------- | ------------------------------------------- | -------------------------------------- |
+| `opencode`    | `opencode acp`                              | native, built-in                       |
+| `kimi`        | `kimi acp`                                  | native, built-in                       |
+| `claude-code` | `npx @agentclientprotocol/claude-agent-acp` | ACP org wrapper                        |
+| `codex`       | `npx @agentclientprotocol/codex-acp`        | ACP org wrapper                        |
+| `pi`          | `pi --mode rpc`, behind a shim              | runskein shim (`adapters/pi/shim.mjs`) |
 
 The first four are shim-free. `pi` speaks no ACP at all, and is the engine the
 shim mechanism exists for: a separate small process speaking ACP on stdio and
@@ -1033,19 +1062,29 @@ chain. **Declare `rate-limit` ahead of `auth`.** First match wins, and an
 engine is free to word a throttled request as an authentication problem —
 kimi prefixes an upstream refusal with `Authentication required:` whatever
 its cause, so a spent quota arrives as `Authentication required: 403 You've
-reached your usage limit for this billing cycle…` (measured 2026-08-25) and an
-auth pattern declared first claims it. That is not a mislabel a consumer can
-work around: the auth path invalidates the cached login, crashes every live
-session on the engine and retires its process, for a failure that clears
-itself. pi surfaces the same condition as its own turn error — `Internal
-error: pi ended the turn with an error: 429 status code (no body)` (measured
-2026-08-25) — which is an ordinary error on the cause chain, not a
-notification. Both patterns are taken from that measured wording — the
-fragment that names the condition, kept long enough not to claim a sentence
-merely mentioning a limit or a number. Neither tries to survive a rewording: a
-rewording that keeps the fragment still classifies, and one that drops it sends
-the failure back to the path it had before. Which of the two happened surfaces
-in the field, not in a test. An adapter that has not had its
+reached your weekly (7-day) usage limit…` (measured 2026-08-31) and an auth
+pattern declared first claims it. That is not a mislabel a consumer can work
+around: the auth path invalidates the cached login, crashes every live session
+on the engine and retires its process, for a failure that clears itself. pi
+surfaces the same condition as its own turn error — `Internal error: pi ended
+the turn with an error: 429 status code (no body)` (measured 2026-08-25) —
+which is an ordinary error on the cause chain, not a notification. Every
+pattern is taken from measured wording, kept long enough not to claim a
+sentence merely mentioning a limit or a number. **Where the same condition has
+been measured more than once, the pattern is anchored on what those payloads
+share** rather than on fragments of any one of them (decision 044): kimi
+reworded its message six days after the first declaration landed, breaking both
+of its fragments in one edit and sending a spent quota back down the auth path,
+so kimi now declares four anchors spread across the description and the
+remediation. pi has one measured payload and stays a single fragment until a
+second is captured. A rewording that breaks every anchor still sends the
+failure back to the path it had before, and which happened surfaces in the
+field, not in a test. Where that lands depends on how broad the `auth` pattern
+behind it is, which is the argument for keeping that one narrow: kimi's is the
+blanket `Authentication required` its engine prefixes everything with, so a
+lapsed `rate-limit` pattern hands a spent quota straight to the teardown, while
+pi's is the specific token `credentials_not_configured`, so the same lapse
+leaves `kind` merely absent. An adapter that has not had its
 throttled payload measured — codex, opencode, claude-code today — declares no
 `rate-limit` pattern at all, because an absent `kind` is honest and a guessed
 one is not. `auth` becomes `UnauthenticatedError`; `rate-limit`, `context`, and

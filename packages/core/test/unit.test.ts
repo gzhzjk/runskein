@@ -17,25 +17,35 @@ import { foldSessionMeta, matchesFilter } from '../src/transcript/store.js';
 import type { TranscriptEvent } from '../src/transcript/event.js';
 
 describe('process environment hygiene', () => {
+  // A stand-in host environment, written with an invented engine's markers
+  // rather than a real one's: which patterns a bundled adapter declares is
+  // that adapter's business, pinned in the runskein meta-package's tests. What
+  // is proved here is the mechanism, which must behave the same for an engine
+  // this repository has never seen.
   const dirty = {
     PATH: '/usr/bin',
-    CLAUDE_SESSION_ID: 'abc',
-    CLAUDECODE: '1',
-    CODEX_SANDBOX_MODE: 'on',
-    OPENCODE_SESSION: 's1',
-    OPENCODE_CALLER: 'c1',
-    OPENCODE_CONFIG: 'keep-me', // not a session marker
+    DEMOAGENT_SESSION_ID: 'abc',
+    DEMOAGENT: '1',
+    DEMOAGENT_CONFIG: 'keep-me', // not a session marker
     HOME: '/home/u',
   };
 
-  it('drops host-agent session markers, keeps the rest', () => {
-    const clean = scrubEnv(dirty);
-    expect(Object.keys(clean).sort()).toEqual(['HOME', 'OPENCODE_CONFIG', 'PATH']);
+  it('scrubs nothing of its own: every marker is an adapter declaration', () => {
+    // The core list is empty on purpose (decision 045). A host variable
+    // survives unless the adapter being spawned asked for it to go, so this
+    // case fails the moment an engine name is written back into core.
+    expect(scrubEnv(dirty)).toEqual(dirty);
   });
 
-  it('applies adapter envScrubExtra on top of the core list', () => {
-    const clean = scrubEnv(dirty, [/^OPENCODE_CONFIG$/]);
-    expect(clean).not.toHaveProperty('OPENCODE_CONFIG');
+  it('drops the markers the adapter declares, keeps the rest', () => {
+    const clean = scrubEnv(dirty, [/^DEMOAGENT/]);
+    expect(Object.keys(clean).sort()).toEqual(['HOME', 'PATH']);
+  });
+
+  it('honours an adapter pattern anchored narrowly enough to spare configuration', () => {
+    const clean = scrubEnv(dirty, [/^DEMOAGENT(_SESSION)?$/]);
+    expect(clean).not.toHaveProperty('DEMOAGENT');
+    expect(clean).toHaveProperty('DEMOAGENT_CONFIG');
     expect(clean).toHaveProperty('PATH');
   });
 
@@ -47,11 +57,9 @@ describe('process environment hygiene', () => {
 
   it('recognises a session marker whatever case the host spells it in', () => {
     // Windows resolves variable names without case, so a marker spelled
-    // `Claudecode` there is the marker the scrub exists to remove, and an
+    // `Demoagent` there is the marker the scrub exists to remove, and an
     // engine handed it back refuses to start with "active session".
-    expect(scrubEnv({ Claudecode: '1', Codex_Sandbox_Mode: 'on', KEEP: 'x' })).toEqual({
-      KEEP: 'x',
-    });
+    expect(scrubEnv({ Demoagent: '1', KEEP: 'x' }, [/^DEMOAGENT/])).toEqual({ KEEP: 'x' });
     // The adapter's pattern is read the same way round: its author's case is
     // preserved rather than the name being folded to match it.
     expect(scrubEnv({ Pi_Session_Id: 's', KEEP: 'x' }, [/^pi_session_/])).toEqual({ KEEP: 'x' });
@@ -87,12 +95,10 @@ describe('process environment hygiene', () => {
     expect(scrubEnv({ A: undefined, B: 'x' })).toEqual({ B: 'x' });
   });
 
-  it('core patterns match the measured probe scrub list', () => {
-    const matches = (k: string) => ENV_SCRUB_PATTERNS.some((p) => p.test(k));
-    expect(matches('CLAUDE_ANYTHING')).toBe(true);
-    expect(matches('CODEX_SANDBOX')).toBe(true);
-    expect(matches('OPENCODE_SESSION_X')).toBe(true);
-    expect(matches('MY_CLAUDE')).toBe(false);
+  it('core declares no engine of its own', () => {
+    // Decision 045: an engine's markers belong to its adapter. Core keeps the
+    // list only for a marker no single engine owns, and there is none today.
+    expect(ENV_SCRUB_PATTERNS).toEqual([]);
   });
 });
 

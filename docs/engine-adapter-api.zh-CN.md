@@ -1,7 +1,7 @@
----
+<!--
 source: docs/engine-adapter-api.md
-source-sha256: ff1f7935cff51537bf4fe3f91ab04b9180ac9f553c29cef10e696d34585998bf
----
+source-sha256: ccf5afb8b07dd58301ebe3ad7e1537e49988abb9ddeda9bc088e1f48ab70a0d2
+-->
 
 # runskein —— API 规范（v1，已冻结）
 
@@ -334,10 +334,18 @@ interface TurnResult {
 且其形状是它自有的，因此 runskein 不会从单一样本构建跨 Engine 词汇。
 请对照 `engineId` 指明的 Engine 来读取 `payload`。
 
-它**不是剩余额度**。目前没有任何 Engine 报告上限、重置或余额——codex 标为 quota 的
-其实是每轮 token 计数——因此这还不能用于预算门控。runskein 绝不会用 `usage_update`
-回填该字段：那是 runskein 已经以 `usage` 拥有的上下文窗口与成本核算，
-把它当作余量展示会给无人值守的宿主一个自信而错误的预算信号。
+它**不是剩余额度**。codex 标为 quota 的其实是每轮 token 计数，因此该字段不能用于
+预算门控；runskein 也绝不会用 `usage_update` 回填它——把 token 计数当作余量展示，
+会给无人值守的宿主一个自信而错误的预算信号。
+
+已经有一个 Engine 开始报告更多东西，而该字段仍然不承载它。claude-code 会在
+`usage_update` 的 `_meta` 上、以 `_claude/rateLimit` 为键流式发送一条限流记录，
+携带 `status`、`resetsAt` 与 `rateLimitType`（实测于 2026-08-31）——一个真正的重置，
+而该字段被设计时还没有任何 Engine 报告过它。它保持不折叠，有两个理由：`quota` 读的是
+提示响应，而这条来自通知；并且折叠一个以某家厂商命名的键，正是上一段所说 runskein
+不做的那件事——从单一样本构建跨 Engine 词汇。宿主今天就可以原样读到它，从
+`on('update')` 或从 Transcript——信封原样保存 `update`，`resetsAt` 也在其中。
+等到第二个 Engine 也报告重置时，它们的共同部分才是词汇可以取材的地方。
 
 流式细节通过 `on('update')` 流动。两种风格可组合：简单流程用
 `await s.prompt(...)`；流式 UI 或做流折叠的宿主则订阅更新。
@@ -534,6 +542,14 @@ interface DigestOptions {
   maxTokens?: number;
   truncation?: 'tail' | 'head' | 'head-tail'; // default tail
 }
+
+interface StructuredDigestOptions extends DigestOptions {
+  format: 'structured'; // narrows digest() to Promise<StructuredDigest>
+}
+
+interface TextDigestOptions extends DigestOptions {
+  format?: 'text'; // narrows digest() to Promise<TranscriptDigest>
+}
 ```
 
 成本只有在货币一致时才跨 rebuilt resume 的各次生命累计。
@@ -550,6 +566,12 @@ Session 累计值（`cumulative`），要么只属于它所在的那个回合（
 回合开启时 snapshot 的逐字段差值，并钳制到零。来自 `_meta` 的上报会作为一条合成的
 `usage_update`Transcript 事件持久化，使用 runskein 自己的字段名——携带 Session 累计值并通过
 runskein`_meta` 条目标记——从而让 resume 在没有 Adapter 时也能一致地重放。
+
+**该声明管的是 token；成本不在其中。** 五个内置 Engine 中有三个今天就报告成本——
+opencode、claude-code 与 pi，都是同一种形状 `{amount, currency}`——无论它们的 Adapter
+是否声明了 token 映射，`session.usage().cost` 对它们都会被填充。它落在 `UsageSummary`
+而不是 `Usage` 上，是因为这些 Engine 报的是 Session 累计总额，而不是每轮的花费，
+因此 `TurnResult.usage` 没有一个诚实的逐轮数字可以承载。
 
 ### 4.2 折叠 —— 消费者侧的展示状态
 
@@ -673,7 +695,8 @@ policies.rules([{ tool, pattern, action: 'allow' | 'deny' }]); // declarative ta
 落在宿主拒绝清单上的变量名同样会被拒绝，而且是在策略被询问之前。
 该清单收录了那些决定一个命令名最终是哪个程序、或者它会加载什么的变量——`PATH`、
 `LD_*`/`DYLD_*`、`NODE_OPTIONS`、`GIT_SSH_COMMAND` 之类——
-以及宿主会擦除的 Session 标记。它是一份固定清单，而不是“其余变量都无法影响一个命令”
+以及宿主会擦除的 Session 标记——也就是本 Session 所属 Engine 在 `envScrubExtra` 里
+自己声明的那些，因此逐个 Engine 各不相同（决策 045）。它是一份固定清单，而不是“其余变量都无法影响一个命令”
 的证明：它排除掉的是规则表无法有意义回答的那些问题，例如“我可以在一个我自己挑的
 `PATH` 下运行它吗”，其余的则交由策略判断。通过该清单的部分对规则可见——
 规则用它的 glob 匹配字符串化后的 input，因此 env 的名字与取值也是规则可以匹配的文本。
@@ -694,6 +717,8 @@ interface TranscriptStore {
     AsyncIterable<TranscriptEvent>;
   sessions(filter?: SessionFilter): Promise<SessionMeta[]>;
   digest(sessionId: string): Promise<TranscriptDigest>;
+  digest(sessionId: string, opts: StructuredDigestOptions): Promise<StructuredDigest>;
+  digest(sessionId: string, opts: TextDigestOptions): Promise<TranscriptDigest>;
   digest(sessionId: string, opts: DigestOptions): Promise<TranscriptDigest | StructuredDigest>;
   delete(sessionId: string): Promise<void>;
 }
@@ -824,7 +849,7 @@ interface EngineAdapter {
     string,
     { meta: string[]; values: Record<string, string | number | boolean>; description?: string }
   >;
-  envScrubExtra?: RegExp[]; // engine-specific env scrub additions
+  envScrubExtra?: RegExp[]; // this engine's own session markers; core declares none
   errorPatterns?: Array<{
     cause: 'auth' | 'rate-limit' | 'context' | 'internal';
     match: string; // RegExp source; compiled case-insensitively by default
@@ -885,13 +910,13 @@ Engine 原生名称；每个 `meta` 是该值在创建请求 `_meta` 对象内�
 供偏好显式装配的宿主通过 `createHub({ adapters: [...] })` 复用——其内容
 就是下表）：
 
-| id            | 启动方式                              | ACP 来源                                |
-| ------------- | ------------------------------------- | --------------------------------------- |
-| `opencode`    | `opencode acp`                        | 原生内置                                |
-| `kimi`        | `kimi acp`                            | 原生内置                                |
-| `claude-code` | `npx @zed-industries/claude-code-acp` | Zed 包装器                              |
-| `codex`       | `npx @agentclientprotocol/codex-acp`  | ACP 组织的包装器                        |
-| `pi`          | `pi --mode rpc`，位于 shim 之后       | runskein shim（`adapters/pi/shim.mjs`） |
+| id            | 启动方式                                    | ACP 来源                                |
+| ------------- | ------------------------------------------- | --------------------------------------- |
+| `opencode`    | `opencode acp`                              | 原生内置                                |
+| `kimi`        | `kimi acp`                                  | 原生内置                                |
+| `claude-code` | `npx @agentclientprotocol/claude-agent-acp` | ACP 组织的包装器                        |
+| `codex`       | `npx @agentclientprotocol/codex-acp`        | ACP 组织的包装器                        |
+| `pi`          | `pi --mode rpc`，位于 shim 之后             | runskein shim（`adapters/pi/shim.mjs`） |
 
 前四个无需 shim。`pi` 完全不说 ACP，也正是 shim 机制存在的那个 Engine：
 一个小小的独立进程，在 stdio 上说 ACP，在另一侧说 Engine 的私有协议，
@@ -939,16 +964,22 @@ class EngineOperationError // post-ready ACP operation failed; carries { operati
 去匹配 Engine 消息及其 cause 链。**把 `rate-limit` 声明在 `auth` 之前。**
 先匹配者胜，而 Engine 完全可能把一次限流写成认证问题 —— kimi 无论何种原因，
 都会给上游的拒绝加上 `Authentication required:` 前缀，于是额度耗尽抵达时是
-`Authentication required: 403 You've reached your usage limit for this billing cycle…`
-（实测于 2026-08-25），声明在前的 auth 模式会把它认领走。这不是消费方绕得开的错标：
+`Authentication required: 403 You've reached your weekly (7-day) usage limit…`
+（实测于 2026-08-31），声明在前的 auth 模式会把它认领走。这不是消费方绕得开的错标：
 auth 那条路会让缓存的登录状态失效、把该 Engine 上每一个 live Session 判为崩溃、
 并回收其进程 —— 而这次失败本会自行恢复。pi 则把同一情形表达为它自己的轮次错误 ——
 `Internal error: pi ended the turn with an error: 429 status code (no body)`
 （实测于 2026-08-25）—— 那是 cause 链上的普通错误，不是通知。
-两条模式都取自上述实测文案 —— 取的是点明该情形的那一段，且留得足够长，
-不至于把仅仅提到某个上限或某个数字的句子也认领走。它们都不试图扛住一次改写：
-若改写后仍保留那一段，分类照旧；若把它改没了，失败就退回它原先所走的那条路。
-究竟是哪一种，只会在现场暴露，不会在测试里暴露。
+每一条模式都取自实测文案，且留得足够长，不至于把仅仅提到某个上限或某个数字的句子
+也认领走。**当同一情形被实测到不止一次时，模式锚定在这些负载的共同部分**，
+而不是其中任何一份的片段（决策 044）：第一版声明落地六天后，kimi 改写了消息，
+一次编辑就打断了它的两个片段，把额度耗尽重新送回 auth 那条路；因此 kimi 现在声明
+四个锚点，分散在情形描述与补救指引两处。pi 只有一份实测负载，在第二份被捕获之前
+保持单一片段。若一次改写打断了全部锚点，失败仍会退回它原先所走的那条路；
+究竟是哪一种，只会在现场暴露，不会在测试里暴露。它会落到哪里，取决于排在后面的
+`auth` 模式有多宽——这正是要把那一条写窄的理由：kimi 的是它给所有消息都加的通配前缀
+`Authentication required`，因此一条失效的 `rate-limit` 模式会把额度耗尽直接送去拆除；
+而 pi 的是具体的 `credentials_not_configured`，同样的失效只会让 `kind` 缺席而已。
 尚未实测过限流负载的 Adapter（今天是 codex、opencode、claude-code）干脆不声明
 `rate-limit` 模式：`kind` 缺席是诚实的，猜一个则不是。`auth` 变成 `UnauthenticatedError`；
 `rate-limit`、`context` 与 `internal` 把 `EngineOperationError.kind` 分别设为

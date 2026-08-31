@@ -198,20 +198,31 @@ describe('AcpConnection over the mock agent', () => {
     a.release();
   });
 
-  it('env hygiene: mock refuses when a CLAUDE* marker leaks through', async () => {
-    // The fixture refuses initialize when it sees the marker var. Core's
-    // scrub must remove it even though it is set in this test's env.
-    process.env['CLAUDE_SESSION_TEST_MARKER'] = 'leaky';
+  it('env hygiene: the adapter declares the marker, and the spawn removes it', async () => {
+    // The fixture refuses initialize when it sees the marker var. Core scrubs
+    // nothing of its own (decision 045), so what must remove it is the pattern
+    // this adapter declares — which is why the adapter carries one here and
+    // why the case below, without it, must fail.
+    process.env['MOCKAGENT_SESSION_TEST_MARKER'] = 'leaky';
     try {
       const manager = track(new ProcessManager());
-      const a = await manager.acquire(mockAdapter({ MOCK_REFUSE_ENV: 'CLAUDE_SESSION_TEST_MARKER' }), {
-        cwd: tmp('runskein-t-'),
-      });
+      const refusing = mockAdapter({ MOCK_REFUSE_ENV: 'MOCKAGENT_SESSION_TEST_MARKER' });
+      const a = await manager.acquire(
+        { ...refusing, envScrubExtra: [/^MOCKAGENT_SESSION_/] },
+        { cwd: tmp('runskein-t-') },
+      );
       // Reaching here proves the marker was scrubbed before spawn.
       expect(a.connection.initializeResult?.protocolVersion).toBe(1);
       a.release();
+
+      // The other half: an undeclared marker reaches the child, which is the
+      // narrowing decision 045 chose. Without this, the case above would still
+      // pass if an engine name were written back into core's list.
+      await expect(
+        manager.acquire({ ...refusing, id: 'mock-undeclared' }, { cwd: tmp('runskein-t-') }),
+      ).rejects.toThrow(/active session/);
     } finally {
-      delete process.env['CLAUDE_SESSION_TEST_MARKER'];
+      delete process.env['MOCKAGENT_SESSION_TEST_MARKER'];
     }
   });
 });

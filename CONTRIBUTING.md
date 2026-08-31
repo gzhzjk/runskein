@@ -52,8 +52,13 @@ The probe writes `docs/conformance/matrix.json`, which holds the provider
 configuration of the machine that ran it, and per-engine `*.raw.json` dumps full
 of that machine's temporary paths. The stability runs (`st:conc`, `st:cwd`,
 `st:quota`, …) write `docs/conformance/st-*.json` the same way. Commit
-`adapters/<id>/conformance.json` and leave all of those out of the pull request
-— they describe your machine, not the engine.
+`adapters/<id>/conformance.json` and leave all of those out of the pull request.
+
+That record is your engine's row from the same probe with the machine taken out
+of it: the probe writes it projected, dropping each config option's values and
+the engine's reply text, and keeping what the option _is_ and how many settings
+it offers. Run the probe and commit what it produced — it is not a summary to
+write by hand.
 
 Found a security problem? Do not open an issue — see
 [SECURITY.md](SECURITY.md).
@@ -109,8 +114,8 @@ should be written as if it were the other.
 
 **Published documents are bilingual.**
 [`docs/published-documents.json`](docs/published-documents.json) lists them,
-and each English source has a Chinese `*.zh-CN.md` peer whose frontmatter
-records the source's hash. When the English changes, translate it and then
+and each English source has a Chinese `*.zh-CN.md` peer whose opening HTML
+comment records the source's hash. When the English changes, translate it and then
 refresh the hash — never the hash alone. Both sides land in the same commit;
 `pnpm quality` fails a commit that moves only one, by design.
 

@@ -27,8 +27,10 @@ import type {
   Usage,
 } from '@runskein/core';
 
-type TextBlock = Extract<ContentBlock, { type: 'text' }>;
-type NonTextBlock = Exclude<ContentBlock, { type: 'text' }>;
+// Exported because `PresentationEvent` carries them in its public shape: a
+// consumer reading `block: Readonly<TextBlock>` has to be able to name it.
+export type TextBlock = Extract<ContentBlock, { type: 'text' }>;
+export type NonTextBlock = Exclude<ContentBlock, { type: 'text' }>;
 
 /** Content block from a future ACP version: object with an unknown string `type`. */
 export type UnknownContentBlock = Readonly<Record<string, unknown>> & {

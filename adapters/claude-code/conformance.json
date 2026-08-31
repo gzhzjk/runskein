@@ -3,20 +3,17 @@
   "ok": true,
   "protocolVersion": 1,
   "agentInfo": {
-    "name": "@zed-industries/claude-code-acp",
-    "title": "Claude Code",
-    "version": "0.16.2"
+    "name": "@agentclientprotocol/claude-agent-acp",
+    "title": "Claude Agent",
+    "version": "0.70.0"
   },
-  "authMethods": [
-    {
-      "description": "Run `claude /login` in the terminal",
-      "name": "Log in with Claude Code",
-      "id": "claude-login"
-    }
-  ],
+  "authMethods": [],
   "capabilities": {
     "loadSession": true,
     "session": {
+      "additionalDirectories": true,
+      "close": true,
+      "delete": true,
       "fork": true,
       "list": true,
       "resume": true
@@ -29,14 +26,18 @@
       "http": true,
       "sse": true
     },
-    "providers": false
+    "providers": true
   },
   "modes": {
     "current": "default",
     "available": [
       {
+        "id": "auto",
+        "name": "Auto"
+      },
+      {
         "id": "default",
-        "name": "Default"
+        "name": "Manual"
       },
       {
         "id": "acceptEdits",
@@ -56,45 +57,71 @@
       }
     ]
   },
-  "models": {
-    "current": "default",
-    "available": [
-      {
-        "id": "default",
-        "name": "Default (recommended)"
-      },
-      {
-        "id": "sonnet",
-        "name": "Sonnet"
-      },
-      {
-        "id": "haiku",
-        "name": "Haiku"
-      }
-    ]
-  },
-  "configOptions": [],
+  "models": null,
+  "configOptions": [
+    {
+      "id": "mode",
+      "name": "Mode",
+      "category": "mode",
+      "type": "select",
+      "optionCount": 6
+    },
+    {
+      "id": "model",
+      "name": "Model",
+      "category": "model",
+      "type": "select",
+      "optionCount": 5
+    },
+    {
+      "id": "effort",
+      "name": "Effort",
+      "category": "thought_level",
+      "type": "select",
+      "optionCount": 6
+    },
+    {
+      "id": "fast",
+      "name": "Fast mode",
+      "category": "model_config",
+      "type": "select",
+      "optionCount": 2
+    },
+    {
+      "id": "agent",
+      "name": "Agent",
+      "category": null,
+      "type": "select",
+      "optionCount": 19
+    }
+  ],
   "prompt": {
     "stopReason": "end_turn",
     "updateKinds": {
-      "available_commands_update": 1,
-      "agent_message_chunk": 2
+      "available_commands_update": 2,
+      "usage_update": 4,
+      "agent_message_chunk": 3
     },
-    "sawUsage": false,
+    "sawUsage": true,
     "permissionRequests": 0,
-    "replyText": "OK",
-    "durationMs": 2702
+    "durationMs": 3572
   },
   "usage": {
-    "ok": false,
-    "source": "none",
-    "fields": [],
-    "semantics": "cumulative"
+    "ok": true,
+    "source": "prompt_response_meta",
+    "fields": [
+      "input",
+      "output",
+      "total",
+      "cacheRead",
+      "cacheCreation"
+    ],
+    "semantics": "per-turn"
   },
   "commandExecution": {
-    "ok": false,
+    "ok": true,
     "usedClientTerminal": false,
-    "detail": "marker not returned (stopReason end_turn)"
+    "detail": "read the marker back (stopReason end_turn)"
   },
-  "close": "not-supported"
+  "close": "closed"
 }

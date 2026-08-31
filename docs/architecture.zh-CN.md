@@ -1,7 +1,7 @@
----
+<!--
 source: docs/architecture.md
-source-sha256: 6bbb694128f53746b5fa1cbcc5811b1fa80d1e4e9c2a71839904a2db78645245
----
+source-sha256: 707f2b09b5afe1e33f39c1a35b04afb9b087864deb61bef6de987374e1b9dc40
+-->
 
 # 架构
 
@@ -121,11 +121,16 @@ runskein 的 `sessionId` 在三条路径中始终不变，所以调用方只要�
 
 这里列出两项细节，是因为它们经过实测，而不是凭空设想：
 
-- **环境清洗。** 启动子进程时会移除 `CLAUDE*`、`CODEX_SANDBOX*` 与
-  `OPENCODE_SESSION*` 变量。否则，从 Claude Code Session 内启动 Engine
-  会泄漏标记，导致 `claude-code-acp` 以「active session」为由拒绝启动。
-- **孤儿进程回收。** 内置 Engine 中只有 claude-code 能在宿主的 `SIGKILL`
-  后继续存活，所以只有它在 watchdog 后方启动。
+- **环境清洗。** 启动子进程时会移除宿主的 Session 标记。否则，从 Claude Code
+  Session 内启动 Engine 会泄漏标记，导致 Claude Code 的 ACP 包装器以
+  「active session」为由拒绝启动。移除哪些标记，由各 Adapter 自己声明——
+  claude-code 声明 `CLAUDE*`，codex 声明 `CODEX_SANDBOX*`，opencode 声明
+  `OPENCODE_SESSION*`/`OPENCODE_CALLER*`，pi 声明它自己的——所以清洗只作用于
+  标记所属的那个 Engine，不作用于其他 Engine（决策 045）。
+- **孤儿进程回收。** 目前没有任何内置 Engine 能活过宿主的 `SIGKILL`——
+  claude-code 曾经可以，直到它的包装器被替换，而这正是这个「宿主死亡看门狗」
+  存在的原因。机制保留下来，由各 Adapter 用 `supervise` 声明：一个 Engine
+  会不会自己收拾干净，是它当前这个版本的性质，不是它永远的性质。
 
 从上层触达不了其中任何一项：宿主拿不到 pid、引用计数或 backoff timer。
 

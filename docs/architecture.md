@@ -120,12 +120,19 @@ starts counting only once no session holds the engine.
 
 Two details are here because they were measured, not imagined:
 
-- **Environment scrubbing.** Child processes are spawned with `CLAUDE*`,
-  `CODEX_SANDBOX*`, and `OPENCODE_SESSION*` variables removed. Launching an
-  engine from inside a Claude Code session otherwise leaks markers that make
-  `claude-code-acp` refuse to start with "active session".
-- **Orphan reaping.** Of the bundled engines only claude-code survives its
-  host's `SIGKILL`, so only it is launched behind a watchdog.
+- **Environment scrubbing.** Child processes are spawned with the host's
+  session markers removed. Launching an engine from inside a Claude Code
+  session otherwise leaks markers that make the Claude Code ACP wrapper refuse
+  to start with "active session". Which markers go is each adapter's own
+  declaration — `CLAUDE*` by claude-code, `CODEX_SANDBOX*` by codex,
+  `OPENCODE_SESSION*`/`OPENCODE_CALLER*` by opencode, its own by pi — so the
+  scrub applies to the engine whose marker it is and not to the others
+  (decision 045).
+- **Orphan reaping.** No bundled engine currently outlives its host's
+  `SIGKILL` — claude-code did until its wrapper was replaced, which is why the
+  parent-death watchdog exists at all. The mechanism stays, declared per adapter
+  with `supervise`, because whether an engine cleans itself up is a property of
+  that engine's current release and not a permanent fact about it.
 
 None of this is reachable from above: a host has no pids, no reference counts,
 and no backoff timers.

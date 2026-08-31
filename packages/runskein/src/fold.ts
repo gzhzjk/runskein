@@ -28,6 +28,8 @@ export type {
   DiffCoverageJudge,
   ToolRowField,
   FoldedToolCallContent,
+  TextBlock,
+  NonTextBlock,
   UnknownContentBlock,
   UnknownToolCallContent,
   PlanSnapshot,

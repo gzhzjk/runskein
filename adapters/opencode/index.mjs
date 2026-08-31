@@ -20,6 +20,12 @@ export default {
   specVersion: 1,
   id: 'opencode',
   launch: { command: 'opencode', args: ['acp'], startTimeoutMs: 30_000 },
+  // opencode identifies its own session and its caller in the environment it
+  // passes down. The patterns are anchored on those two names alone:
+  // `OPENCODE_CONFIG` and `OPENCODE_CONFIG_CONTENT` are configuration a host
+  // deliberately sets — the live suite passes permissions that way — and
+  // scrubbing them would silently discard it.
+  envScrubExtra: [/^OPENCODE_(SESSION|CALLER)/],
   errorPatterns: [{ cause: 'auth', match: 'Authentication required' }],
   /**
    * opencode reports per-turn token accounting on the prompt response's

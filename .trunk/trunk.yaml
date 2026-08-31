@@ -48,9 +48,11 @@ lint:
       paths: [adapters/pi/shim.mjs]
     # Recorded probe output. The probe — and, for the published projection,
     # scripts/project-conformance-matrix.mjs — writes these with
-    # JSON.stringify(…, 2); reformatting them makes the committed measurement
-    # differ byte-wise from what the next run produces, so a real capability
-    # change would arrive buried in a whole-file reformat.
+    # JSON.stringify(…, 2) and a trailing newline; reformatting them makes the
+    # committed measurement differ byte-wise from what the next run produces, so
+    # a real capability change would arrive buried in a whole-file reformat.
+    # packages/conformance/test/adapterRecord.test.ts compares an adapter record
+    # against that exact serialisation, so a reformat here fails there.
     - linters: [prettier]
       paths:
         - docs/conformance/**

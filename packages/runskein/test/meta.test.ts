@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { Hub, builtinAdapters, createHub, policies, jsonlStore } from '../src/index.js';
 import { createDiffCoverageJudge, createFolder } from '../src/fold.js';
-import { validateAdapter } from '@runskein/core/internal';
+import { scrubEnv, validateAdapter } from '@runskein/core/internal';
 import type { EngineAdapter } from '@runskein/core';
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync } from 'node:fs';
@@ -29,6 +29,52 @@ describe('runskein meta-package', () => {
       // The shipped adapters must clear the same zod gate discovery enforces.
       expect(() => validateAdapter(adapter)).not.toThrow();
     }
+  });
+
+  // Decision 045 moved the env scrub out of core and into the adapters, so
+  // this is where "no marker was lost on the way" is now provable. Core's list
+  // is empty; if a bundled adapter drops its declaration, nothing else fails.
+  describe('each engine declares the session markers it leaves behind', () => {
+    /** Scrub the name with the named adapter's own patterns only. */
+    const scrubbedFor = (id: string, name: string): boolean => {
+      const adapter = builtinAdapters.find((a) => a.id === id);
+      expect(adapter).toBeDefined();
+      return !Object.hasOwn(scrubEnv({ [name]: 'v' }, adapter?.envScrubExtra ?? []), name);
+    };
+
+    // Every marker core used to hold, attributed to the engine that leaves it.
+    it.each([
+      ['claude-code', 'CLAUDE_SESSION_ID'],
+      ['claude-code', 'CLAUDECODE'],
+      ['codex', 'CODEX_SANDBOX_MODE'],
+      ['opencode', 'OPENCODE_SESSION'],
+      ['opencode', 'OPENCODE_CALLER'],
+      ['pi', 'PI_CODING_AGENT'],
+      ['pi', 'PI_SESSION_ID'],
+    ])('%s scrubs %s', (id, name) => {
+      expect(scrubbedFor(id, name)).toBe(true);
+    });
+
+    // The patterns are anchored, and these are what the anchoring is for: a
+    // variable a host deliberately sets, close enough in name to be caught by
+    // a lazier pattern. `OPENCODE_CONFIG_CONTENT` is how the live suite hands
+    // opencode its permission settings, and `PI_CODING_AGENT_DIR` is the
+    // user's pi configuration directory.
+    it.each([
+      ['claude-code', 'MY_CLAUDE_KEY'],
+      ['codex', 'CODEX_HOME'],
+      ['opencode', 'OPENCODE_CONFIG_CONTENT'],
+      ['pi', 'PI_CODING_AGENT_DIR'],
+    ])('%s spares %s', (id, name) => {
+      expect(scrubbedFor(id, name)).toBe(false);
+    });
+
+    // kimi declares nothing, and that is the honest entry: no kimi session
+    // marker has been measured, and a guessed pattern would scrub a variable
+    // no one has seen.
+    it('kimi declares no marker, because none was measured', () => {
+      expect(builtinAdapters.find((a) => a.id === 'kimi')?.envScrubExtra).toBeUndefined();
+    });
   });
 
   // What `createHub`'s note says, pinned against what it does. The note used to

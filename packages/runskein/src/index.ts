@@ -124,6 +124,8 @@ export type {
   EngineErrorKind,
   EngineErrorPattern,
   EngineAdapter,
+  UsageMapping,
+  UsageTokenKey,
   HubOptions,
   SessionOpts,
   Unsubscribe,

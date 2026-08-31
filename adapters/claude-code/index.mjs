@@ -1,12 +1,15 @@
 /**
  * @runskein/adapter-claude-code — declarative adapter.
  *
- * Launches the Zed ACP wrapper for Claude Code via npx (shim-free: the
- * wrapper IS an ACP server). Swapping to an official ACP entry point, if one
- * appears, is a one-line change here.
+ * Launches Anthropic's ACP wrapper for Claude Code via npx (shim-free: the
+ * wrapper IS an ACP server). It was `@zed-industries/claude-code-acp` until
+ * that package was deprecated with a rename notice pointing here.
  *
- * The model list is discovered from session/new's `models` and written with
- * session/set_model, so no static configHints are needed here.
+ * Model choice is discovered rather than declared, so no static configHints
+ * are needed — but where it is discovered moved with the rename: 0.16 listed
+ * models on `session/new`, and this wrapper publishes them as a `model`
+ * config option instead. Core reads both, and decision 009 makes the config
+ * option win where an engine publishes both.
  */
 import { execFile } from 'node:child_process';
 
@@ -26,36 +29,77 @@ export default {
   id: 'claude-code',
   launch: {
     command: 'npx',
-    args: ['-y', '@zed-industries/claude-code-acp'],
+    args: ['-y', '@agentclientprotocol/claude-agent-acp'],
     // npx cold-start downloads the wrapper; be generous.
     startTimeoutMs: 120_000,
   },
-  // Measured: this wrapper does not exit when its stdin closes, so a host that
-  // dies uncleanly leaves it running forever — every live run of the test suite
-  // leaked exactly one. The watchdog ties its lifetime back to the host's. The
-  // other three engines exit on their own and are spawned without it.
-  supervise: true,
-  // Thinking depth reaches this engine only at session creation. The wrapper
-  // reads `session/new`'s `_meta.claudeCode.options` once, inside its own
-  // session construction, and nothing afterwards changes what it read — so
-  // runskein reports this as settable at creation and refuses a runtime write
-  // rather than sending one that would be accepted and ignored.
+  // Claude Code marks its own session in the environment of everything it
+  // runs, and this wrapper reads those markers as "you are already in a
+  // session" and refuses to start — the measured failure the whole env scrub
+  // exists for. One prefix covers both forms: the `CLAUDE_*` session
+  // variables and the bare `CLAUDECODE` flag. Anchored, so a consumer's own
+  // `MY_CLAUDE_KEY` survives.
+  envScrubExtra: [/^CLAUDE/],
+  // No `supervise`, and that is a change: the wrapper this adapter used to
+  // launch did not exit when its stdin closed, so every host that died
+  // uncleanly leaked one. This one cleans itself up. Measured with ST-ORPH-05
+  // and the watchdog off, on the same machine minutes apart: the whole tree was
+  // gone 505 ms after a SIGKILLed host, where the old wrapper left two
+  // processes alive past the case's 5 s bound. Turning the flag back on is
+  // harmless (101 ms), so if a later release regresses, restore it here.
   //
-  // The budgets are this adapter's knowledge, not core's: `high` means a token
-  // count here and something else on every other engine.
-  //
-  // This rides a wrapper contract, not ACP. It can stop working on any release
-  // of @zed-industries/claude-code-acp without an error — the setting would
-  // simply return to its default — so it is guarded by a live case that
-  // asserts thinking actually increased, not by this declaration alone.
-  creationConfig: {
-    reasoning: {
-      meta: ['claudeCode', 'options', 'maxThinkingTokens'],
-      values: { low: 4000, medium: 10000, high: 32000 },
-      description: 'Thinking budget, applied when the session is created',
-    },
-  },
+  // No `creationConfig` either. Thinking depth used to reach this engine only
+  // through the wrapper's private `_meta.claudeCode.options.maxThinkingTokens`,
+  // read once during session construction, which is why it was declared
+  // creation-only. This wrapper publishes a `thought_level` config option of
+  // its own, and the old declaration actively blocked it: a runtime write was
+  // refused as `config:reasoning@runtime` while the creation-time path was
+  // accepted and did nothing. Removing it is what makes the engine's own option
+  // reachable: CF-06 warns with the declaration in place (both levels refused)
+  // and passes without it (both accepted).
   errorPatterns: [{ cause: 'auth', match: 'Authentication required' }],
+  /**
+   * claude-code reports per-turn token accounting on the prompt response's
+   * top-level `usage` object, the same carrier opencode uses.
+   *
+   * `per-turn` is measured, not inferred, and the measurement had to be built
+   * to survive one trap. Across four turns of one session, alternating a terse
+   * answer with a verbose one, `outputTokens` went 5 → 241 → 5 → 5: it falls
+   * back, which a cumulative counter cannot do. But `totalTokens` rose the
+   * whole way — 46233 → 48292 → 48317 → 48342 — because `cachedReadTokens`
+   * grows with the conversation. Reading only the total would have concluded
+   * `cumulative` and then misreported every turn. The arithmetic settles it:
+   * `2 + 5 + 24462 + 21764 = 46233` is that turn's four fields, not a session
+   * running total.
+   *
+   * Only two aliases are declared, because the declaration is additive:
+   * `inputTokens`, `outputTokens` and `totalTokens` are already built-in alias
+   * names, and restating one creates a second place to keep it right. The two
+   * cache names are not built in.
+   *
+   * There is no `thought` alias and there will not be one. The wrapper's
+   * `sessionUsage()` returns exactly five fields, and Anthropic bills extended
+   * thinking inside `output_tokens` without breaking it out — so `usage.thought`
+   * stays undefined for this engine no matter what is declared here.
+   *
+   * What stays unfolded, deliberately. The `{used, size}` context gauge on
+   * `usage_update`, because fabricating a window gauge from token counts would
+   * be invention (decision 024). And `_meta._claude/rateLimit`, which carries a
+   * real `resetsAt` — the first any bundled engine has reported — but arrives on
+   * a notification under a key naming one vendor, where `TurnResult.quota` reads
+   * the prompt response and is documented not to build a cross-engine
+   * vocabulary from a single example. A host reads it verbatim from
+   * `on('update')` or the transcript meanwhile.
+   *
+   * Cost needs no declaration at all: `session.usage()` already folds
+   * `{cost, currency}` from any engine's `usage_update`, and does so for this
+   * engine today.
+   */
+  usage: {
+    source: { kind: 'prompt_response_meta', path: ['usage'] },
+    tokens: { cacheRead: ['cachedReadTokens'], cacheCreation: ['cachedWriteTokens'] },
+    semantics: 'per-turn',
+  },
   /**
    * Probe whether the underlying Claude Code CLI is installed.
    * @returns installed flag, version, and a login hint when unavailable.
@@ -65,8 +109,8 @@ export default {
     // are what matter, not npx's.
     const version = await tryVersion('claude', ['--version']);
     if (version === undefined) {
-      return { installed: false, loginHint: 'install Claude Code, then: claude /login' };
+      return { installed: false, loginHint: 'install Claude Code, then: claude auth login' };
     }
-    return { installed: true, version, loginHint: 'claude /login' };
+    return { installed: true, version, loginHint: 'claude auth login' };
   },
 };

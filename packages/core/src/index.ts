@@ -90,6 +90,10 @@ export type {
   DetectResult,
   EngineErrorPattern,
   EngineAdapter,
+  // `EngineAdapter.usage` is part of the frozen surface and an adapter author
+  // has to be able to name its type, not only build the object structurally.
+  UsageMapping,
+  UsageTokenKey,
   HubOptions,
   SessionOpts,
   Unsubscribe,

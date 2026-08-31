@@ -54,6 +54,15 @@ export interface CoreGateOptions {
   /** Extra adapter env for the env-hygiene case only (mock toggles). */
   envHygieneEnv?: Record<string, string>;
   /**
+   * The scrub the adapter under test declares for the env-hygiene case — the
+   * marker a scripted agent refuses on. A real engine needs nothing here: its
+   * own adapter already declares its markers (decision 045). A fixture agent
+   * has no adapter of its own, so the case hands it one, which is also what
+   * keeps the case honest — core scrubs nothing on its own, so a case that
+   * passed without this would be proving something else.
+   */
+  envHygieneScrub?: RegExp[];
+  /**
    * Pinned live config applied at every session creation — the live branch
    * passes the engine's adapter live.config.json record. When set and the
    * engine rejects it with a ConfigError, the case skips rather than fails:
@@ -76,6 +85,17 @@ function withEnv(adapter: EngineAdapter, extra: Record<string, string> | undefin
     ...adapter,
     launch: { ...adapter.launch, env: { ...adapter.launch.env, ...extra } },
   };
+}
+
+/**
+ * Give an adapter the scrub patterns a fixture agent's own package would carry.
+ * @param adapter - the adapter to gate.
+ * @param extra - patterns to declare, or undefined to leave the adapter alone.
+ * @returns the adapter, or a copy declaring the patterns.
+ */
+function withScrub(adapter: EngineAdapter, extra: RegExp[] | undefined): EngineAdapter {
+  if (!extra) return adapter;
+  return { ...adapter, envScrubExtra: [...(adapter.envScrubExtra ?? []), ...extra] };
 }
 
 /**
@@ -202,11 +222,14 @@ export function coreGateSuite(adapter: EngineAdapter, opts: CoreGateOptions = {}
       'env hygiene: a polluted host-agent environment does not break the spawn',
       async (ctx) => {
         // Simulates running inside a parent agent session: leaked CLAUDE*
-        // markers were measured to make claude-code-acp refuse to start.
+        // markers were measured to make the Claude Code ACP wrapper refuse to
+        // start. What is proved is that core applies the scrub the adapter
+        // being spawned declares — a real engine declares its own, and a
+        // scripted one is handed the same thing through `envHygieneScrub`.
         process.env['CLAUDE_GATE_MARKER'] = 'leaky-parent-session';
         process.env['CODEX_SANDBOX_GATE'] = '1';
         try {
-          const h = hub(withEnv(adapter, opts.envHygieneEnv));
+          const h = hub(withScrub(withEnv(adapter, opts.envHygieneEnv), opts.envHygieneScrub));
           const s = await gateSession(h, ctx, { cwd: cwd() });
           const result = await s.prompt(quickPrompt);
           expect(result.stopReason).toBe('end_turn');

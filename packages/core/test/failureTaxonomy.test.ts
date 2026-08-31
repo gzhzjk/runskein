@@ -276,29 +276,46 @@ describe('ST-ERR-03 — validated declarative pattern tables', () => {
   });
 
   /**
-   * What kimi returned on 2026-08-25 with the account's quota spent and its
-   * login perfectly valid. Replaying it pins the pattern against this recorded
-   * payload: loosening or dropping the rate-limit declaration turns the case
-   * red.
+   * Every spent-quota refusal kimi has actually returned, with the date it was
+   * captured. The account's login was valid on both occasions.
    *
-   * It cannot detect kimi rewording the message. What a rewording does depends
-   * on whether it keeps a matched fragment, and the two cases below pin both
-   * branches — neither is a failure the suite could notice on its own.
+   * A table rather than a constant because the second entry exists: the first
+   * declaration was written from the 2026-08-25 payload alone, and the
+   * 2026-08-31 rewording broke both of its fragments at once, sending a spent
+   * quota back down the auth path in production. The pattern is now anchored on
+   * what these share rather than on fragments of any one of them (decision
+   * 044), and the next field report should be a line here.
    */
-  const KIMI_QUOTA_SPENT =
-    "Authentication required: 403 You've reached your usage limit for this billing cycle. " +
-    'Your quota will be refreshed in the next cycle. To continue now, purchase extra usage ' +
-    'or upgrade your plan: https://www.kimi.com/membership/subscription?tab=quota';
+  const KIMI_QUOTA_SPENT: [captured: string, payload: string][] = [
+    [
+      '2026-08-25',
+      "Authentication required: 403 You've reached your usage limit for this billing cycle. " +
+        'Your quota will be refreshed in the next cycle. To continue now, purchase extra usage ' +
+        'or upgrade your plan: https://www.kimi.com/membership/subscription?tab=quota',
+    ],
+    [
+      '2026-08-31',
+      "Authentication required: 403 You've reached your weekly (7-day) usage limit. " +
+        'Your quota will reset when the current 7-day window ends. To continue now, purchase ' +
+        'extra usage or upgrade your plan: https://www.kimi.com/membership/subscription?tab=quota',
+    ],
+  ];
 
-  it('reads a spent kimi quota as rate-limit, not as a dead credential', () => {
+  it.each(KIMI_QUOTA_SPENT)(
+    'reads the %s spent kimi quota as rate-limit, not as a dead credential',
+    (_captured, payload) => {
+      const patterns = compileErrorPatterns(kimi.errorPatterns);
+      expect(classifyEngineFailure(patterns, new Error(payload))).toBe('rate-limit');
+    },
+  );
+
+  it('still reads a bare credential failure as auth, and claims nothing else', () => {
     const patterns = compileErrorPatterns(kimi.errorPatterns);
-    expect(classifyEngineFailure(patterns, new Error(KIMI_QUOTA_SPENT))).toBe('rate-limit');
-    // A real credential failure still reaches the auth pattern behind it.
     expect(classifyEngineFailure(patterns, new Error('Authentication required'))).toBe('auth');
-    // And the rate-limit pattern claims nothing it was not measured against.
-    // The last one is the guard on the pattern's width: `usage limit` alone
-    // reads a sentence about a configured limit as a refusal, so loosening the
-    // declaration toward the general turns this red.
+    // The rate-limit pattern claims nothing it was not measured against. The
+    // last one is the guard on the pattern's width, and it is why `usage limit`
+    // is never matched on its own: it also names a *configured* limit, which is
+    // not a refusal. Widening the declaration toward the general turns this red.
     for (const other of [
       'context window exceeded',
       'engine unavailable',
@@ -309,31 +326,85 @@ describe('ST-ERR-03 — validated declarative pattern tables', () => {
     }
   });
 
-  it('depends on declaration order: the auth pattern alone claims that message', () => {
-    // The negative half of the case above. kimi prefixes an upstream refusal
-    // with "Authentication required:" whatever its cause, so both patterns
-    // match this message and only the order keeps the quota case out of the
-    // auth path — which invalidates the login and retires the engine.
+  it('depends on declaration order: the auth pattern alone claims those messages', () => {
+    // The negative half. kimi prefixes an upstream refusal with
+    // "Authentication required:" whatever its cause, so both patterns match a
+    // quota message and only the order keeps it out of the auth path — which
+    // invalidates the login and retires the engine.
     const authOnly = compileErrorPatterns([{ cause: 'auth', match: 'Authentication required' }]);
-    expect(classifyEngineFailure(authOnly, new Error(KIMI_QUOTA_SPENT))).toBe('auth');
+    for (const [, payload] of KIMI_QUOTA_SPENT) {
+      expect(classifyEngineFailure(authOnly, new Error(payload))).toBe('auth');
+    }
   });
 
-  it('keeps classifying a reworded quota message that still names the condition', () => {
+  it('survives a rewording that keeps any single anchor', () => {
     const patterns = compileErrorPatterns(kimi.errorPatterns);
-    // A plausible rewrite of the payload above, keeping one of the two
-    // statements kimi makes about the condition. The pattern matches that
-    // fragment, not the sentence around it, so this still reads as rate-limit.
-    const reworded =
-      'Authentication required: 403 This account has reached your usage limit; try again next cycle.';
-    expect(classifyEngineFailure(patterns, new Error(reworded))).toBe('rate-limit');
+    // One line per anchor, each carrying that anchor and no other, so a
+    // declaration that quietly loses one of the four turns exactly one red
+    // rather than hiding behind the three that still match.
+    const perAnchor = [
+      'Authentication required: 403 This account has reached your usage limit; try later.',
+      'Authentication required: 403 Out of credit. Your quota will reset shortly.',
+      'Authentication required: 403 Out of credit — purchase extra usage to continue.',
+      'Authentication required: 403 See https://www.kimi.com/membership/subscription?tab=quota',
+    ];
+    for (const message of perAnchor) {
+      expect(classifyEngineFailure(patterns, new Error(message))).toBe('rate-limit');
+    }
   });
 
-  it('falls back to auth when a rewording drops both fragments', () => {
+  it('falls back to auth when a rewording drops every anchor', () => {
     const patterns = compileErrorPatterns(kimi.errorPatterns);
-    // The documented other branch, and the reason a rewording is a field
-    // report: nothing here is wrong, and the spent quota is a teardown again.
-    const reworded = 'Authentication required: 403 Monthly allowance exhausted; purchase more.';
+    // Still the documented other branch: four anchors make this less likely,
+    // not impossible, and no hermetic suite can foresee the wording that does
+    // it. This is what a field report looks like before it is one.
+    const reworded = 'Authentication required: 403 Monthly allowance exhausted; buy more.';
     expect(classifyEngineFailure(patterns, new Error(reworded))).toBe('auth');
+  });
+
+  it('leaves everything standing when the same message is classified rate-limit', async () => {
+    // The mirror of the auth case above, and the assertion that was missing:
+    // decision 037 promised that a spent quota keeps the login, the session and
+    // the process, but only the *classification* was ever checked. Measured
+    // live against a real spent kimi quota on 2026-08-31, every line below was
+    // the opposite before the declaration was fixed — UnauthenticatedError, a
+    // failed session, an engine:unauthenticated event and a dead engine.
+    //
+    // The payload carries kimi's "Authentication required:" prefix on purpose:
+    // both patterns match it, so this also pins the declaration order.
+    const traceFile = join(mkdtempSync(join(tmpdir(), 'runskein-quota-trace-')), 'trace.log');
+    const quota = KIMI_QUOTA_SPENT[1]![1];
+    const base = failingAdapter(quota, kimi.errorPatterns);
+    const adapter: EngineAdapter = {
+      ...base,
+      launch: { ...base.launch, env: { MOCK_PROMPT_ERROR: quota, MOCK_TRACE_FILE: traceFile } },
+    };
+    const hub = makeHub({}, {}, [adapter]);
+    const events: string[] = [];
+    hub.on('engine:unauthenticated', ({ engineId }) => events.push(engineId));
+    const session = await hub.session({ engine: 'mock', cwd: tmp('runskein-quota-') });
+    expect(countSpawns(traceFile)).toBe(1);
+
+    const error = await session.prompt('trigger').catch((failure: unknown) => failure);
+
+    // UnauthenticatedError does not extend EngineOperationError, so this line
+    // alone says which of the two paths ran.
+    expect(error).toBeInstanceOf(EngineOperationError);
+    expect(error).toMatchObject({ operation: 'session/prompt', kind: 'rate-limit' });
+    // Nothing was torn down: no event, the login still stands, and a second
+    // session neither rejects nor needs a rescan to reach the same process.
+    expect(events).toEqual([]);
+    const entry = (await hub.engines()).find((engine) => engine.id === 'mock');
+    expect(entry).toBeDefined();
+    expect(entry?.authenticated).not.toBe(false);
+    const second = await hub.session({ engine: 'mock', cwd: tmp('runskein-quota-') });
+    expect(countSpawns(traceFile)).toBe(1);
+    // The first session is still usable — a throttled turn is not a crash, so
+    // it fails again the same way rather than rejecting as a dead session.
+    const again = await session.prompt('trigger again').catch((failure: unknown) => failure);
+    expect(again).toMatchObject({ kind: 'rate-limit' });
+    await second.close();
+    await session.close();
   });
 
   /**

@@ -113,6 +113,7 @@ coreGateSuite(fakePi({ FAKE_PI_TOOL: '1', FAKE_PI_ASK: '1' }), {
   // The fixture refuses to start when the marker leaks through, so a
   // regression in core's scrub fails this case instead of passing quietly.
   envHygieneEnv: { FAKE_PI_REFUSE_ENV: 'CLAUDE_GATE_MARKER' },
+  envHygieneScrub: [/^CLAUDE_GATE_MARKER$/],
   permission: {
     prompt: 'run something',
     rules: [{ tool: 'execute', pattern: '*', action: 'allow' }],

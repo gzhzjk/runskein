@@ -34,6 +34,10 @@ export default {
     // npx cold-start downloads the wrapper; be generous.
     startTimeoutMs: 120_000,
   },
+  // codex describes its sandbox to its children through `CODEX_SANDBOX*`. A
+  // runskein host started from inside a sandboxed codex would otherwise hand a
+  // fresh codex a sandbox description that was never true of it.
+  envScrubExtra: [/^CODEX_SANDBOX/],
   errorPatterns: [{ cause: 'auth', match: 'Authentication required' }],
   /**
    * codex reports token accounting on the prompt response's

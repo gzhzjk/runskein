@@ -22,6 +22,7 @@ import {
   type CompiledErrorPattern,
 } from './errorTaxonomy.js';
 import { EngineOperationError } from './errors.js';
+import { missingRuntimeAsset } from './process/spawn.js';
 import { USAGE_TOKEN_KEYS } from './transcript/event.js';
 import type { DetectResult, EngineAdapter, EngineErrorPattern, InvalidEngineInfo } from './types.js';
 
@@ -206,7 +207,7 @@ function resolveShim(adapter: EngineAdapter, dir: string | undefined): EngineAda
   if (dir !== undefined && relative(dir, shim).startsWith('..')) {
     throw new Error(`shim '${adapter.shim}' resolves outside the adapter directory`);
   }
-  if (!existsSync(shim)) throw new Error(`shim entry point not found: ${shim}`);
+  if (!existsSync(shim)) throw new Error(missingRuntimeAsset('shim entry point', shim));
   return { ...adapter, shim };
 }
 

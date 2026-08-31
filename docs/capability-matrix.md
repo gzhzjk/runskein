@@ -42,7 +42,7 @@ there is nothing to differentiate.
 | Prompt (turn promise) | Core                           | `s.prompt()` → `TurnResult`                        | ✅ ✅ ✅ ✅ ✅ · all `end_turn`                                                                                                                |
 | Cancel active turn    | Core                           | `s.cancel()`                                       | active prompt resolves `stopReason:'cancelled'`; queued prompts reject `CancelledError`; every bundled engine advertises `session/cancel` |
 | Streaming updates     | Core                           | `s.on('update')`                                   | ✅ ✅ ✅ ✅ ✅                                                                                                                                 |
-| Close session         | Core (API) / Negotiated (wire) | `s.close()`                                        | ✓ · ✓ · — · ✓ · ✓                                                                                                                         |
+| Close session         | Core (API) / Negotiated (wire) | `s.close()`                                        | ✓ · ✓ · ✓ · ✓ · ✓                                                                                                                         |
 | **Resume**            | **Emulated**                   | `hub.session({engine,cwd,resume})`, `s.resumeTier` | native `session/resume`: ✓ ✓ ✓ ✓ ✓                                                                                                        |
 | Load (history replay) | Negotiated (resume tier 2)     | internal                                           | `loadSession`: ✓ ✓ ✓ ✓ ✓                                                                                                                  |
 | Fork                  | Negotiated                     | `s.fork()`                                         | ✓ · ✓ · ✓ · — · ✓                                                                                                                         |
@@ -77,7 +77,7 @@ The RunSkein `sessionId` is stable across all three; `s.resumeTier:
 | Capability                         | Tier                                | API                                     | Measured                                                                                                                                        |
 | ---------------------------------- | ----------------------------------- | --------------------------------------- | -----------------------------------------------------------------------------------------------                                                 |
 | Text out (chunks)                  | Core                                | `update: agent_message_chunk`           | ✅×5                                                                                                                                             |
-| Thinking out                       | Core (pass-through)                 | `agent_thought_chunk`                   | opencode & kimi emit heavily; others model-dependent                                                                                            |
+| Thinking out                       | Core (pass-through)                 | `agent_thought_chunk`                   | streamed by opencode, kimi and codex; claude-code streams none at any thought level — see the note below                                        |
 | Tool calls (kind/status/locations) | Core (pass-through)                 | `tool_call` / `tool_call_update`        | ACP ToolKind: read/edit/execute/…                                                                                                               |
 | Diffs                              | Negotiated (pass-through)           | `ToolCallContent.diff`                  |                                                                                                                                                 |
 | Plan / todo stream                 | Negotiated (pass-through)           | `plan` / `plan_update` / `plan_removed` |                                                                                                                                                 |
@@ -99,11 +99,42 @@ capabilities each bundled engine advertised, at the version it was probed at.
 | ----------- | ---------------- | ------------- | ---- | ---- | ---- | ------ | ----------- | -------- | ------- | --------- | ----------- |
 | OpenCode    | 1.18.25          | ✓             | ✓    | ✓    | ✓    | —      | ✓           | ✓        | ✓       | ✗         | ✓           |
 | Kimi Code   | 0.38.0           | ✓             | ✓    | ✓    | ✓    | ✓      | ✓           | ✓        | ✓       | ✗         | ✗           |
-| Claude Code | 0.16.2           | ✓             | ✓    | ✓    | ✓    | —      | ✓           | ✓        | ✓       | ✗         | ✗           |
+| Claude Code | 0.70.0           | ✓             | ✓    | ✓    | ✓    | ✓      | ✓           | ✓        | ✓       | ✓         | ✓           |
 | Codex       | 1.7.0            | ✓             | ✓    | —    | ✓    | ✓      | ✓           | ✓        | ✗       | ✓         | ✓           |
 | pi          | 0.84.2 (shim 1)  | ✓             | ✓    | ✓    | ✗    | ✗      | ✗           | ✗        | ✗       | ✗         | ✓           |
 
 <!-- /generated:builtin-support -->
+
+**Thinking out, and what a raised thought level buys you.** Whether an engine
+_streams_ thinking and whether it _does_ more thinking are two different
+questions, and they have different answers per engine. Every engine except pi
+publishes a thought level, but only some let you watch the result — and a
+pinned model can narrow which levels it will actually take, which is why
+`hub.describe()` on your own machine beats this table:
+
+| Engine      | Publishes a thought level | Streams thinking text | Reports `usage.thought` | A raised level is visible as |
+| ----------- | ------------------------- | --------------------- | ----------------------- | ---------------------------- |
+| opencode    | yes                       | yes                   | yes                     | either                       |
+| kimi        | yes                       | yes                   | no                      | streamed text                |
+| codex       | yes                       | yes, but not always   | yes                     | thought tokens               |
+| claude-code | yes                       | no                    | no                      | nothing runskein surfaces    |
+| pi          | no                        | no                    | no                      | —                            |
+
+Provenance: the thought-token column is each engine's `usage.fields` in the
+matrix; whether an engine publishes a thought level was read from
+`hub.describe()` on 2026-08-31; the streaming column is the live run of the
+same day (cases CF-06, CF-10, PV-02) — except kimi's, which carries the
+matrix's own earlier measurement because that account's quota was spent, so no
+live turn could run.
+
+claude-code's ACP wrapper emits a thought chunk only when the thinking text is
+non-empty, and recent Claude models omit that text, so a turn that spent
+thousands of tokens thinking arrives as silence. **Do not read an absent
+`agent_thought_chunk` as "the model did not think."** The work is real — it is
+billed inside the turn's output tokens, which is where the live suite measures
+it (case CF-10) — but Anthropic does not break it out, so no `usage.thought`
+can ever reach you for this engine. A host that renders a thought pane should
+branch on the engine, not assume every engine fills it.
 
 **Token usage** means the probe read real token numbers off that engine's
 wire: the `usage.fields` list of its matrix entry is non-empty, so the numbers

@@ -104,8 +104,8 @@ What differs between engines is not the call but **when** a key can be written,
 and `describe()` says so for each option:
 
 ```ts
-const { configOptions } = await hub.describe('claude-code');
-configOptions.find((o) => o.id === 'reasoning')?.settable; // 'creation'
+const { configOptions } = await hub.describe(engineId);
+configOptions.find((o) => o.id === 'effort')?.settable; // undefined | 'creation'
 ```
 
 `settable: 'creation'` means the engine only accepts that setting while the
@@ -113,6 +113,17 @@ session is being built. `hub.session({ config })` carries it on the creation
 request, and a later `setConfig()` refuses it with `NotSupportedError` instead
 of sending a write the engine would ignore. No `settable` field means the normal
 case: writable at creation and at any time after.
+
+**No bundled engine reports `settable: 'creation'` today.** claude-code did,
+through an adapter declaration, until its wrapper began publishing a thought
+level of its own — a writable one, which the declaration was shadowing. Read
+`settable` anyway: it is what a third-party adapter uses, and what any engine
+can start reporting in its next release. That is also why the option ids above
+are the engine's own: claude-code's thought level is `effort` now, where the
+adapter's declaration had called it `reasoning`. The key you _write_ does not
+move — `config: { reasoning: 'high' }` still reaches whatever the engine calls
+it — but code that matches on an id from `describe()` is matching on the
+engine's vocabulary, not runskein's.
 
 Two things follow. If you want no per-engine branching at all, do all your
 configuration at creation — that path works the same on every engine. If you
@@ -198,9 +209,39 @@ their pipe closes are left behind — and runskein reclaims them itself: the nex
 run's first engine acquisition sweeps the ownership registry for processes its
 own hosts left behind, and a periodic sweep follows. The sweep is tied to
 acquisition rather than to startup on purpose, so a program that only inspects
-(`engines()`, `describe()`) never reaps anything. Of the bundled engines only
-claude-code survives its host's `SIGKILL`, which is why only it is launched
-behind a watchdog.
+(`engines()`, `describe()`) never reaps anything. No bundled engine currently
+outlives its host's `SIGKILL`; claude-code did until its wrapper was replaced,
+which is why the watchdog exists. Do not read that as a promise — an engine's
+next release can change it, which is why the sweep runs regardless.
+
+## Bundling runskein into one artifact
+
+Two files runskein ships are **spawned as processes**, not imported: pi's shim,
+and the parent-death watchdog that an adapter declaring `supervise` runs its
+engine through. Both are found relative to the module that needs them, so a
+bundler that flattens several packages into one file moves the code and leaves
+the files behind.
+
+Nothing about this is silent. A bundled hub reports it:
+
+```text
+pi  health: 'invalid'
+    shim entry point not found: /app/shim.mjs — this path is resolved from the
+    module's own location, so a bundler that flattens the package will move it…
+```
+
+and a supervised adapter fails its first session with an `EngineStartError`
+saying the same thing about the watchdog. The remedy is either:
+
+- **copy the runtime assets beside your artifact**, keeping the layout the
+  message names; or
+- **leave `runskein` external to the bundle** and let it resolve them inside
+  `node_modules`, which is what an unbundled install does.
+
+Everything else survives bundling. Four of the five built-in engines are
+launched by a command on `PATH` and carry no files of their own, so a bundle
+that loses pi keeps the rest — which is why the hub reports one invalid adapter
+rather than refusing to start.
 
 ## Testing your application without an engine
 

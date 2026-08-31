@@ -21,41 +21,40 @@ nine**:
 | `@runskein/adapter-pi`          |                                              |
 
 There is deliberately no compatibility matrix between them. `@runskein/core`
-0.1.0-alpha.24 goes with `@runskein/fold` 0.1.0-alpha.24 and nothing else —
-mixing versions is neither tested nor supported, and the meta-package pins its
-adapters to its own version so that the common case cannot get it wrong.
+0.1.0 goes with `@runskein/fold` 0.1.0 and nothing else — mixing versions is
+neither tested nor supported, and the meta-package pins its adapters to its own
+version so that the common case cannot get it wrong.
 
 `packages/cli` and `packages/conformance` are development tools and are not
 published. Clone the repository if you want them.
 
 ## What the number means
 
-Versions look like `0.1.0-alpha.24`. Two halves of that carry meaning:
+Versions look like `0.1.0`, and both halves carry meaning:
 
-- **`0.1.0` — pre-1.0.** The v1 _surface_ is frozen and specified in
+- **`0.x` — pre-1.0.** The v1 _surface_ is frozen and specified in
   [the API specification](engine-adapter-api.md); the implementation of it is a
   preview. While the version stays `0.x`, a release may change behaviour a
   consumer depends on.
-- **`alpha.24` — the release counter.** It increments by one per release. There
-  is no parallel patch line and there are no backports: **the newest alpha is
-  the only supported version.** A fix ships in the next one.
+- **The last number is the release counter.** It increments by one per release.
+  There is no parallel patch line and there are no backports: **the newest
+  release is the only supported version.** A fix ships in the next one.
 
-That is the honest shape of a preview, and it is why the install below cannot
-drop its tag.
+Every version before `0.1.0` was a prerelease — `0.1.0-alpha.25`,
+`0.1.0-beta.1` — reachable only under a tag of its own. Those tags still
+resolve, and nothing behind them is maintained.
 
 ## Installing
 
-`npm install runskein@alpha`. The `@alpha` is not optional — a bare package name
-resolves the `latest` tag, which does not point at a release. The
-[README](../README.md#install) has the detail, including what happens if you
-drop it.
+`npm install runskein`. No tag: `0.1.1` is published under `latest` on all nine
+packages.
 
 Node.js 22 or newer, ESM only.
 
 ## Where to see what changed
 
 - **Per release** — the GitHub Release attached to that version's tag. Tags are
-  the bare version string, no `v` prefix: `0.1.0-alpha.24`.
+  the bare version string, no `v` prefix: `0.1.0`.
 - **Changes to the specified surface** — [`docs/decisions/`](decisions/). Every
   change to the frozen v1 surface carries a numbered record saying what was
   decided and why. A release note names the records it ships.

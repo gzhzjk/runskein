@@ -4,6 +4,13 @@
  * translation. A translation declares the SHA-256 of the English source so an
  * English edit cannot leave a plausible-looking but stale Chinese document.
  *
+ * The declaration is an HTML comment rather than YAML frontmatter, and has to
+ * be the first thing in the file. GitHub renders frontmatter as a two-row
+ * metadata table above the page, so on `README.zh-CN.md` the first thing a
+ * Chinese reader met was a path and a hash meant for this script. A comment is
+ * invisible to every Markdown renderer and readable in the raw file, which is
+ * where the person refreshing it looks.
+ *
  * Usage: `pnpm docs:translations:check [--release <version>]`.
  */
 import { createHash } from 'node:crypto';
@@ -36,10 +43,14 @@ function verifyPair(source, translation) {
 
   const english = readFileSync(sourcePath, 'utf8');
   const chinese = readFileSync(translationPath, 'utf8');
-  const declaredSource = /^---\nsource: (.+)\nsource-sha256: ([a-f0-9]{64})\n---\n/m.exec(chinese);
+  // Anchored at the start of the file, not merely present: a declaration
+  // further down would still be rendered by nothing, but it would no longer be
+  // where the next person looks, and the Chinese-text check below reads the
+  // rest of the file by slicing this match off the front.
+  const declaredSource = /^<!--\nsource: (.+)\nsource-sha256: ([a-f0-9]{64})\n-->\n/.exec(chinese);
   const failures = [];
   if (!declaredSource) {
-    failures.push(`${translation} needs source/source-sha256 frontmatter`);
+    failures.push(`${translation} must open with an HTML comment declaring source and source-sha256`);
     return failures;
   }
   if (declaredSource[1] !== source)

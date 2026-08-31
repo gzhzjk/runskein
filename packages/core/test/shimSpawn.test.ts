@@ -13,7 +13,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { Registry } from '../src/registry.js';
-import { spawnEngine } from '../src/process/spawn.js';
+import { missingRuntimeAsset, spawnEngine } from '../src/process/spawn.js';
 import type { EngineAdapter } from '../src/types.js';
 
 /**
@@ -153,5 +153,64 @@ describe('engine launch environment', () => {
       if (previous === undefined) delete process.env['RUNSKEIN_LAUNCH_CASE'];
       else process.env['RUNSKEIN_LAUNCH_CASE'] = previous;
     }
+  });
+});
+
+describe('a runtime asset that has to be spawned and is not there', () => {
+  // Both of these resolve their path from the module's own location, so a
+  // bundler that flattens the package moves them without moving the file.
+  // Measured on a real bundle of `runskein`: pi's shim was looked for beside
+  // the consumer's artifact, and a supervised adapter died on node's own
+  // "Cannot find module" — arriving through the 2000-character stderr tail with
+  // its beginning sliced off, so the caller read a stack fragment starting
+  // mid-word at `odules/cjs/loader`.
+
+  it('says what is missing, where it looked, why, and what to do', () => {
+    const message = missingRuntimeAsset('the widget', '/app/widget.mjs');
+    expect(message).toContain('the widget');
+    expect(message).toContain('/app/widget.mjs');
+    // The cause and the remedy are the halves a reader cannot supply
+    // themselves; a message naming only the path reads as a broken install.
+    expect(message).toContain('bundler');
+    expect(message).toMatch(/copy|external/i);
+  });
+
+  it('refuses a supervised spawn before starting node, and names the cause', () => {
+    const adapter: EngineAdapter = {
+      specVersion: 1,
+      id: 'supervised',
+      launch: { command: process.execPath, args: ['-e', '0'], startTimeoutMs: 5_000 },
+      supervise: true,
+      detect: async () => ({ installed: true }),
+    };
+    const absent = join(mkdtempSync(join(tmpdir(), 'runskein-no-supervisor-')), 'supervisor.mjs');
+
+    let thrown: unknown;
+    try {
+      spawnEngine(adapter, { cwd: tmpdir() }, absent);
+    } catch (error) {
+      thrown = error;
+    }
+
+    // A plain Error here on purpose: this module imports nothing of the package
+    // so that the parent-death fixture can load it alone, and the manager is
+    // what types a spawn failure. The message is what has to survive.
+    expect(thrown).toBeInstanceOf(Error);
+    expect((thrown as Error).message).toContain(absent);
+    expect((thrown as Error).message).toContain('supervise');
+    expect((thrown as Error).message).toContain('bundler');
+  });
+
+  it('leaves an unsupervised adapter alone, whatever the watchdog path says', () => {
+    // The check must not cost an adapter that never asked for supervision.
+    const adapter: EngineAdapter = {
+      specVersion: 1,
+      id: 'plain',
+      launch: { command: process.execPath, args: ['-e', 'setTimeout(()=>{},50)'], startTimeoutMs: 5_000 },
+      detect: async () => ({ installed: true }),
+    };
+    const spawned = spawnEngine(adapter, { cwd: tmpdir() }, '/nowhere/supervisor.mjs');
+    expect(spawned.child.pid).toBeGreaterThan(0);
+    spawned.child.kill('SIGKILL');
   });
 });

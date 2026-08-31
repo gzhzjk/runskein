@@ -28,6 +28,7 @@ coreGateSuite(mockAdapter, {
   // Makes env hygiene a REAL assertion: the fixture refuses initialize when
   // it sees the marker, so the case fails if core's scrub ever regresses.
   envHygieneEnv: { MOCK_REFUSE_ENV: 'CLAUDE_GATE_MARKER' },
+  envHygieneScrub: [/^CLAUDE_GATE_MARKER$/],
   cancelEnv: { MOCK_PROMPT_DELAY_MS: '3000' },
   permissionEnv: { MOCK_ASK_PERMISSION: '1' },
   permission: {

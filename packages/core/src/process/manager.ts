@@ -427,7 +427,15 @@ export class ProcessManager {
     handle.generation++;
     const generation = handle.generation;
     const launchCwd = resolve(cwd);
-    const { child, stderrTail, argv0 } = spawnEngine(handle.adapter, { cwd: launchCwd });
+    // `spawnEngine` imports nothing of this package, so it reports a missing
+    // runtime asset as a plain Error; typing it is this layer's job.
+    let spawned;
+    try {
+      spawned = spawnEngine(handle.adapter, { cwd: launchCwd });
+    } catch (cause) {
+      throw new EngineStartError({ engineId: handle.adapter.id, stage: 'spawn', cause });
+    }
+    const { child, stderrTail, argv0 } = spawned;
     handle.child = child;
     handle.stderrTail = stderrTail;
     this.trackOwnership(handle.adapter.id, child, argv0);

@@ -5,6 +5,14 @@ permissions, and a single persistent transcript format — with engines
 integrated as auto-discovered adapters over the Agent Client Protocol
 (which is never exposed to you).
 
+```bash
+npm install runskein
+```
+
+Node.js 22 or newer, ESM only. This installs no engine: runskein drives
+OpenCode, Kimi Code, Claude Code, Codex or pi already on your `PATH`, so
+install at least one and log in first.
+
 ## Quickstart
 
 ```ts
@@ -45,17 +53,25 @@ await session.close();
 await hub.quit();
 ```
 
+The default policy is `allowAll`, so the agent may read and write files under
+the `cwd` you pass. Point a first experiment at a directory you can throw away.
+
 ## Adding an engine
 
 Drop a directory with a `runskein.adapter` marker in `<cwd>/adapters/<id>/` (or
 publish a `runskein-adapter-<id>` package) whose default export follows the
-adapter spec — no core or consumer changes. See `docs/adapter-guide.md` and the
-bundled `adapters/*` packages for reference.
+adapter spec — no core or consumer changes. See the
+[adapter guide](https://github.com/gzhzjk/runskein/blob/main/docs/adapter-guide.md)
+and the bundled `adapters/*` packages for reference.
 
 ## Docs
 
-- `docs/engine-adapter-api.md` — the frozen v1 API surface
-- `docs/capability-matrix.md` — capability tiers and what each engine measured
-- `docs/architecture.md` — how the pieces fit together
-- `docs/adapter-guide.md` — writing an adapter
-- `docs/conformance/matrix.public.json` — measured engine capabilities
+- [README](https://github.com/gzhzjk/runskein#readme) — the three-minute start, and why this exists
+- [API specification](https://github.com/gzhzjk/runskein/blob/main/docs/engine-adapter-api.md) — the frozen v1 surface
+- [Capability matrix](https://github.com/gzhzjk/runskein/blob/main/docs/capability-matrix.md) — capability tiers and what each engine measured
+- [Architecture](https://github.com/gzhzjk/runskein/blob/main/docs/architecture.md) — how the pieces fit together
+- [Adapter guide](https://github.com/gzhzjk/runskein/blob/main/docs/adapter-guide.md) — writing an adapter
+- [Measured matrix](https://github.com/gzhzjk/runskein/blob/main/docs/conformance/matrix.public.json) — the probe output the tables are drawn from
+
+Questions, or an engine behaving differently from the matrix?
+[Open an issue](https://github.com/gzhzjk/runskein/issues).

@@ -26,6 +26,7 @@ import type { EngineAdapter } from '@runskein/core';
 import { SessionTerminals } from '@runskein/core/internal';
 import { builtinAdapters } from 'runskein';
 import { computeUsageRow } from './usageSupport.js';
+import { projectAdapterRecord } from './adapterRecord.js';
 
 // ── Engine launch manifests — the bundled adapters/* packages ─────────
 
@@ -330,10 +331,20 @@ for (const m of targets) {
   // On success, refresh the adapter's committed conformance.json so a fresh
   // run always matches what is checked in; any diff is then deliberate drift
   // that shows up in review rather than silently.
+  //
+  // Projected, never the raw summary: that file is exported to the release
+  // repository, and the summary carries the operator's own machine — the
+  // providers this host is logged into, the agents it has installed, and
+  // whatever a local hook appended to the engine's reply. This is the only
+  // place the file is written, which is why the cut is here and not in
+  // `project-conformance-matrix.mjs --write`: that command refuses a
+  // one-engine matrix, and an adapter author probing only their own engine is
+  // exactly who the adapter guide sends to `pnpm probe <id>`.
   if (r.ok) {
     const adapterDir = resolve(import.meta.dirname, '../../../adapters', m.id);
     mkdirSync(adapterDir, { recursive: true });
-    writeFileSync(join(adapterDir, 'conformance.json'), JSON.stringify(summary, null, 2));
+    const record = projectAdapterRecord(summary);
+    writeFileSync(join(adapterDir, 'conformance.json'), `${JSON.stringify(record, null, 2)}\n`);
     console.error(`━━ wrote ${join(adapterDir, 'conformance.json')}`);
   }
 }

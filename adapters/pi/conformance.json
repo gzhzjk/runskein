@@ -35,32 +35,7 @@
       "name": "Model",
       "category": "model",
       "type": "select",
-      "options": [
-        {
-          "value": "minimax/MiniMax-M2.7",
-          "name": "minimax/MiniMax-M2.7"
-        },
-        {
-          "value": "minimax/MiniMax-M2.7-highspeed",
-          "name": "minimax/MiniMax-M2.7-highspeed"
-        },
-        {
-          "value": "minimax/MiniMax-M3",
-          "name": "minimax/MiniMax-M3"
-        },
-        {
-          "value": "DeepSeek-V4-Flash-0731/DeepSeek-V4-Flash",
-          "name": "DeepSeek-V4-Flash-0731/DeepSeek-V4-Flash"
-        },
-        {
-          "value": "opencode go/deepseek-v4-flash",
-          "name": "opencode go/DeepSeek V4 Flash"
-        },
-        {
-          "value": "opencode go/ox-alpha-free",
-          "name": "opencode go/ox-alpha-free"
-        }
-      ]
+      "optionCount": 6
     }
   ],
   "prompt": {
@@ -71,7 +46,6 @@
     },
     "sawUsage": true,
     "permissionRequests": 0,
-    "replyText": "OK",
     "durationMs": 4635
   },
   "usage": {
